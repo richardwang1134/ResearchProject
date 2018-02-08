@@ -17,4 +17,4 @@ git commit -m '一行解說文字'
 git push
 
 正常下載流程
-git clone 專案網址
+git pull 專案網址
