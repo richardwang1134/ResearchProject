@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+  "name": "Request攔截工具",
+  "description": "目標：攔截並顯示Request內文",
+  "version": "1.0",
+  "browser_action": {
+    "default_icon": "icon.png"
+  },
+  "permissions": [
+    "webRequest",
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": ["test.js"],
+    "persistent": true
+  }
+}
