@@ -10,3 +10,11 @@ git status			查看目前檔案的狀態
 git log				查看目前所有commit的歷史紀錄
 git diff 			比較文件或commit間修改的差異 
 git show log中的代碼		詳細列出該次commit的修改內容
+
+正常上傳流程
+git add .
+git commit -m '一行解說文字'
+git push
+
+正常下載流程
+git clone 專案網址
