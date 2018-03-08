@@ -1,7 +1,8 @@
 
 //----INIT----
-var arr = ["www.google.com","www.gstatic.com","apis.google.com"]
-var obj = {whiteList:arr}
+var blockedDomain = {};
+var arr = ["www.google.com","www.gstatic.com","apis.google.com"];
+var obj = {whiteList:arr};
 chrome.storage.sync.set(obj);
 
 //----REQUEST----
@@ -12,6 +13,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 			if(details.requestHeaders[i].name === "Referer"){
 				var ref = details.requestHeaders[i].value.split("/")[2];
 				var url = details.url.split("/")[2];
+				console.log("url:",url);
 				if(!url.match(ref)){
 					var whiteList = await getWhiteList(url);
 					for(var j =0; j < whiteList.length; j++){
@@ -23,6 +25,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 					}
 					console.log("url:",url);
 					console.log("--------block--------");
+					blockedDomain.push(url);
 					return{cancel:true};
 				}	
 			}
@@ -30,7 +33,8 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 	}
 	//filter
 ,	{	urls: ["<all_urls>"],
-		types: ["script"]
+		//types: ["script"],
+		//types: ["other"]
 	}
 	//optional, extra information specification
 , 	["blocking", 'requestHeaders']
