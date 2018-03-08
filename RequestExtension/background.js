@@ -28,8 +28,9 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 					//console.log("url:",url);
 					console.log("--------block--------");
 					//delete cookies
-					chrome.cookies.getAll({url:urlDomain}, function(cookies){	
-						var names=[],num= cookies.length;
+					var cookies = await GetCookie(urlDomain);
+					var names=[],num= cookies.length;
+					//console.log(cookies);
 					if(num){
 						for (i = 0; i < num; i++)
 							names.push(cookies[i].name);
@@ -41,7 +42,10 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 					else{
 						console.log("empty!");
 					}
-				});
+
+
+
+				
 					//blockedDomain.push(url);
 					return{cancel:true};
 				}	
@@ -65,6 +69,16 @@ function getWhiteList(url){
 				"whiteList",
 				(item)=>{resolve(item.whiteList)}
 			)
+		}
+	);
+}
+//----GET Cookies----
+function GetCookie(url){
+	return new Promise(
+		(resolve)=>{
+			chrome.cookies.getAll({url:url},function(cookies){
+				resolve(cookies)
+			});
 		}
 	);
 }
