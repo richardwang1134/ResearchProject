@@ -13,9 +13,11 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 			if(details.requestHeaders[i].name === "Referer"){
 				var ref = details.requestHeaders[i].value.split("/")[2];
 				var url = details.url.split("/")[2];
-				console.log("url:",url);
+				var urlDomain = details.url;
+
 				if(!url.match(ref)){
 					var whiteList = await getWhiteList(url);
+
 					for(var j =0; j < whiteList.length; j++){
 						if(url === whiteList[j]){
 							console.log("url:",url);
@@ -23,9 +25,24 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 							return{cancel:false};
 						}
 					}
-					console.log("url:",url);
+					//console.log("url:",url);
 					console.log("--------block--------");
-					blockedDomain.push(url);
+					//delete cookies
+					chrome.cookies.getAll({url:urlDomain}, function(cookies){	
+						var names=[],num= cookies.length;
+					if(num){
+						for (i = 0; i < num; i++)
+							names.push(cookies[i].name);
+						for (i=0;i<names.length;i++)
+							chrome.cookies.remove({url:urlDomain,name:names[i]});
+							//console.log(names[i]," has been deleted!");
+						console.log("cookies on ",url,"have been deleted!");
+					}
+					else{
+						console.log("empty!");
+					}
+				});
+					//blockedDomain.push(url);
 					return{cancel:true};
 				}	
 			}
@@ -33,7 +50,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 	}
 	//filter
 ,	{	urls: ["<all_urls>"],
-		//types: ["script"],
+		types: ["script"],
 		//types: ["other"]
 	}
 	//optional, extra information specification
