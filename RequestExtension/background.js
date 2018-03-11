@@ -1,11 +1,16 @@
 
-//----INIT----
+
+//----(TEST DATA)----
 var blockedDomain = {};
-var arr = ["www.google.com","www.gstatic.com","apis.google.com"];
-var obj = {whiteList:arr};
+var WLTest = ["www.google.com","www.gstatic.com","apis.google.com"];
+var Rd1 = ["10:00:01","url1","ref1"];
+var Rd2 = ["10:00:02","url2","ref2"];
+var Rd3 = ["11:10:01","url3","ref3"];
+var RdTest = [Rd1,Rd2,Rd3];
+var obj = {whiteList:WLTest};
 chrome.storage.sync.set(obj);
 
-//----REQUEST----
+//----BLOCK & CHECK REQUEST----
 chrome.webRequest.onBeforeSendHeaders.addListener(
 	//callback
 	async (details)=>{
@@ -15,7 +20,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 				var url = details.url.split("/")[2];
 				console.log("url:",url);
 				if(!url.match(ref)){
-					var whiteList = await getWhiteList(url);
+					var whiteList = await getWhiteList();
 					for(var j =0; j < whiteList.length; j++){
 						if(url === whiteList[j]){
 							console.log("url:",url);
@@ -25,7 +30,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 					}
 					console.log("url:",url);
 					console.log("--------block--------");
-					blockedDomain.push(url);
+					//blockedDomain.push(url);
 					return{cancel:true};
 				}	
 			}
@@ -41,7 +46,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 );
 
 //----GET_WHITELIST----
-function getWhiteList(url){
+function getWhiteList(){
 	return new Promise(
 		(resolve)=>{
 			chrome.storage.sync.get(
@@ -51,4 +56,20 @@ function getWhiteList(url){
 		}
 	);
 }
+//----SET_WHITELIST----
 
+/*----SEND WHITELIST & BLOCK RECORD MSG----*/
+chrome.runtime.onMessage.addListener(
+	(request, sender, sendResponse)=>{
+	  	if (request.get == "wl"){
+			var json_str = JSON.stringify(WLTest);
+			sendResponse({wl: json_str});
+			console.log("SendWL:",WLTest);
+		}
+		else if (request.update){
+			WLTest = JSON.parse(request.update);
+			sendResponse({ack:JSON.stringify("OK")});
+			console.log("UpdateWL:",WLTest);
+		}	
+	}
+);
