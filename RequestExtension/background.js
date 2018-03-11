@@ -16,29 +16,27 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 	async (details)=>{
 		for(var i = 0; i < details.requestHeaders.length; i++){
 			if(details.requestHeaders[i].name === "Referer"){
-				var ref = details.requestHeaders[i].value.split("/")[2];
-				var url = details.url.split("/")[2];
-				console.log("url:",url);
-				if(!url.match(ref)){
+				var refDomain = details.requestHeaders[i].value.split("/")[2];
+				var url = details.url;
+				var urlDomain = url.split("/")[2];
+				if(!urlDomain.match(refDomain)){
 					var whiteList = await getWhiteList();
 					for(var j =0; j < whiteList.length; j++){
-						if(url === whiteList[j]){
-							console.log("url:",url);
-							console.log("--------pass--------");
+						if(urlDomain === whiteList[j]){
+							console.log("    Pass    : ",urlDomain);
 							return{cancel:false};
 						}
 					}
-					console.log("url:",url);
-					console.log("--------block--------");
-					//blockedDomain.push(url);
-					return{cancel:true};
+					var result = await delCookie(url);
+					console.log(result);
+					return{cancel:false};
 				}	
 			}
 		}
 	}
 	//filter
 ,	{	urls: ["<all_urls>"],
-		//types: ["script"],
+		types: ["script"],
 		//types: ["other"]
 	}
 	//optional, extra information specification
@@ -56,7 +54,31 @@ function getWhiteList(){
 		}
 	);
 }
-//----SET_WHITELIST----
+//----Delete Cookie----
+function delCookie(url){
+	return new Promise(
+		(resolve,reject)=>{
+			var urlDomain = url.split("/")[2];
+			try{
+				chrome.cookies.getAll({url:url},function(cookie){
+					var names = [],
+						num = cookie.length;
+					if(num > 0){
+						for (var i = 0; i < num; i++)
+							names.push(cookie[i].name);
+						for (var i = 0, num = names.length; i < num; i++)
+							chrome.cookies.remove({url:url,name:names[i]});
+						resolve("Del cookie : "+urlDomain);
+					}else{
+						resolve(" No coockie : "+urlDomain);
+					}
+				});
+			}catch(e){
+				reject("Delete cookie failed: "+urlDomain);
+			}
+		}
+	);
+}
 
 /*----SEND WHITELIST & BLOCK RECORD MSG----*/
 chrome.runtime.onMessage.addListener(
