@@ -1,5 +1,4 @@
 
-
 //----(TEST DATA)----
 var blockedDomain = {};
 var WLTest = ["www.google.com","www.gstatic.com","apis.google.com"];
@@ -54,7 +53,8 @@ function getWhiteList(){
 		}
 	);
 }
-//----Delete Cookie----
+
+//----DELETE COOKIE----
 function delCookie(url){
 	return new Promise(
 		(resolve,reject)=>{
@@ -80,7 +80,7 @@ function delCookie(url){
 	);
 }
 
-/*----SEND WHITELIST & BLOCK RECORD MSG----*/
+/*----SEND MSG OF [WHITELIST & BLOCK RECORD]----*/
 chrome.runtime.onMessage.addListener(
 	(request, sender, sendResponse)=>{
 	  	if (request.get == "wl"){
