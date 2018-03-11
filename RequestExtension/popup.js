@@ -6,7 +6,7 @@ var P2 = document.querySelector("#P2");
 B1.onclick = ()=>{tabButtonClicked(B1,B2,P1,P2)}
 B2.onclick = ()=>{tabButtonClicked(B2,B1,P2,P1)}
 
-function tabButtonClicked(Ba,Bb,Pa,Pb){
+function tabButtonClicked(Ba,Bb,Pa,Pb){//切換白名單和阻擋紀錄頁面
 
     //tab和page外觀切換
     if(Ba.className=="tab-button-off"){
@@ -31,7 +31,7 @@ function tabButtonClicked(Ba,Bb,Pa,Pb){
     }
 }
 
-function refreshWL(){
+function refreshWL(){//根據WL刷新頁面
     //移除舊表格
     var table = document.querySelector("#T2");
     while(table.firstChild){
@@ -45,6 +45,7 @@ function refreshWL(){
     var add = document.createElement("th");
     var input = document.createElement("input");
         input.id = "input";
+        input.onkeypress =()=>{if(event.keyCode == 13) add2WL(input.value);};
     var add = document.createElement("th");
         add.id = "add";
         add.innerHTML= "＋";
@@ -59,12 +60,12 @@ function refreshWL(){
     }
 }
 
-function add2WL(url){
+function add2WL(url){//新增新的url到白名單、更新白名單、刷新頁面
     wl.push(escapeHtml(url));
     updateWL();
 }
 
-function addWLRows(url){
+function addWLRows(url){//依照url在頁面上新增一頁
     var table = document.querySelector("#T2");
     var tr = document.createElement("tr");
     var th = document.createElement("th");
@@ -91,7 +92,7 @@ function delWLRow(url){
     updateWL();
 }
 
-function updateWL(){
+function updateWL(){//更新白名單並刷新頁面
     var json_str = JSON.stringify(wl);
     chrome.runtime.sendMessage(
         {update: json_str },
