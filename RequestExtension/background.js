@@ -1,39 +1,38 @@
-
 //----INIT----
-var blockedDomain = {};
-var arr = ["www.google.com","www.gstatic.com","apis.google.com"];
-var obj = {whiteList:arr};
-chrome.storage.sync.set(obj);
+var WL = [];
+var BR = [];
 
-//----REQUEST----
+//----BLOCK & CHECK REQUEST----
 chrome.webRequest.onBeforeSendHeaders.addListener(
 	//callback
 	async (details)=>{
 		for(var i = 0; i < details.requestHeaders.length; i++){
 			if(details.requestHeaders[i].name === "Referer"){
-				var ref = details.requestHeaders[i].value.split("/")[2];
-				var url = details.url.split("/")[2];
-				console.log("url:",url);
-				if(!url.match(ref)){
-					var whiteList = await getWhiteList(url);
-					for(var j =0; j < whiteList.length; j++){
-						if(url === whiteList[j]){
-							console.log("url:",url);
-							console.log("--------pass--------");
-							return{cancel:false};
+				var refDomain = details.requestHeaders[i].value.split("/")[2];
+				var url = details.url;
+				var urlDomain = url.split("/")[2];
+				if(!urlDomain.match(refDomain)){
+					var whiteList = await getWhiteList();
+					if(whiteList){
+						for(var j =0; j < whiteList.length; j++){
+							if(urlDomain === whiteList[j]){
+								console.log("    Pass    : ",urlDomain);
+								return{cancel:false};
+							}
 						}
 					}
-					console.log("url:",url);
-					console.log("--------block--------");
-					blockedDomain.push(url);
-					return{cancel:true};
+					var result = await delCookie(url);
+					if(result[0]=="D"&&result[3]==" ")
+						BR.push([getTime(),urlDomain,refDomain]);
+					console.log(result);
+					return{cancel:false};
 				}	
 			}
 		}
 	}
 	//filter
 ,	{	urls: ["<all_urls>"],
-		//types: ["script"],
+		types: ["script"],
 		//types: ["other"]
 	}
 	//optional, extra information specification
@@ -41,14 +40,73 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 );
 
 //----GET_WHITELIST----
-function getWhiteList(url){
+function getWhiteList(){
 	return new Promise(
 		(resolve)=>{
 			chrome.storage.sync.get(
 				"whiteList",
-				(item)=>{resolve(item.whiteList)}
+				(item)=>{resolve(item.WL)}
 			)
 		}
 	);
 }
 
+//----DELETE COOKIE----
+function delCookie(url){
+	return new Promise(
+		(resolve,reject)=>{
+			var urlDomain = url.split("/")[2];
+			try{
+				chrome.cookies.getAll({url:url},function(cookie){
+					var names = [],
+						num = cookie.length;
+					if(num > 0){
+						for (var i = 0; i < num; i++)
+							names.push(cookie[i].name);
+						for (var i = 0, num = names.length; i < num; i++)
+							chrome.cookies.remove({url:url,name:names[i]});
+						resolve("Del cookie : "+urlDomain);
+					}else{
+						resolve(" No coockie : "+urlDomain);
+					}
+				});
+			}catch(e){
+				reject("Delete cookie failed: "+urlDomain);
+			}
+		}
+	);
+}
+
+function getTime(){
+	var d = new(Date);
+	var h = d.getHours();
+	var m = d.getMinutes();
+	var s = d.getSeconds();
+	if(h < 10) h = "0" + h;
+	if(m < 10) m = "0" + m;
+	if(s < 10) s = "0" + s;
+	return(h + ":" + m + ":" + s);
+}
+
+/*----SEND MSG OF [WHITELIST & BLOCK RECORD]----*/
+chrome.runtime.onMessage.addListener(
+	(request, sender, sendResponse)=>{
+	  	if (request.get == "wl"){
+			var json_str = JSON.stringify(WL);
+			sendResponse({wl: json_str});
+			console.log("SendWL:",WL);
+		}else if(request.get == "br"){
+			var json_strs = [];
+			for(var i = 0; i < BR.length; i++)
+				json_strs.push(JSON.stringify(BR[i]));
+			var json_str = JSON.stringify(json_strs);
+			sendResponse({br: json_str});
+			console.log("SendBR:",BR);
+		}else if (request.update){
+			WL = JSON.parse(request.update);
+			sendResponse({ack:JSON.stringify("OK")});
+			chrome.storage.sync.set({WL:WL})
+			console.log("UpdateWL:",WL);
+		}	
+	}
+);

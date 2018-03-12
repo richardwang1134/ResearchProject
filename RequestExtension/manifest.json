@@ -12,6 +12,7 @@
     ,   "<all_urls>"
     ,   "tabs"
     ,   "storage"
+    ,   "cookies"
     ]
 ,  "background"         : 
     {   "scripts"           : ["background.js"]
