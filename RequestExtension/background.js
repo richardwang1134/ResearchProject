@@ -12,20 +12,29 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 				var url = details.url;
 				var urlDomain = url.split("/")[2];
 				if(!urlDomain.match(refDomain)){
-					var whiteList = await getWhiteList();
-					if(whiteList){
-						for(var j =0; j < whiteList.length; j++){
-							if(urlDomain === whiteList[j]){
+					if(WL){
+						for(var j =0; j < WL.length; j++){
+							if(urlDomain == WL[j]){
 								console.log("    Pass    : ",urlDomain);
 								return{cancel:false};
 							}
 						}
 					}
 					var result = await delCookie(url);
-					if(result[0]=="D"&&result[3]==" ")
-						BR.push([getTime(),urlDomain,refDomain]);
+					if(result[0]=="D" && result[3]==" "){
+						for(var i = 0; i < BR.length; i++){
+							if(urlDomain == BR[i][1]){
+								BR[i][0]=getTime();
+								console.log(result);
+								return{cancel:false};
+							}
+						}
+						if(i >= BR.length)
+							BR.push([getTime(),urlDomain,refDomain]);
+					}
 					console.log(result);
 					return{cancel:false};
+
 				}	
 			}
 		}
@@ -105,7 +114,7 @@ chrome.runtime.onMessage.addListener(
 		}else if (request.update){
 			WL = JSON.parse(request.update);
 			sendResponse({ack:JSON.stringify("OK")});
-			chrome.storage.sync.set({WL:WL})
+			chrome.storage.sync.set({WL:WL});
 			console.log("UpdateWL:",WL);
 		}	
 	}
