@@ -1,10 +1,20 @@
 var wl = [];
-var B1 = document.querySelector("#B1");
-var B2 = document.querySelector("#B2");
-var P1 = document.querySelector("#P1");
-var P2 = document.querySelector("#P2");
-B1.onclick = ()=>{tabButtonClicked(B1,B2,P1,P2)}
-B2.onclick = ()=>{tabButtonClicked(B2,B1,P2,P1)}
+var br = [];
+
+document.addEventListener(
+    "DOMContentLoaded",
+    ()=>{
+        var B1 = document.querySelector("#B1");
+        var B2 = document.querySelector("#B2");
+        var P1 = document.querySelector("#P1");
+        var P2 = document.querySelector("#P2");
+        B1.onclick = ()=>{tabButtonClicked(B1,B2,P1,P2)}
+        B2.onclick = ()=>{tabButtonClicked(B2,B1,P2,P1)}
+        tabButtonClicked(B1,B2,P1,P2);
+    }
+)
+
+
 
 function tabButtonClicked(Ba,Bb,Pa,Pb){//切換白名單和阻擋紀錄頁面
 
@@ -17,7 +27,16 @@ function tabButtonClicked(Ba,Bb,Pa,Pb){//切換白名單和阻擋紀錄頁面
     }
     //如果是P1 取得阻擋紀錄
     if(Ba.id == "B1"){
-        ;
+        chrome.runtime.sendMessage(
+            {get:"br"},
+            (response)=>{
+                br = JSON.parse(response.br);
+                for(var i =0; i < br.length; i++){
+                    br[i] = JSON.parse(br[i]);
+                }
+                refreshBR();
+            }
+        );
     }
     //如果是B2 取得白名單
     else if(Ba.id=="B2"){
@@ -29,6 +48,55 @@ function tabButtonClicked(Ba,Bb,Pa,Pb){//切換白名單和阻擋紀錄頁面
             }
         );
     }
+}
+
+function refreshBR(){//根據阻擋紀錄刷新頁面
+    var table = document.querySelector("#T1");
+        while(table.firstChild){
+        table.removeChild(table.lastChild);
+    }
+    var tr = document.createElement("tr");
+    var time = document.createElement("th");
+        time.innerHTML = "Time";
+        time.id = "BRHeaderTime";
+    var url = document.createElement("th");
+        url .innerHTML = "URL";
+        url.id = "BRHeader";
+    var ref = document.createElement("th");
+        ref.innerHTML = "Referrer";
+        ref.id = "BRHeader";
+    table.appendChild(tr);
+    tr.appendChild(time);
+    tr.appendChild(url);
+    tr.appendChild(ref);
+    var num = br.length;
+    if(num >= 15){
+        for(var i = num-15; i < num; i++)
+            addBRRows(br[i]);
+    }else{
+        for(var i = 0; i < num; i++)
+            addBRRows(br[i]);
+    }
+}
+
+function addBRRows(arr){//依照arr內容在頁面上新增一頁
+    var table = document.querySelector("#T1");
+    var tr = document.createElement("tr");
+    var time = document.createElement("th");
+        time.innerHTML = arr[0];
+        time.className = "BRItem";
+    var url = document.createElement("th");
+        url.innerHTML = arr[1];
+        url.className = "BRItem";
+        url.id = "BRUrl";
+        url.onclick = ()=>{add2WL(url.innerHTML)};
+    var ref = document.createElement("th");
+        ref.innerHTML = arr[2];
+        ref.className = "BRItem";
+    table.appendChild(tr);
+    tr.appendChild(time);
+    tr.appendChild(url);
+    tr.appendChild(ref);
 }
 
 function refreshWL(){//根據WL刷新頁面
@@ -61,23 +129,32 @@ function refreshWL(){//根據WL刷新頁面
 }
 
 function add2WL(url){//新增新的url到白名單、更新白名單、刷新頁面
-    wl.push(escapeHtml(url));
-    updateWL();
+    chrome.runtime.sendMessage(
+        {get:"wl"},
+        (response)=>{
+            wl = JSON.parse(response.wl);
+            console.log("wl:",wl);
+            if(wl.indexOf(url)==-1){
+                wl.push(escapeHtml(url));
+                updateWL();
+            }
+        }
+    );
 }
 
 function addWLRows(url){//依照url在頁面上新增一頁
     var table = document.querySelector("#T2");
     var tr = document.createElement("tr");
     var th = document.createElement("th");
+        th.innerHTML = url;
+        th.id = "WLURL";
     var del = document.createElement("th");
-    th.innerHTML = url;
-    th.id = "WLURL";
+        del.id = "WLDel";
+        del.onmouseover =()=>{del.innerHTML = "—";};
+        del.onmouseout =()=>{del.innerHTML = "";};
+        del.onclick =()=>{delWLRow(url)};
     table.appendChild(tr);
     tr.appendChild(th)
-    del.id = "WLDel";
-    del.onmouseover =()=>{del.innerHTML = "—";};
-    del.onmouseout =()=>{del.innerHTML = "";};
-    del.onclick =()=>{delWLRow(url)};
     tr.appendChild(del);
 }
 
@@ -100,6 +177,8 @@ function updateWL(){//更新白名單並刷新頁面
             var ack = JSON.parse(response.ack);
             if(ack == "OK"){
                 refreshWL();
+            }else{
+                console("WL update failed");
             }
         }
     );

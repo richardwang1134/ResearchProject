@@ -1,13 +1,6 @@
-
-//----(TEST DATA)----
-var blockedDomain = {};
-var WLTest = ["www.google.com","www.gstatic.com","apis.google.com"];
-var Rd1 = ["10:00:01","url1","ref1"];
-var Rd2 = ["10:00:02","url2","ref2"];
-var Rd3 = ["11:10:01","url3","ref3"];
-var RdTest = [Rd1,Rd2,Rd3];
-var obj = {whiteList:WLTest};
-chrome.storage.sync.set(obj);
+//----INIT----
+var WL = [];
+var BR = [];
 
 //----BLOCK & CHECK REQUEST----
 chrome.webRequest.onBeforeSendHeaders.addListener(
@@ -19,16 +12,29 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 				var url = details.url;
 				var urlDomain = url.split("/")[2];
 				if(!urlDomain.match(refDomain)){
-					var whiteList = await getWhiteList();
-					for(var j =0; j < whiteList.length; j++){
-						if(urlDomain === whiteList[j]){
-							console.log("    Pass    : ",urlDomain);
-							return{cancel:false};
+					if(WL){
+						for(var j =0; j < WL.length; j++){
+							if(urlDomain == WL[j]){
+								console.log("    Pass    : ",urlDomain);
+								return{cancel:false};
+							}
 						}
 					}
 					var result = await delCookie(url);
+					if(result[0]=="D" && result[3]==" "){
+						for(var i = 0; i < BR.length; i++){
+							if(urlDomain == BR[i][1]){
+								BR[i][0]=getTime();
+								console.log(result);
+								return{cancel:false};
+							}
+						}
+						if(i >= BR.length)
+							BR.push([getTime(),urlDomain,refDomain]);
+					}
 					console.log(result);
 					return{cancel:false};
+
 				}	
 			}
 		}
@@ -48,7 +54,7 @@ function getWhiteList(){
 		(resolve)=>{
 			chrome.storage.sync.get(
 				"whiteList",
-				(item)=>{resolve(item.whiteList)}
+				(item)=>{resolve(item.WL)}
 			)
 		}
 	);
@@ -80,18 +86,36 @@ function delCookie(url){
 	);
 }
 
+function getTime(){
+	var d = new(Date);
+	var h = d.getHours();
+	var m = d.getMinutes();
+	var s = d.getSeconds();
+	if(h < 10) h = "0" + h;
+	if(m < 10) m = "0" + m;
+	if(s < 10) s = "0" + s;
+	return(h + ":" + m + ":" + s);
+}
+
 /*----SEND MSG OF [WHITELIST & BLOCK RECORD]----*/
 chrome.runtime.onMessage.addListener(
 	(request, sender, sendResponse)=>{
 	  	if (request.get == "wl"){
-			var json_str = JSON.stringify(WLTest);
+			var json_str = JSON.stringify(WL);
 			sendResponse({wl: json_str});
-			console.log("SendWL:",WLTest);
-		}
-		else if (request.update){
-			WLTest = JSON.parse(request.update);
+			console.log("SendWL:",WL);
+		}else if(request.get == "br"){
+			var json_strs = [];
+			for(var i = 0; i < BR.length; i++)
+				json_strs.push(JSON.stringify(BR[i]));
+			var json_str = JSON.stringify(json_strs);
+			sendResponse({br: json_str});
+			console.log("SendBR:",BR);
+		}else if (request.update){
+			WL = JSON.parse(request.update);
 			sendResponse({ack:JSON.stringify("OK")});
-			console.log("UpdateWL:",WLTest);
+			chrome.storage.sync.set({WL:WL});
+			console.log("UpdateWL:",WL);
 		}	
 	}
 );
