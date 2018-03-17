@@ -89,10 +89,10 @@ function addBRRows(arr){//依照arr內容在頁面上新增一頁
         url.innerHTML = arr[1];
         url.className = "BRItem";
         url.id = "BRUrl";
-        url.onclick = ()=>{add2WL(url.innerHTML)};
     var ref = document.createElement("th");
         ref.innerHTML = arr[2];
         ref.className = "BRItem";
+        ref.onclick = ()=>{add2WL(ref.innerHTML)};
     table.appendChild(tr);
     tr.appendChild(time);
     tr.appendChild(url);

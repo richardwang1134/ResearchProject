@@ -5,48 +5,46 @@ var BR = [];
 //----BLOCK & CHECK REQUEST----
 chrome.webRequest.onBeforeSendHeaders.addListener(
 	//callback
-	async (details)=>{
-		for(var i = 0; i < details.requestHeaders.length; i++){
+	(details)=>{
+		for(var i = 0; i < details.requestHeaders.length; i++){//取得ref
 			if(details.requestHeaders[i].name === "Referer"){
-				var refDomain = details.requestHeaders[i].value.split("/")[2];
+				var ref = details.requestHeaders[i].value;
 				var url = details.url;
 				var urlDomain = url.split("/")[2];
-				if(!urlDomain.match(refDomain)){
-					if(WL){
-						for(var j =0; j < WL.length; j++){
-							if(urlDomain == WL[j]){
-								console.log("    Pass    : ",urlDomain);
-								return{cancel:false};
-							}
-						}
+				var refDomain = ref.split("/")[2];
+				if(urlDomain.match(refDomain)){
+					console.log("Same : ",refDomain,urlDomain);
+					return {cancel:false};
+				}
+				for(var j =0; j < WL.length; j++)
+					if(refDomain == WL[j]){
+						console.log("wl  : ",refDomain,urlDomain);
+						return {cancel:false};
 					}
-					var result = await delCookie(url);
-					if(result[0]=="D" && result[3]==" "){
-						for(var i = 0; i < BR.length; i++){
-							if(urlDomain == BR[i][1]){
-								BR[i][0]=getTime();
-								console.log(result);
-								return{cancel:false};
-							}
-						}
-						if(i >= BR.length)
-							BR.push([getTime(),urlDomain,refDomain]);
-					}
-					console.log(result);
-					return{cancel:false};
-
-				}	
+				add2BR(refDomain,urlDomain);
+				console.log("block: ",refDomain,urlDomain);
+				return {cancel:true};
 			}
 		}
 	}
 	//filter
 ,	{	urls: ["<all_urls>"],
-		types: ["script"],
-		//types: ["other"]
+		types: ["script"]
 	}
 	//optional, extra information specification
 , 	["blocking", 'requestHeaders']
 );
+
+function add2BR(refDomain,urlDomain){
+	for(var i = 0; i < BR.length; i++){
+		if(refDomain == BR[i][2]){
+			BR[i][0]=getTime();
+			return{cancel:false};
+		}
+	}
+	if(i >= BR.length)
+		BR.push([getTime(),urlDomain,refDomain]);
+}
 
 //----GET_WHITELIST----
 function getWhiteList(){
@@ -76,7 +74,7 @@ function delCookie(url){
 							chrome.cookies.remove({url:url,name:names[i]});
 						resolve("Del cookie : "+urlDomain);
 					}else{
-						resolve(" No coockie : "+urlDomain);
+						resolve(" No cookie  : "+urlDomain);
 					}
 				});
 			}catch(e){
@@ -84,6 +82,20 @@ function delCookie(url){
 			}
 		}
 	);
+}
+
+function getCookie(url){
+	return new Promise(
+		(resolve)=>{
+			chrome.cookies.getAll(
+				{url:url},
+				(cookie)=>{
+					if(cookie) resolve(cookie);
+					else resolve("No Cookie");
+				}
+			)
+		}
+	)
 }
 
 function getTime(){
