@@ -1,6 +1,10 @@
 //----INIT----
-var WL = [];
-var BR = [];
+var WL = []; //White List	[ref]
+var BR = []; //Block Record	[time,url,ref]
+//const deleted = new Queue();
+//const deleting = new Queue();
+
+
 
 //----BLOCK & CHECK REQUEST----
 chrome.webRequest.onBeforeSendHeaders.addListener(
@@ -13,16 +17,25 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 				var urlDomain = url.split("/")[2];
 				var refDomain = ref.split("/")[2];
 				if(urlDomain.match(refDomain)){
-					console.log("Same : ",refDomain,urlDomain);
+					console.log("  Same   : ",refDomain,urlDomain);
 					return {cancel:false};
 				}
+				/*var k = deleted.indexOf([urlDomain,refDomain]);
+				if(k!=-1){
+					console.log("NC  : ",refDomain,urlDomain);
+					deleted.remove(k);
+					return {cancel:false};
+				}*/
 				for(var j =0; j < WL.length; j++)
-					if(refDomain == WL[j]){
-						console.log("wl  : ",refDomain,urlDomain);
+					if(urlDomain == WL[j]){
+						console.log("WhiteList: ",refDomain,urlDomain);
 						return {cancel:false};
 					}
 				add2BR(refDomain,urlDomain);
-				console.log("block: ",refDomain,urlDomain);
+				//deleting.enqueue([urlDomain,refDomain]);
+				procBlocked(url);
+				//deleting.print();
+				console.log("  Block  : ",refDomain,urlDomain);
 				return {cancel:true};
 			}
 		}
@@ -34,6 +47,26 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 	//optional, extra information specification
 , 	["blocking", 'requestHeaders']
 );
+
+async function procBlocked(urlComplete){
+	//var url,ref,urlPattern;
+	await delCookie(urlComplete);
+
+	/*while(!deleting.isEmpty()){
+		[url,ref] = deleting.dequeue();
+		await delCookie(urlComplete);
+		console.log("deleted: ",urlComplete);
+		deleted.enqueue([url,ref]);
+		urlPattern = "*://"+url+"/*";
+		chrome.tabs.query(
+			{"url":urlPattern},
+			(tabs)=>{
+				//chrome.tabs.reload(tabs.id);
+			}
+		);
+		
+	}*/
+}
 
 function add2BR(refDomain,urlDomain){
 	for(var i = 0; i < BR.length; i++){
@@ -131,3 +164,46 @@ chrome.runtime.onMessage.addListener(
 		}	
 	}
 );
+
+function Queue() {
+	let items = [];
+	this.remove=function(i){
+		var l = items.length;
+		if(i >= 0 && i < l){
+			items[i] = items[l-1];
+			items.pop();
+		}
+	}
+	this.enqueue = function(element) {
+		items.push(element);
+	};
+	this.dequeue = function() {
+		return items.shift();
+	};
+	this.front = function() {
+		return items[0];
+	};
+	this.isEmpty = function() {
+		return items.length === 0;
+	};
+	this.clear = function() {
+		items = [];
+	};
+	this.size = function() {
+		return items.length;
+	};
+	this.print = function() {
+		console.log(items);
+	};
+	this.toArray = function(){
+		return items;
+	}
+	this.indexOf = function(obj){
+		for(var i = 0; i < items.length; i++){
+			if(obj == items[i]){
+				return i;
+			}
+		}
+		return -1;
+	}
+}
