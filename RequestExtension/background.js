@@ -1,9 +1,6 @@
 //----INIT----
 var WL = []; //White List	[ref]
 var BR = []; //Block Record	[time,url,ref]
-//const deleted = new Queue();
-//const deleting = new Queue();
-
 
 
 //----BLOCK & CHECK REQUEST----
@@ -20,21 +17,13 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 					console.log("  Same   : ",refDomain,urlDomain);
 					return {cancel:false};
 				}
-				/*var k = deleted.indexOf([urlDomain,refDomain]);
-				if(k!=-1){
-					console.log("NC  : ",refDomain,urlDomain);
-					deleted.remove(k);
-					return {cancel:false};
-				}*/
 				for(var j =0; j < WL.length; j++)
 					if(urlDomain == WL[j]){
 						console.log("WhiteList: ",refDomain,urlDomain);
 						return {cancel:false};
 					}
 				add2BR(refDomain,urlDomain);
-				//deleting.enqueue([urlDomain,refDomain]);
-				procBlocked(url);
-				//deleting.print();
+				procBlocked(url,ref);
 				console.log("  Block  : ",refDomain,urlDomain);
 				return {cancel:true};
 			}
@@ -48,24 +37,16 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 , 	["blocking", 'requestHeaders']
 );
 
-async function procBlocked(urlComplete){
-	//var url,ref,urlPattern;
-	await delCookie(urlComplete);
-
-	/*while(!deleting.isEmpty()){
-		[url,ref] = deleting.dequeue();
-		await delCookie(urlComplete);
-		console.log("deleted: ",urlComplete);
-		deleted.enqueue([url,ref]);
-		urlPattern = "*://"+url+"/*";
-		chrome.tabs.query(
-			{"url":urlPattern},
-			(tabs)=>{
-				//chrome.tabs.reload(tabs.id);
-			}
-		);
-		
-	}*/
+async function procBlocked(url,ref){
+	var result = await delCookie(ref);
+	console.log(result);
+	$.get(
+		url,
+		(data)=>{
+			console.log("get content(type: string) of");
+			console.log(url);
+		}
+	);
 }
 
 function add2BR(refDomain,urlDomain){
@@ -115,6 +96,11 @@ function delCookie(url){
 			}
 		}
 	);
+}
+
+async function printCoockie(url){
+	var c = await getCookie(url);
+	console.log("cccc",c);
 }
 
 function getCookie(url){

@@ -15,7 +15,9 @@
     ,   "cookies"
     ]
 ,  "background"         : 
-    {   "scripts"           : ["background.js"]
+    {   "scripts"           :   [   "jquery.min.js",
+                                    "background.js"
+                                ]
     ,   "persistent"        : true
     }
 }
