@@ -1,29 +1,48 @@
 var wl = [];
 var br = [];
+var cs = [];
+var cr = [];
+var URL ="";
+var urlcs = [];
 
 document.addEventListener(
     "DOMContentLoaded",
     ()=>{
         var B1 = document.querySelector("#B1");
         var B2 = document.querySelector("#B2");
+        var B3 = document.querySelector("#B3");
+        var B4 = document.querySelector("#B4");
+
         var P1 = document.querySelector("#P1");
         var P2 = document.querySelector("#P2");
-        B1.onclick = ()=>{tabButtonClicked(B1,B2,P1,P2)}
-        B2.onclick = ()=>{tabButtonClicked(B2,B1,P2,P1)}
-        tabButtonClicked(B1,B2,P1,P2);
+        var P3 = document.querySelector("#P3");
+        var P4 = document.querySelector("#P4");
+
+        B1.onclick = ()=>{tabButtonClicked(B1,B2,B3,B4,P1,P2,P3,P4)}
+        B2.onclick = ()=>{tabButtonClicked(B2,B1,B3,B4,P2,P1,P3,P4)}
+        B3.onclick = ()=>{tabButtonClicked(B3,B1,B2,B4,P3,P1,P2,P4)}
+        B4.onclick = ()=>{tabButtonClicked(B4,B1,B2,B3,P4,P1,P2,P3)}
+
+        tabButtonClicked(B1,B2,B3,B4,P1,P2,P3,P4);
     }
 )
 
 
 
-function tabButtonClicked(Ba,Bb,Pa,Pb){//切換白名單和阻擋紀錄頁面
+function tabButtonClicked(Ba,Bb,Bc,Bd,Pa,Pb,Pc,Pd){//切換頁面
 
     //tab和page外觀切換
     if(Ba.className=="tab-button-off"){
+
         Ba.className="tab-button-on";
         Bb.className="tab-button-off";
+        Bc.className="tab-button-off";
+        Bd.className="tab-button-off";
+
         Pa.style.display = "block";
         Pb.style.display = "none";
+        Pc.style.display = "none";
+        Pd.style.display = "none";
     }
     //如果是P1 取得阻擋紀錄
     if(Ba.id == "B1"){
@@ -45,6 +64,32 @@ function tabButtonClicked(Ba,Bb,Pa,Pb){//切換白名單和阻擋紀錄頁面
             (response)=>{
                 wl = JSON.parse(response.wl);
                 refreshWL();
+            }
+        );
+    }
+    //如果是B3 取得當前網頁Cookie狀態
+    else if(Ba.id=="B3"){
+        chrome.runtime.sendMessage(
+            {get:"cs"},
+            (response)=>{
+                cs = JSON.parse(response.cs);
+                refreshCS();
+            }
+        );
+        chrome.runtime.sendMessage(
+            {get:"url"},
+            (response)=>{
+                URL = JSON.parse(response.url);
+            }
+        );
+    }
+    //如果是B4 取得網頁Cookie設定紀錄
+    else if(Ba.id=="B4"){
+        chrome.runtime.sendMessage(
+            {get:"cr"},
+            (response)=>{
+                cr = JSON.parse(response.cr);
+                refreshCR();
             }
         );
     }
@@ -172,7 +217,7 @@ function delWLRow(url){
 function updateWL(){//更新白名單並刷新頁面
     var json_str = JSON.stringify(wl);
     chrome.runtime.sendMessage(
-        {update: json_str },
+        {WLupdate: json_str },
         (response)=>{
             var ack = JSON.parse(response.ack);
             if(ack == "OK"){
@@ -193,4 +238,221 @@ function escapeHtml(text) {
         "'": '&#039;'
     };
     return text.replace(/[|&|<|>|"|']/g,(m)=>{ return map[m]; });
+}
+
+function refreshCS(){
+    //移除舊表格
+    var table = document.querySelector("#T3");
+        while(table.firstChild){
+        table.removeChild(table.lastChild);
+    }
+    //新增表格
+    var tr = document.createElement("tr");
+
+    var add = document.createElement("th");
+    add.innerHTML= "＋";
+    add.id = "add";
+    add.onclick=()=>{Add2CR(URL)};
+    var name = document.createElement("th");
+    name.innerHTML = "Name";
+    name.id = "CSHeader";
+    var samesite = document.createElement("th");
+    samesite.innerHTML = "SameSite";
+    samesite.id = "CSHeader";
+
+    table.appendChild(tr);
+    tr.appendChild(name);
+    tr.appendChild(samesite);
+    tr.appendChild(add);
+
+    for(var i = 0 ; i < cs.length ; i++){
+        addCSRows(cs[i]);
+    }
+}
+function addCSRows(cookie){//依照cookie內容在頁面上新增一頁
+    var table = document.querySelector("#T3");
+    var tr = document.createElement("tr");
+    var name = document.createElement("th");
+        name.innerHTML = cookie.name;
+        name.className = "CSItem";
+    var samesite = document.createElement("th");
+        samesite.innerHTML = cookie.sameSite;
+        samesite.className = "CSItem";
+    var ChangeButton = document.createElement("th");
+        ChangeButton.innerHTML = "CM";
+        ChangeButton.className = "CSButton";
+        ChangeButton.onclick =()=>{ChangeCS(cs,cookie.name);updateCS();};
+
+    table.appendChild(tr);
+    tr.appendChild(name);
+    tr.appendChild(samesite);
+    tr.appendChild(ChangeButton);
+}
+
+function ChangeCS(CookieArray,CookieName){
+    for(var i = 0 ; i < CookieArray.length ; i++){
+        if(CookieName == CookieArray[i].name){
+            if(CookieArray[i].sameSite == "strict"){CookieArray[i].sameSite = "no_restriction" ;}
+            else{CookieArray[i].sameSite = "strict";}
+        }
+    }
+}
+function updateCS(){
+    var json_str = JSON.stringify(cs);
+    chrome.runtime.sendMessage(
+        {CSupdate: json_str },
+        (response)=>{
+            var ack = JSON.parse(response.ack);
+            if(ack == "OK"){
+                refreshCS();
+            }else{
+                console("CS update failed");
+            }
+        }
+    );   
+}
+
+function Add2CR(url){
+    chrome.runtime.sendMessage(
+        {get:"AddCR"},
+        (response)=>{
+            cr = JSON.parse(response.cr);
+            console.log("cr:",cr);
+            if(cr.indexOf(url)==-1){
+                cr.push(escapeHtml(url));
+                updateCR();
+            }
+        }
+    ); 
+}
+function updateCR(){
+	var json_str = JSON.stringify(cr);
+    chrome.runtime.sendMessage(
+        {CRupdate: json_str },
+        (response)=>{
+            var ack = JSON.parse(response.ack);
+            if(ack == "OK"){
+                refreshCR();
+            }else{
+                console("CR update failed");
+            }
+        }
+    );   
+}
+function refreshCR(){
+    //移除舊表格
+    var table = document.querySelector("#T4");
+    while(table.firstChild){
+        table.removeChild(table.lastChild);
+    }
+    //生成新表格的標題列
+    var tr = document.createElement("tr");
+    var th = document.createElement("th");
+        th.innerHTML = "Domain Name";
+        th.id = "CRHeader";
+    var del = document.createElement("th");
+        del.id = "CRHeader";
+        del.innerHTML = "Delete";
+    table.appendChild(tr);
+    tr.appendChild(th);
+    tr.appendChild(del);
+    //生成新表格的內容
+    for(var i = 0; i < cr.length; i++){
+        addCRRows(cr[i]);
+    }
+}
+function addCRRows(url){
+    var table = document.querySelector("#T4");
+    var tr = document.createElement("tr");
+    var th = document.createElement("th");
+        th.innerHTML = url;
+        th.id = "CRURL";
+        th.onclick=async function(){
+            urlcs = await GetCS(url);
+            showCS(url);
+        };
+    var del = document.createElement("th");
+        del.innerHTML = "X";
+        del.id = "CRDEL";
+        del.onclick =()=>{delCRRow(url)};
+
+    table.appendChild(tr);
+    tr.appendChild(th);
+    tr.appendChild(del);
+}
+function delCRRow(url){
+    for(var i =0; i < cr.length-1; i++){
+        if(cr[i] == url){
+            cr[i] = cr[i+1];
+            cr[i+1] = url;
+        }
+    }
+    cr.pop();
+    chrome.storage.sync.remove(url,function(){
+        console.log("remove CS on",url);
+    });
+    updateCR();
+}
+
+function GetCS(url){
+    return new Promise(
+        (resolve)=>{
+            chrome.storage.sync.get(
+                url,
+                (item)=>{
+                    resolve(item[url]);
+                }
+            )
+        }
+    )
+}
+function saveCR(url){
+    chrome.storage.sync.set({[url]:urlcs},function(){});
+    refreshCR();
+}
+function showCS(url){
+    var table = document.querySelector("#T4");
+    while(table.firstChild){
+        table.removeChild(table.lastChild);
+    }
+    //生成新表格的標題列
+    var tr = document.createElement("tr");
+    var th = document.createElement("th");
+        th.innerHTML = url;
+        th.id = "CRHeader";
+    var save = document.createElement("th");
+        save.innerHTML = "Save";
+        save.id = "CRButton";
+        save.onclick=()=>{saveCR(url);}
+    var back = document.createElement("th");
+        back.innerHTML = "Back";
+        back.id = "CRButton";
+        back.onclick=()=>{refreshCR();}
+    table.appendChild(tr);
+    tr.appendChild(th);
+    tr.appendChild(save);
+    tr.appendChild(back);
+    for(var i = 0 ; i < urlcs.length ; i++){
+        AddCS(urlcs[i],url);
+    }
+}
+
+function AddCS(cookie,url){
+    var table = document.querySelector("#T4");
+    var tr = document.createElement("tr");
+    var name = document.createElement("th");
+        name.innerHTML = cookie.name;
+        name.className = "CSItem";
+    var samesite = document.createElement("th");
+        samesite.innerHTML = cookie.sameSite;
+        samesite.className = "CSItem";
+    var ChangeButton = document.createElement("th");
+        ChangeButton.innerHTML = "CM";
+        ChangeButton.className = "CSButton";
+        ChangeButton.onclick =()=>{ChangeCS(urlcs,cookie.name);showCS(url)};
+
+    table.appendChild(tr);
+    tr.appendChild(name);
+    tr.appendChild(samesite);
+    tr.appendChild(ChangeButton);
 }
