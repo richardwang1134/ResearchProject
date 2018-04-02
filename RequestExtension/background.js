@@ -1,55 +1,88 @@
 //----INIT----
 var WL = []; //White List	[ref]
 var BR = []; //Block Record	[time,url,ref]
+sendRequest("123","456");
 
-
-//----BLOCK & CHECK REQUEST----
-chrome.webRequest.onBeforeSendHeaders.addListener(
-	//callback
+//redirect request, then process blocked request
+chrome.webRequest.onBeforeRequest.addListener(
 	(details)=>{
-		for(var i = 0; i < details.requestHeaders.length; i++){//取得ref
-			if(details.requestHeaders[i].name === "Referer"){
-				var ref = details.requestHeaders[i].value;
-				var url = details.url;
-				var urlDomain = url.split("/")[2];
-				var refDomain = ref.split("/")[2];
-				if(urlDomain.match(refDomain)){
-					console.log("  Same   : ",refDomain,urlDomain);
-					return {cancel:false};
-				}
-				for(var j =0; j < WL.length; j++)
-					if(urlDomain == WL[j]){
-						console.log("WhiteList: ",refDomain,urlDomain);
-						return {cancel:false};
-					}
-				add2BR(refDomain,urlDomain);
-				procBlocked(url,ref);
-				console.log("  Block  : ",refDomain,urlDomain);
-				return {cancel:true};
-			}
+		if(details.url!="http://127.0.0.1:8000/test"){
+			var url = details.url;
+			var rid = details.requestId.toString();
+			var tid = details.tabId;
+			procBlocked(url,rid,tid);
+			return {redirectUrl:"http://127.0.0.1:8000/test"};
 		}
 	}
-	//filter
 ,	{	urls: ["<all_urls>"],
 		types: ["script"]
 	}
-	//optional, extra information specification
-, 	["blocking", 'requestHeaders']
+, 	["blocking"]
 );
 
-async function procBlocked(url,ref){
-	var result = await delCookie(ref);
-	console.log(result);
-	$.get(
-		url,
-		(data)=>{
-			console.log("get content(type: string) of");
-			console.log(url);
+//add new header -- requestId
+chrome.webRequest.onBeforeSendHeaders.addListener(
+	(details)=>{
+		var rid = details.requestId.toString();
+		var obj = {"name":"requestId","value":rid};
+		details.requestHeaders.push(obj);
+		obj = {"name":"requestType","value":"1"};
+		details.requestHeaders.push(obj);
+		return {requestHeaders: details.requestHeaders};
+	}
+,	{	urls: ["http://127.0.0.1:8000/test"],
+		types: ["script"]	}
+
+, 	["blocking","requestHeaders"]
+);
+
+//process blocked request
+async function procBlocked(url,rid,tid){
+	var ref = await getTabURL(tid);
+	var refDomain = ref.split("/")[2];
+	var urlDomain = url.split("/")[2];
+	if(refDomain.match(urlDomain)){;
+	}else if(inWL(ref)){;
+	}else{
+		add2BR(ref,url);
+		var resulet = await delCookie(ref);
+	}
+	sendRequest(url,rid);
+}
+
+//send request with url that before redirect and request id
+function sendRequest(url,rid){
+	console.log("OK");
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', 'http://127.0.0.1:8000/test', true);
+	xhr.setRequestHeader("orgURL",url);
+	xhr.setRequestHeader("requestId",rid);
+	xhr.setRequestHeader("requestType","2");
+	xhr.send(); 
+}
+
+//get url by tabId
+function getTabURL(tid){
+	return new promise(
+		(resolve)=>{
+			chrome.tabs.get(tid,(item)=>{
+				resolve(item.url);
+			});
 		}
 	);
 }
 
-function add2BR(refDomain,urlDomain){
+//confirm wheather domain is in WL
+function inWL(domain){
+	for(var i =0; i < WL.length; i++)
+		if(domain == WL[j])	return true;
+	return false;
+}
+
+//add record to block record list
+function add2BR(ref,url){
+	refDomain = ref.split("/")[2];
+	urlDomain = url.split("/")[2];
 	for(var i = 0; i < BR.length; i++){
 		if(refDomain == BR[i][2]){
 			BR[i][0]=getTime();
@@ -60,7 +93,7 @@ function add2BR(refDomain,urlDomain){
 		BR.push([getTime(),urlDomain,refDomain]);
 }
 
-//----GET_WHITELIST----
+//get white list
 function getWhiteList(){
 	return new Promise(
 		(resolve)=>{
@@ -72,7 +105,7 @@ function getWhiteList(){
 	);
 }
 
-//----DELETE COOKIE----
+//delete cookie by url
 function delCookie(url){
 	return new Promise(
 		(resolve,reject)=>{
@@ -98,11 +131,7 @@ function delCookie(url){
 	);
 }
 
-async function printCoockie(url){
-	var c = await getCookie(url);
-	console.log("cccc",c);
-}
-
+//get cookie by url
 function getCookie(url){
 	return new Promise(
 		(resolve)=>{
@@ -117,6 +146,7 @@ function getCookie(url){
 	)
 }
 
+//get time
 function getTime(){
 	var d = new(Date);
 	var h = d.getHours();
@@ -128,7 +158,7 @@ function getTime(){
 	return(h + ":" + m + ":" + s);
 }
 
-/*----SEND MSG OF [WHITELIST & BLOCK RECORD]----*/
+//communicate with popup page
 chrome.runtime.onMessage.addListener(
 	(request, sender, sendResponse)=>{
 	  	if (request.get == "wl"){
@@ -150,46 +180,3 @@ chrome.runtime.onMessage.addListener(
 		}	
 	}
 );
-
-function Queue() {
-	let items = [];
-	this.remove=function(i){
-		var l = items.length;
-		if(i >= 0 && i < l){
-			items[i] = items[l-1];
-			items.pop();
-		}
-	}
-	this.enqueue = function(element) {
-		items.push(element);
-	};
-	this.dequeue = function() {
-		return items.shift();
-	};
-	this.front = function() {
-		return items[0];
-	};
-	this.isEmpty = function() {
-		return items.length === 0;
-	};
-	this.clear = function() {
-		items = [];
-	};
-	this.size = function() {
-		return items.length;
-	};
-	this.print = function() {
-		console.log(items);
-	};
-	this.toArray = function(){
-		return items;
-	}
-	this.indexOf = function(obj){
-		for(var i = 0; i < items.length; i++){
-			if(obj == items[i]){
-				return i;
-			}
-		}
-		return -1;
-	}
-}
