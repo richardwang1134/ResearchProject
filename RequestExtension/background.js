@@ -71,6 +71,29 @@ function getTabURL(tid){
 		}
 	);
 }
+chrome.tabs.onUpdated.addListener(
+	async function (tabId, props, tab) {
+		if (props.status == "loading" && tab.selected) {
+		var SelectURL = false;
+		CS = [];
+		URL = tab.url.split("/")[2];
+		CR = await getCookieRecord();
+		for(var i = 0 ; i < CR.length ; i++){
+			if( URL == CR[i]){
+				SelectURL = true;
+			}
+		}
+		CS = await getCookie(tab.url);
+		for(var i = 0 ; i < CS.length ; i++){
+			CS[i] = await SetSameSite(tab.url,CS[i],'strict');
+		}
+		if(SelectURL){
+			var CSCR = await getCS(URL);
+			CS = await CompareCS(tab.url,CSCR,CS);
+			//console.log(CS);
+		}
+	}
+});
 
 //confirm wheather domain is in WL
 function inWL(domain){
@@ -101,6 +124,26 @@ function getWhiteList(){
 				"whiteList",
 				(item)=>{resolve(item.WL)}
 			)
+		}
+	);
+}
+//GET CookieRecord
+function getCookieRecord(){
+	return new Promise(
+		(resolve)=>{
+			chrome.storage.sync.get(
+				"cookieRecord",
+				(item)=>{resolve(item["cookieRecord"])}
+			)
+		}
+	);
+}
+function getCS(url){
+	return new Promise(
+		(resolve)=>{
+			chrome.storage.sync.get(URL,function(items){
+				resolve(items[url]);
+			})
 		}
 	);
 }
@@ -172,11 +215,44 @@ chrome.runtime.onMessage.addListener(
 			var json_str = JSON.stringify(json_strs);
 			sendResponse({br: json_str});
 			console.log("SendBR:",BR);
-		}else if (request.update){
-			WL = JSON.parse(request.update);
+		}else if (request.WLupdate){
+			var json_strs = JSON.parse(request.WLupdate);
+				WL = json_strs;
+				sendResponse({ack:JSON.stringify("OK")});
+				chrome.storage.sync.set({"whiteList":WL});//貌似寫錯了?
+				console.log("UpdateWL:",WL);
+		}else if(request.CSupdate){
+			var json_strs = JSON.parse(request.CSupdate);
+			CS = json_strs;
 			sendResponse({ack:JSON.stringify("OK")});
-			chrome.storage.sync.set({WL:WL});
-			console.log("UpdateWL:",WL);
+			console.log("UpdateCS:",CS);
+		}else if(request.CRupdate){
+			var json_strs = JSON.parse(request.CRupdate);
+			CR = json_strs;
+			sendResponse({ack:JSON.stringify("OK")});
+			chrome.storage.sync.set({"cookieRecord":CR},function(){});
+			console.log("UpdateCR:",CR);
+		}
+		else if(request.get=="cs"){
+			var json_str = JSON.stringify(CS);
+			sendResponse({cs: json_str});
+			console.log("SendCS:",CS);
+		}else if(request.get=="cr"){
+			var json_str = JSON.stringify(CR);
+			sendResponse({cr: json_str});
+			console.log("SendCR:",CR);
+		}else if(request.get=="url"){
+			var json_str = JSON.stringify(URL);
+			sendResponse({url: json_str});
+			console.log("SendURL:",URL);
+		}else if(request.get=="AddCR"){
+			var json_str = JSON.stringify(CR);
+			sendResponse({cr: json_str});
+			chrome.storage.sync.set({[URL]:CS},function(){});
+			console.log("Add ",CS,"on ",URL,"into CR");
+		}
+		else{
+			console.log("error!");
 		}	
 	}
 );
