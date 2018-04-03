@@ -1,17 +1,16 @@
 //----INIT----
 var WL = []; //White List	[ref]
 var BR = []; //Block Record	[time,url,ref]
-sendRequest("123","456");
 
 //redirect request, then process blocked request
 chrome.webRequest.onBeforeRequest.addListener(
 	(details)=>{
-		if(details.url!="http://127.0.0.1:8000/test"){
+		if(details.url!="http://127.0.0.1:8000/requestB1"){
 			var url = details.url;
 			var rid = details.requestId.toString();
 			var tid = details.tabId;
 			procBlocked(url,rid,tid);
-			return {redirectUrl:"http://127.0.0.1:8000/test"};
+			return {redirectUrl:"http://127.0.0.1:8000/requestB1"};
 		}
 	}
 ,	{	urls: ["<all_urls>"],
@@ -26,11 +25,10 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 		var rid = details.requestId.toString();
 		var obj = {"name":"requestId","value":rid};
 		details.requestHeaders.push(obj);
-		obj = {"name":"requestType","value":"1"};
-		details.requestHeaders.push(obj);
+		console.log("send request 1 :" + rid);
 		return {requestHeaders: details.requestHeaders};
 	}
-,	{	urls: ["http://127.0.0.1:8000/test"],
+,	{	urls: ["http://127.0.0.1:8000/requestB1"],
 		types: ["script"]	}
 
 , 	["blocking","requestHeaders"]
@@ -47,29 +45,29 @@ async function procBlocked(url,rid,tid){
 		add2BR(ref,url);
 		var resulet = await delCookie(ref);
 	}
-	sendRequest(url,rid);
+	sendRequest(rid,url);
 }
 
 //send request with url that before redirect and request id
-function sendRequest(url,rid){
-	console.log("OK");
+function sendRequest(rid,url){
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', 'http://127.0.0.1:8000/test', true);
+	xhr.open('GET', 'http://127.0.0.1:8000/requestB2', true);
 	xhr.setRequestHeader("orgURL",url);
 	xhr.setRequestHeader("requestId",rid);
-	xhr.setRequestHeader("requestType","2");
 	xhr.send(); 
+	console.log("send request 2 :" + rid);
 }
 
 //get url by tabId
 function getTabURL(tid){
-	return new promise(
+	return new Promise(
 		(resolve)=>{
-			chrome.tabs.get(tid,(item)=>{
-				resolve(item.url);
-			});
+			chrome.tabs.get(
+				tid,
+				(item)=>{resolve(item.url)}
+			)
 		}
-	);
+	)
 }
 chrome.tabs.onUpdated.addListener(
 	async function (tabId, props, tab) {
