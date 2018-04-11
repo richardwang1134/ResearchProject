@@ -5,12 +5,16 @@ var BR = []; //Block Record	[time,url,ref]
 //redirect request, then process blocked request
 chrome.webRequest.onBeforeRequest.addListener(
 	(details)=>{
-		if(details.url!="http://127.0.0.1:8000/requestB1"){
+		if(details.url!="http://127.0.0.1:8000/browserRequest1"){
 			var url = details.url;
 			var rid = details.requestId.toString();
 			var tid = details.tabId;
-			procBlocked(url,rid,tid);
-			return {redirectUrl:"http://127.0.0.1:8000/requestB1"};
+			if(tid == -1){
+				return;
+			}else{
+				procBlocked(url,rid,tid);
+				return {redirectUrl:"http://127.0.0.1:8000/browserRequest1"};
+			}
 		}
 	}
 ,	{	urls: ["<all_urls>"],
@@ -28,7 +32,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 		console.log("send request 1 :" + rid);
 		return {requestHeaders: details.requestHeaders};
 	}
-,	{	urls: ["http://127.0.0.1:8000/requestB1"],
+,	{	urls: ["http://127.0.0.1:8000/browserRequest1"],
 		types: ["script"]	}
 
 , 	["blocking","requestHeaders"]
@@ -36,6 +40,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 
 //process blocked request
 async function procBlocked(url,rid,tid){
+	console.log(url,rid,tid);
 	var ref = await getTabURL(tid);
 	var refDomain = ref.split("/")[2];
 	var urlDomain = url.split("/")[2];
@@ -51,8 +56,8 @@ async function procBlocked(url,rid,tid){
 //send request with url that before redirect and request id
 function sendRequest(rid,url){
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', 'http://127.0.0.1:8000/requestB2', true);
-	xhr.setRequestHeader("orgURL",url);
+	xhr.open('GET', 'http://127.0.0.1:8000/browserRequest2', true);
+	xhr.setRequestHeader("originalURL",url);
 	xhr.setRequestHeader("requestId",rid);
 	xhr.send(); 
 	console.log("send request 2 :" + rid);
@@ -76,11 +81,13 @@ chrome.tabs.onUpdated.addListener(
 		CS = [];
 		URL = tab.url.split("/")[2];
 		CR = await getCookieRecord();
-		for(var i = 0 ; i < CR.length ; i++){
-			if( URL == CR[i]){
-				SelectURL = true;
+		if(CR){
+			for(var i = 0 ; i < CR.length ; i++){
+				if( URL == CR[i]){
+					SelectURL = true;
+				}
 			}
-		}
+		}		
 		CS = await getCookie(tab.url);
 		for(var i = 0 ; i < CS.length ; i++){
 			CS[i] = await SetSameSite(tab.url,CS[i],'strict');
@@ -96,7 +103,7 @@ chrome.tabs.onUpdated.addListener(
 //confirm wheather domain is in WL
 function inWL(domain){
 	for(var i =0; i < WL.length; i++)
-		if(domain == WL[j])	return true;
+		if(domain == WL[i])	return true;
 	return false;
 }
 
