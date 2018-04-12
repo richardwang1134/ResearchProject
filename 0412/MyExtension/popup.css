@@ -1,0 +1,49 @@
+body {
+    display: flex;
+    flex-direction:column;
+    background-color: #1E1E1E;
+    font-size: 12px;
+    color: #ADADAD;
+    width: 300px; 
+}
+p {
+    font-family: verdana;
+    text-align: center;
+}
+div{
+    background-color: #333333;
+}
+    .Frame {
+        background-color: #1E1E1E;
+        border: 0;
+        height: 40px;
+        margin-top: 2px;
+        display: flex;
+        flex-direction:row;
+    }
+        .website{
+            background-color: #333333;
+            width: 240px;
+            margin-right: 2px;
+        }
+        .login{
+            background-color: #333333;
+            margin-right: 2px;
+            width: 40px;
+        }
+        .logout{
+            background-color: #ADADAD;
+            color: #1E1E1E;
+            margin-right: 2px;
+            width: 40px;
+        }
+        .setting{
+            background-color: #333333;
+            margin-right: 2px;
+            width: 40px;
+        }
+        .option{
+            background-color: #333333;
+            margin-right: 2px;
+            flex-grow: 1;
+        }
