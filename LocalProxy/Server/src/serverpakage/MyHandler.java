@@ -149,26 +149,40 @@ public class MyHandler implements Runnable {
 			dataOutputStream.writeBytes(serverRequest);		
 			//read response from server
 			bufferedReader = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-			while((line = bufferedReader.readLine())!=null) {
-				response += line + "\n";
+			boolean flag = true;
+			while((line = bufferedReader.readLine())!=null) {				
+				if(flag) {
+					response += line + "\r\n";
+					flag = false;
+				}else {
+					response += line + "\n";
+				}		
 			}
 		}else if(protocol.equals("https")) {
 			HttpsURLConnection conn = (HttpsURLConnection)url.openConnection();
 			bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			boolean flag = true;
 			while((line = bufferedReader.readLine())!=null) {
-				response += line + "\n";
+				if(flag) {
+					response += line + "\r\n";
+					flag = false;
+				}else {
+					response += line + "\n";
+				}				
 			}
 		}
 		System.out.println(longline);
-		System.out.println(response.substring(0, 100));
+		System.out.println(protocol);
+		System.out.println(url);
+		System.out.println(response.substring(0, 1000));
 		return;		
 	}
 	private void printMapStatus(String status,String Id,String host) {
-		String threadName = Thread.currentThread().getName();
+		/*String threadName = Thread.currentThread().getName();
 		System.out.println(longline);
 		System.out.println(status+" MyMap on # " + threadName);
 		System.out.println("Id # : " + Id);
-		System.out.println("Host : " + host);
+		System.out.println("Host : " + host);*/
 		return;
 	}
 }

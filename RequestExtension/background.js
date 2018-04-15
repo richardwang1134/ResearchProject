@@ -1,6 +1,9 @@
 //----INIT----
 var WL = []; //White List	[ref]
 var BR = []; //Block Record	[time,url,ref]
+var CS = []; //當前頁面的Cookie Status
+var CR = []; //各網頁的Cookie設定
+var URL = "";//當前頁面url
 
 //redirect request, then process blocked request
 chrome.webRequest.onBeforeRequest.addListener(
@@ -29,7 +32,6 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 		var rid = details.requestId.toString();
 		var obj = {"name":"requestId","value":rid};
 		details.requestHeaders.push(obj);
-		console.log("send request 1 :" + rid);
 		return {requestHeaders: details.requestHeaders};
 	}
 ,	{	urls: ["http://127.0.0.1:8000/browserRequest1"],
@@ -40,7 +42,6 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 
 //process blocked request
 async function procBlocked(url,rid,tid){
-	console.log(url,rid,tid);
 	var ref = await getTabURL(tid);
 	var refDomain = ref.split("/")[2];
 	var urlDomain = url.split("/")[2];
@@ -53,6 +54,25 @@ async function procBlocked(url,rid,tid){
 	sendRequest(rid,url);
 }
 
+function SetSameSite(url,cookie,sameSite){
+	return new Promise((resolve)=>{
+			chrome.cookies.set(
+			{	
+			 	url:url
+				,name:cookie.name
+				,value:cookie.value
+				,domain:cookie.domain
+				,path:cookie.path
+				,secure:cookie.secure
+				,httpOnly:cookie.httpOnly
+				,sameSite:sameSite
+				,expirationDate:cookie.expirationDate
+				,storeId:cookie.storeId
+			},(cookie)=>{
+			resolve(cookie);
+		})
+	})
+}
 //send request with url that before redirect and request id
 function sendRequest(rid,url){
 	var xhr = new XMLHttpRequest();
@@ -60,7 +80,6 @@ function sendRequest(rid,url){
 	xhr.setRequestHeader("originalURL",url);
 	xhr.setRequestHeader("requestId",rid);
 	xhr.send(); 
-	console.log("send request 2 :" + rid);
 }
 
 //get url by tabId
@@ -77,33 +96,61 @@ function getTabURL(tid){
 chrome.tabs.onUpdated.addListener(
 	async function (tabId, props, tab) {
 		if (props.status == "loading" && tab.selected) {
-		var SelectURL = false;
+		var ON_CR = false;
+		var ON_WL = false;
 		CS = [];
 		URL = tab.url.split("/")[2];
 		CR = await getCookieRecord();
+		WL = await getWhiteList();
 		if(CR){
 			for(var i = 0 ; i < CR.length ; i++){
 				if( URL == CR[i]){
-					SelectURL = true;
+					ON_CR = true;
 				}
 			}
-		}		
-		CS = await getCookie(tab.url);
-		for(var i = 0 ; i < CS.length ; i++){
-			CS[i] = await SetSameSite(tab.url,CS[i],'strict');
 		}
-		if(SelectURL){
+		if(WL){
+			for(var i = 0 ; i < WL.length ; i++){
+				if(URL == WL[i]){
+					ON_WL = true;
+				}
+			}
+		}
+		CS = await getCookie(tab.url);
+		if(!ON_WL){
+			for(var i = 0 ; i < CS.length ; i++){
+				CS[i] = await SetSameSite(tab.url,CS[i],'strict');
+			}
+		}
+		if(ON_CR){
 			var CSCR = await getCS(URL);
 			CS = await CompareCS(tab.url,CSCR,CS);
 			//console.log(CS);
 		}
 	}
 });
-
+function CompareCS(url,CSCR,CS){
+	return new Promise(
+	async function(resolve){
+		for(var i = 0 ; i < CS.length ; i++){
+			for(var j = 0 ; j < CSCR.length ; j++){
+				if(CS[i].name == CSCR[j].name){
+					CS[i] = await SetSameSite(url,CS[i],CSCR[j].sameSite);
+					//console.log(CS[i]);
+				}
+			}
+		}
+		//console.log(CS);
+		resolve(CS);
+	}
+	);
+}
 //confirm wheather domain is in WL
 function inWL(domain){
-	for(var i =0; i < WL.length; i++)
-		if(domain == WL[i])	return true;
+	if(WL){
+		for(var i =0; i < WL.length; i++)
+			if(domain == WL[i])	return true;
+	}
 	return false;
 }
 
@@ -127,7 +174,7 @@ function getWhiteList(){
 		(resolve)=>{
 			chrome.storage.sync.get(
 				"whiteList",
-				(item)=>{resolve(item.WL)}
+				(item)=>{resolve(item.whiteList)}
 			)
 		}
 	);
@@ -206,11 +253,12 @@ function getTime(){
 	return(h + ":" + m + ":" + s);
 }
 
-//communicate with popup page
 chrome.runtime.onMessage.addListener(
 	(request, sender, sendResponse)=>{
 	  	if (request.get == "wl"){
-			var json_str = JSON.stringify(WL);
+			var json_str;
+			if(WL){json_str = JSON.stringify(WL);}
+			else{json_str = JSON.stringify("");}
 			sendResponse({wl: json_str});
 			console.log("SendWL:",WL);
 		}else if(request.get == "br"){
@@ -224,7 +272,7 @@ chrome.runtime.onMessage.addListener(
 			var json_strs = JSON.parse(request.WLupdate);
 				WL = json_strs;
 				sendResponse({ack:JSON.stringify("OK")});
-				chrome.storage.sync.set({"whiteList":WL});//貌似寫錯了?
+				chrome.storage.sync.set({"whiteList":WL});
 				console.log("UpdateWL:",WL);
 		}else if(request.CSupdate){
 			var json_strs = JSON.parse(request.CSupdate);
@@ -239,11 +287,15 @@ chrome.runtime.onMessage.addListener(
 			console.log("UpdateCR:",CR);
 		}
 		else if(request.get=="cs"){
-			var json_str = JSON.stringify(CS);
+			var json_str ;
+			if(CS){json_str = JSON.stringify(CS);}
+			else{json_str = JSON.stringify([]);}
 			sendResponse({cs: json_str});
 			console.log("SendCS:",CS);
 		}else if(request.get=="cr"){
-			var json_str = JSON.stringify(CR);
+			var json_str ;
+			if(CR){json_str = JSON.stringify(CR);}
+			else{json_str = JSON.stringify([]);}
 			sendResponse({cr: json_str});
 			console.log("SendCR:",CR);
 		}else if(request.get=="url"){
@@ -251,7 +303,9 @@ chrome.runtime.onMessage.addListener(
 			sendResponse({url: json_str});
 			console.log("SendURL:",URL);
 		}else if(request.get=="AddCR"){
-			var json_str = JSON.stringify(CR);
+			var json_str ;
+			if(CR){json_str = JSON.stringify(CR);}
+			else{json_str = JSON.stringify([]);}
 			sendResponse({cr: json_str});
 			chrome.storage.sync.set({[URL]:CS},function(){});
 			console.log("Add ",CS,"on ",URL,"into CR");
