@@ -5,116 +5,143 @@ var cr = [];
 var URL ="";
 var urlcs = [];
 
+ 
+
 document.addEventListener(
     "DOMContentLoaded",
     ()=>{
-        var B1 = document.querySelector("#B1");
-        var B2 = document.querySelector("#B2");
-        var B3 = document.querySelector("#B3");
-        var B4 = document.querySelector("#B4");
+        var Status = document.querySelector("#Status");
+        var Record = document.querySelector("#Record");
 
-        var P1 = document.querySelector("#P1");
-        var P2 = document.querySelector("#P2");
-        var P3 = document.querySelector("#P3");
-        var P4 = document.querySelector("#P4");
+        var Pstatus = document.querySelector("#Pstatus");
+        var Precord = document.querySelector("#Precord");
 
-        B1.onclick = ()=>{tabButtonClicked(B1,B2,B3,B4,P1,P2,P3,P4)}
-        B2.onclick = ()=>{tabButtonClicked(B2,B1,B3,B4,P2,P1,P3,P4)}
-        B3.onclick = ()=>{tabButtonClicked(B3,B1,B2,B4,P3,P1,P2,P4)}
-        B4.onclick = ()=>{tabButtonClicked(B4,B1,B2,B3,P4,P1,P2,P3)}
+        Status.onmouseover = () =>{ChangeColor(Status,Record);}
+        Record.onmouseover = () =>{ChangeColor(Record,Status);}
 
-        tabButtonClicked(B1,B2,B3,B4,P1,P2,P3,P4);
+        Status.onclick = ()=>{tabButtonClicked(Status,Record,Pstatus,Precord);}
+        Record.onclick = ()=>{tabButtonClicked(Record,Status,Precord,Pstatus);}
+        
     }
 )
+function ChangeColor(Ba,Bb){
+    Ba.className = "tab-onmouseover";
+    Bb.className = "tab-button-off";
+    if(Selection == "Status"){
+        Status.className = "tab-button-on";
+    }
+    else if(Selection == "Record"){
+        Record.className = "tab-button-on";
+    }
+}
+function tabButtonClicked(Ba,Bb,Pa,Pb){
+    if(Ba.className!="tab-button-on"){
 
-
-
-function tabButtonClicked(Ba,Bb,Bc,Bd,Pa,Pb,Pc,Pd){//切換頁面
-
-    //tab和page外觀切換
-    if(Ba.className=="tab-button-off"){
-
-        Ba.className="tab-button-on";
-        Bb.className="tab-button-off";
-        Bc.className="tab-button-off";
-        Bd.className="tab-button-off";
+        Ba.style.display = "none";
+        Bb.style.display = "none";
 
         Pa.style.display = "block";
         Pb.style.display = "none";
-        Pc.style.display = "none";
-        Pd.style.display = "none";
-    }
-    //如果是P1 取得阻擋紀錄
-    if(Ba.id == "B1"){
-        chrome.runtime.sendMessage(
-            {get:"br"},
-            (response)=>{
-                br = JSON.parse(response.br);
-                for(var i =0; i < br.length; i++){
-                    br[i] = JSON.parse(br[i]);
+
+        if(Ba.id == "Status"){
+            chrome.runtime.sendMessage(
+                {get:"br"},
+                    (response)=>{
+                        br = JSON.parse(response.br);
+                        for(var i =0; i < br.length; i++){
+                            br[i] = JSON.parse(br[i]);
+                        }
+                        refreshBR();
                 }
-                refreshBR();
-            }
-        );
-    }
-    //如果是B2 取得白名單
-    else if(Ba.id=="B2"){
-        chrome.runtime.sendMessage(
-            {get:"wl"},
-            (response)=>{
-                wl = JSON.parse(response.wl);
-                refreshWL();
-            }
-        );
-    }
-    //如果是B3 取得當前網頁Cookie狀態
-    else if(Ba.id=="B3"){
-        chrome.runtime.sendMessage(
-            {get:"cs"},
-            (response)=>{
-                cs = JSON.parse(response.cs);
-                refreshCS();
-            }
-        );
-        chrome.runtime.sendMessage(
-            {get:"url"},
-            (response)=>{
-                URL = JSON.parse(response.url);
-            }
-        );
-    }
-    //如果是B4 取得網頁Cookie設定紀錄
-    else if(Ba.id=="B4"){
-        chrome.runtime.sendMessage(
-            {get:"cr"},
-            (response)=>{
-                cr = JSON.parse(response.cr);
-                refreshCR();
-            }
-        );
+            );
+            chrome.runtime.sendMessage(
+                {get:"url"},
+                (response)=>{
+                    URL = JSON.parse(response.url);
+                }
+            );
+            chrome.runtime.sendMessage(
+                {get:"cs"},
+                (response)=>{
+                    cs = JSON.parse(response.cs);
+                }
+            );
+            chrome.runtime.sendMessage(
+                {get:"wl"},
+                (response)=>{
+                    wl = JSON.parse(response.wl);
+                }
+            );
+        }
+        else if(Ba.id=="Record"){
+            chrome.runtime.sendMessage(
+                {get:"wl"},
+                (response)=>{
+                    wl = JSON.parse(response.wl);
+                    refreshWL();
+                }
+            );
+            chrome.runtime.sendMessage(
+                {get:"cr"},
+                (response)=>{
+                    cr = JSON.parse(response.cr);
+                }
+            );
+            chrome.runtime.sendMessage(
+                {get:"br"},
+                (response)=>{
+                    br = JSON.parse(response.br);
+                    for(var i =0; i < br.length; i++){
+                        br[i] = JSON.parse(br[i]);
+                    }
+                }
+            );
+        }
     }
 }
 
 function refreshBR(){//根據阻擋紀錄刷新頁面
-    var table = document.querySelector("#T1");
+    var table = document.querySelector("#Tstatus");
         while(table.firstChild){
         table.removeChild(table.lastChild);
     }
-    var tr = document.createElement("tr");
+    var tr1 = document.createElement("tr");
+    var CS = document.createElement("th");
+        CS.innerHTML = "CookieStatus";
+        CS.id = "StatusCS";
+        CS.onclick = ()=>{refreshCS();}
+    var Return = document.createElement("th");
+        Return.id = "StatusReturn";
+        Return.onclick=()=>{ReturnHome();}
+    var LED =  document.createElement("th");
+    var tr2 = document.createElement("tr");
     var time = document.createElement("th");
         time.innerHTML = "Time";
-        time.id = "BRHeaderTime";
+        time.id = "BRHeader";
     var url = document.createElement("th");
         url .innerHTML = "URL";
         url.id = "BRHeader";
     var ref = document.createElement("th");
-        ref.innerHTML = "Referrer";
+        ref.innerHTML = "Refer";
         ref.id = "BRHeader";
-    table.appendChild(tr);
-    tr.appendChild(time);
-    tr.appendChild(url);
-    tr.appendChild(ref);
+
+    if(LEDcolor(URL)){
+        LED.id = "LEDGreen";
+    }else{
+        LED.id = "LEDRed";
+    }
+
+    table.appendChild(tr1);
+    tr1.appendChild(CS);
+    tr1.appendChild(Return);
+    tr1.appendChild(LED);
+    table.appendChild(tr2);
+    tr2.appendChild(url);
+    tr2.appendChild(ref);
+    tr2.appendChild(time);
+
     var num = br.length;
+    
     if(num >= 15){
         for(var i = num-15; i < num; i++)
             addBRRows(br[i]);
@@ -122,36 +149,38 @@ function refreshBR(){//根據阻擋紀錄刷新頁面
         for(var i = 0; i < num; i++)
             addBRRows(br[i]);
     }
+
 }
 
 function addBRRows(arr){//依照arr內容在頁面上新增一頁
-    var table = document.querySelector("#T1");
+    var table = document.querySelector("#Tstatus");
     var tr = document.createElement("tr");
-    var time = document.createElement("th");
-        time.innerHTML = arr[0];
-        time.className = "BRItem";
     var url = document.createElement("th");
-        url.innerHTML = arr[1];
+        url.innerHTML = arr[0];
         url.className = "BRItem";
         url.id = "BRUrl";
-        url.onclick = ()=>{add2WL(url.innerHTML)};
+        url.onclick = ()=>{add2WL(url.innerHTML);ReturnHome();};
     var ref = document.createElement("th");
-        ref.innerHTML = arr[2];
+        ref.innerHTML = arr[1];
         ref.className = "BRItem";
+    var time = document.createElement("th");
+        time.innerHTML = arr[2];
+        time.className = "BRItem";
+        
     table.appendChild(tr);
-    tr.appendChild(time);
     tr.appendChild(url);
     tr.appendChild(ref);
+    tr.appendChild(time);
 }
 
 function refreshWL(){//根據WL刷新頁面
     //移除舊表格
-    var table = document.querySelector("#T2");
+    var table = document.querySelector("#Trecord");
     while(table.firstChild){
         table.removeChild(table.lastChild);
     }
     //生成新表格的標題列
-    var tr = document.createElement("tr");
+    var tr1 = document.createElement("tr");
     var th = document.createElement("th");
         th.innerHTML = "Domain Name";
         th.id = "WLHeader";
@@ -163,10 +192,23 @@ function refreshWL(){//根據WL刷新頁面
         add.id = "add";
         add.innerHTML= "＋";
         add.onclick =()=>{add2WL(input.value)};
-    table.appendChild(tr);
-    tr.appendChild(th);
+    var tr2 = document.createElement("tr");
+
+    var URL = document.createElement("th");
+        URL.id = "RecordURL";
+        URL.innerHTML = "URL";
+    var Return = document.createElement("th");
+        Return.id = "RecordReturn";
+        Return.onclick=()=>{ReturnHome();};
+
+    table.appendChild(tr1);
+    tr1.appendChild(th);
     th.appendChild(input);
-    tr.appendChild(add);
+    tr1.appendChild(add);
+
+    table.appendChild(tr2);
+    tr2.appendChild(URL);
+    tr2.appendChild(Return);
     //生成新表格的內容
     for(var i = 0; i < wl.length; i++){
         addWLRows(wl[i]);
@@ -178,7 +220,7 @@ function add2WL(url){//新增新的url到白名單、更新白名單、刷新頁
         {get:"wl"},
         (response)=>{
             wl = JSON.parse(response.wl);
-            console.log("wl:",wl);
+            //console.log("wl:",typeof(wl));
             if(wl.indexOf(url)==-1){
                 wl.push(escapeHtml(url));
                 updateWL();
@@ -188,16 +230,20 @@ function add2WL(url){//新增新的url到白名單、更新白名單、刷新頁
 }
 
 function addWLRows(url){//依照url在頁面上新增一頁
-    var table = document.querySelector("#T2");
+    var table = document.querySelector("#TRecord");
     var tr = document.createElement("tr");
     var th = document.createElement("th");
         th.innerHTML = url;
-        th.id = "WLURL";
+        th.id = "RecordWeb";
+        th.onclick=async function(){
+            urlcs = await GetCS(url);
+            ShowInfo(url);
+        };
     var del = document.createElement("th");
         del.id = "WLDel";
         del.onmouseover =()=>{del.innerHTML = "—";};
         del.onmouseout =()=>{del.innerHTML = "";};
-        del.onclick =()=>{delWLRow(url)};
+        del.onclick =()=>{delWLRow(url);delCRRow(url);};
     table.appendChild(tr);
     tr.appendChild(th)
     tr.appendChild(del);
@@ -242,17 +288,17 @@ function escapeHtml(text) {
 
 function refreshCS(){
     //移除舊表格
-    var table = document.querySelector("#T3");
+    var table = document.querySelector("#TStatus");
         while(table.firstChild){
         table.removeChild(table.lastChild);
     }
     //新增表格
-    var tr = document.createElement("tr");
+    var tr1 = document.createElement("tr");
 
     var add = document.createElement("th");
     add.innerHTML= "＋";
     add.id = "add";
-    add.onclick=()=>{Add2CR(URL)};
+    add.onclick=()=>{Add2CR(URL);ReturnHome();};
     var name = document.createElement("th");
     name.innerHTML = "Name";
     name.id = "CSHeader";
@@ -260,17 +306,31 @@ function refreshCS(){
     samesite.innerHTML = "SameSite";
     samesite.id = "CSHeader";
 
-    table.appendChild(tr);
-    tr.appendChild(name);
-    tr.appendChild(samesite);
-    tr.appendChild(add);
+    var tr2 = document.createElement("tr");
+    var url = document.createElement("th");
+        url.innerHTML = URL;
+        url.id = "StatusURL";
+    var Return = document.createElement("th");
+        Return.id = "StatusReturn";
+        Return.onclick = ()=>{ReturnStatus();}
+    var space = document.createElement("th");
+
+    table.appendChild(tr2);
+    tr2.appendChild(url);
+    tr2.appendChild(Return);
+    tr2.appendChild(space);
+
+    table.appendChild(tr1);
+    tr1.appendChild(name);
+    tr1.appendChild(samesite);
+    tr1.appendChild(add);
 
     for(var i = 0 ; i < cs.length ; i++){
         addCSRows(cs[i]);
     }
 }
 function addCSRows(cookie){//依照cookie內容在頁面上新增一頁
-    var table = document.querySelector("#T3");
+    var table = document.querySelector("#TStatus");
     var tr = document.createElement("tr");
     var name = document.createElement("th");
         name.innerHTML = cookie.name;
@@ -279,7 +339,7 @@ function addCSRows(cookie){//依照cookie內容在頁面上新增一頁
         samesite.innerHTML = cookie.sameSite;
         samesite.className = "CSItem";
     var ChangeButton = document.createElement("th");
-        ChangeButton.innerHTML = "CM";
+        //ChangeButton.innerHTML = "CM";
         ChangeButton.className = "CSButton";
         ChangeButton.onclick =()=>{ChangeCS(cs,cookie.name);updateCS();};
 
@@ -317,13 +377,13 @@ function Add2CR(url){
         {get:"AddCR"},
         (response)=>{
             cr = JSON.parse(response.cr);
-            console.log("cr:",cr);
             if(cr.indexOf(url)==-1){
                 cr.push(escapeHtml(url));
                 updateCR();
             }
         }
-    ); 
+    );
+    add2WL(url); 
 }
 function updateCR(){
 	var json_str = JSON.stringify(cr);
@@ -332,53 +392,11 @@ function updateCR(){
         (response)=>{
             var ack = JSON.parse(response.ack);
             if(ack == "OK"){
-                refreshCR();
             }else{
                 console("CR update failed");
             }
         }
     );   
-}
-function refreshCR(){
-    //移除舊表格
-    var table = document.querySelector("#T4");
-    while(table.firstChild){
-        table.removeChild(table.lastChild);
-    }
-    //生成新表格的標題列
-    var tr = document.createElement("tr");
-    var th = document.createElement("th");
-        th.innerHTML = "Domain Name";
-        th.id = "CRHeader";
-    var del = document.createElement("th");
-        del.id = "CRHeader";
-        del.innerHTML = "Delete";
-    table.appendChild(tr);
-    tr.appendChild(th);
-    tr.appendChild(del);
-    //生成新表格的內容
-    for(var i = 0; i < cr.length; i++){
-        addCRRows(cr[i]);
-    }
-}
-function addCRRows(url){
-    var table = document.querySelector("#T4");
-    var tr = document.createElement("tr");
-    var th = document.createElement("th");
-        th.innerHTML = url;
-        th.id = "CRURL";
-        th.onclick=async function(){
-            urlcs = await GetCS(url);
-            showCS(url);
-        };
-    var del = document.createElement("th");
-        del.innerHTML = "X";
-        del.id = "CRDEL";
-        del.onclick =()=>{delCRRow(url)};
-
-    table.appendChild(tr);
-    tr.appendChild(th);
-    tr.appendChild(del);
 }
 function delCRRow(url){
     for(var i =0; i < cr.length-1; i++){
@@ -408,37 +426,11 @@ function GetCS(url){
 }
 function saveCR(url){
     chrome.storage.sync.set({[url]:urlcs},function(){});
-    refreshCR();
-}
-function showCS(url){
-    var table = document.querySelector("#T4");
-    while(table.firstChild){
-        table.removeChild(table.lastChild);
-    }
-    //生成新表格的標題列
-    var tr = document.createElement("tr");
-    var th = document.createElement("th");
-        th.innerHTML = url;
-        th.id = "CRHeader";
-    var save = document.createElement("th");
-        save.innerHTML = "Save";
-        save.id = "CRButton";
-        save.onclick=()=>{saveCR(url);}
-    var back = document.createElement("th");
-        back.innerHTML = "Back";
-        back.id = "CRButton";
-        back.onclick=()=>{refreshCR();}
-    table.appendChild(tr);
-    tr.appendChild(th);
-    tr.appendChild(save);
-    tr.appendChild(back);
-    for(var i = 0 ; i < urlcs.length ; i++){
-        AddCS(urlcs[i],url);
-    }
+    ReturnRecord();
 }
 
 function AddCS(cookie,url){
-    var table = document.querySelector("#T4");
+    var table = document.querySelector("#Trecord");
     var tr = document.createElement("tr");
     var name = document.createElement("th");
         name.innerHTML = cookie.name;
@@ -447,12 +439,132 @@ function AddCS(cookie,url){
         samesite.innerHTML = cookie.sameSite;
         samesite.className = "CSItem";
     var ChangeButton = document.createElement("th");
-        ChangeButton.innerHTML = "CM";
         ChangeButton.className = "CSButton";
-        ChangeButton.onclick =()=>{ChangeCS(urlcs,cookie.name);showCS(url)};
+        ChangeButton.onclick =()=>{ChangeCS(urlcs,cookie.name);ShowInfo(url)};
 
     table.appendChild(tr);
     tr.appendChild(name);
     tr.appendChild(samesite);
     tr.appendChild(ChangeButton);
+}
+function AddResource(resource){
+    var table = document.querySelector("#Trecord");
+    var tr = document.createElement("tr");
+    var Resource = document.createElement("th");
+    var space = document.createElement("th");
+    var twospace = document.createElement("th");
+    Resource.innerHTML = resource ;
+    Resource.id = "label";
+
+    table.appendChild(tr);
+    tr.appendChild(Resource);
+    tr.appendChild(space);
+    tr.appendChild(twospace);
+}
+
+function ReturnHome(){
+    var table = document.querySelector("#Trecord");
+    while(table.firstChild){
+        table.removeChild(table.lastChild);
+    }
+    table = document.querySelector("#Tstatus");
+    while(table.firstChild){
+        table.removeChild(table.lastChild);
+    }
+    var Status = document.querySelector("#Status");
+    var Record = document.querySelector("#Record");
+
+    Status.style.display = "block";
+    Record.style.display = "block";
+
+
+    
+}
+function ReturnRecord(){
+    var table = document.querySelector("#Trecord");
+    while(table.firstChild){
+        table.removeChild(table.lastChild);
+    }
+    table = document.querySelector("#Tstatus");
+    while(table.firstChild){
+        table.removeChild(table.lastChild);
+    }
+    refreshWL();
+}
+function ReturnStatus(){
+    var table = document.querySelector("#Trecord");
+    while(table.firstChild){
+        table.removeChild(table.lastChild);
+    }
+    table = document.querySelector("#Tstatus");
+    while(table.firstChild){
+        table.removeChild(table.lastChild);
+    }
+    refreshBR();
+}
+function ShowInfo(url){
+    var table = document.querySelector("#Trecord");
+    while(table.firstChild){
+        table.removeChild(table.lastChild);
+    }
+    var tr1 = document.createElement("tr");
+    var space = document.createElement("th");
+    var twospace = document.createElement("th");
+    var URLinfo = document.createElement("th");
+        URLinfo.innerHTML = url;
+        URLinfo.id = "RecordURL";
+    var Return = document.createElement("th");
+        Return.id = "RecordReturn";
+        Return.onclick=()=>{ReturnRecord();}
+    var Save = document.createElement("th");
+        Save.id = "RecordSave";
+        Save.onclick=()=>{saveCR(url);}
+    var tr2 = document.createElement("tr");
+    var Resource =document.createElement("th");
+        Resource.innerHTML = "Resource";
+        Resource.id = "label1";
+    var tr3 = document.createElement("tr");
+    var CN = document.createElement("th");
+        CN.innerHTML = "CookieName";
+        CN.id = "label1";
+    var Same = document.createElement("th");
+        Same.innerHTML = "SameSite";
+        Same.id = "label1";
+    var Change = document.createElement("th");
+        Change.innerHTML="change";
+        Change.id = "label1";
+    
+    
+    
+    table.appendChild(tr1);
+    tr1.appendChild(URLinfo);
+    tr1.appendChild(Return);
+    tr1.appendChild(Save);
+    table.appendChild(tr2);
+    tr2.appendChild(Resource);
+    tr2.appendChild(space);
+    tr2.appendChild(twospace);
+    for(var i = 0 ; i < br.length ; i++){
+        if(br[i][0] == url){
+            AddResource(br[i][1]);
+        }
+    }
+
+    table.appendChild(tr3);
+    tr3.appendChild(CN);
+    tr3.appendChild(Same);
+    tr3.appendChild(Change);
+
+    for(var i = 0 ; i < urlcs.length ; i++){
+        AddCS(urlcs[i],url);
+    }
+}
+function LEDcolor(url){
+    
+    for(var i = 0; i < wl.length ; i++){
+        if(url == wl[i]){
+            return true;
+        }
+    }
+    return false;
 }

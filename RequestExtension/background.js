@@ -16,7 +16,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 				return;
 			}else{
 				procBlocked(url,rid,tid);
-				console.log("send request 1 of request " + rid);
+				//console.log("send request 1 of request " + rid);
 				return {redirectUrl:"http://127.0.0.1:8000/browserRequest1"};
 			}
 		}
@@ -41,6 +41,79 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 , 	["blocking","requestHeaders"]
 );
 
+chrome.tabs.onUpdated.addListener(
+	async function (tabId, props, tab) {
+		if (props.status == "loading" && tab.selected) {
+		var ON_CR = false;
+		var ON_WL = false;
+		CS = [];
+		URL = tab.url.split("/")[2];
+		CR = await getCookieRecord();
+		WL = await getWhiteList();
+		if(CR){
+			for(var i = 0 ; i < CR.length ; i++){
+				if( URL == CR[i]){
+					ON_CR = true;
+				}
+			}
+		}
+		if(WL){
+			for(var i = 0 ; i < WL.length ; i++){
+				if(URL == WL[i]){
+					ON_WL = true;
+				}
+			}
+		}
+		CS = await getCookie(tab.url);
+		if(!ON_WL){
+			for(var i = 0 ; i < CS.length ; i++){
+				CS[i] = await SetSameSite(tab.url,CS[i],'strict');
+			}
+		}
+		if(ON_CR){
+			var CSCR = await getCS(URL);
+			CS = await CompareCS(tab.url,CSCR,CS);
+		}
+	}
+});
+
+chrome.tabs.onSelectionChanged.addListener(
+	function (tabId,selectinfo) {
+	chrome.tabs.getSelected(null,
+		async function(tab){
+			var ON_CR = false;
+			var ON_WL = false;
+			CS = [];
+			URL = tab.url.split("/")[2];
+			CR = await getCookieRecord();
+			WL = await getWhiteList();
+			if(CR){
+				for(var i = 0 ; i < CR.length ; i++){
+					if( URL == CR[i]){
+						ON_CR = true;
+					}
+				}
+			}
+			if(WL){
+				for(var i = 0 ; i < WL.length ; i++){
+					if(URL == WL[i]){
+						ON_WL = true;
+					}
+				}
+			}
+			CS = await getCookie(tab.url);
+			if(!ON_WL){
+				for(var i = 0 ; i < CS.length ; i++){
+					CS[i] = await SetSameSite(tab.url,CS[i],'strict');
+				}
+			}
+			if(ON_CR){
+				var CSCR = await getCS(URL);
+				CS = await CompareCS(tab.url,CSCR,CS);
+			}
+	});
+  });
+
 //process blocked request
 async function procBlocked(url,rid,tid){
 	var ref = await getTabURL(tid);
@@ -49,7 +122,7 @@ async function procBlocked(url,rid,tid){
 	if(refDomain.match(urlDomain)){;
 	}else if(inWL(ref)){;
 	}else{
-		add2BR(ref,url);
+		add2BR(refDomain,urlDomain);
 		var resulet = await delCookie(ref);
 	}
 	sendRequest(rid,url);
@@ -76,7 +149,7 @@ function SetSameSite(url,cookie,sameSite){
 }
 //send request with url that before redirect and request id
 function sendRequest(rid,url){
-	console.log("send request 2 of request " + rid);
+	//console.log("send request 2 of request " + rid);
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', 'http://127.0.0.1:8000/browserRequest2', false);
 	xhr.setRequestHeader("originalURL",url);
@@ -127,7 +200,6 @@ chrome.tabs.onUpdated.addListener(
 		if(ON_CR){
 			var CSCR = await getCS(URL);
 			CS = await CompareCS(tab.url,CSCR,CS);
-			//console.log(CS);
 		}
 	}
 });
@@ -138,11 +210,9 @@ function CompareCS(url,CSCR,CS){
 			for(var j = 0 ; j < CSCR.length ; j++){
 				if(CS[i].name == CSCR[j].name){
 					CS[i] = await SetSameSite(url,CS[i],CSCR[j].sameSite);
-					//console.log(CS[i]);
 				}
 			}
 		}
-		//console.log(CS);
 		resolve(CS);
 	}
 	);
@@ -157,17 +227,23 @@ function inWL(domain){
 }
 
 //add record to block record list
-function add2BR(ref,url){
-	refDomain = ref.split("/")[2];
-	urlDomain = url.split("/")[2];
-	for(var i = 0; i < BR.length; i++){
-		if(refDomain == BR[i][2]){
-			BR[i][0]=getTime();
-			return{cancel:false};
+async function add2BR(refDomain,urlDomain){
+	var found = await FoundInBR(refDomain);
+	if(!found)
+		BR.push([refDomain,urlDomain,getTime()]);
+}
+function FoundInBR(refDomain){
+	return new Promise(
+		(resolve)=>{
+			for(var i = 0 ; i < BR.length ; i++){
+				if(refDomain == BR[i][1]){
+					BR[i][2] = getTime();
+					resolve(false);
+				}
+			}
+			resolve(false);
 		}
-	}
-	if(i >= BR.length)
-		BR.push([getTime(),urlDomain,refDomain]);
+	)
 }
 
 //get white list
