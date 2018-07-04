@@ -16,6 +16,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 				return;
 			}else{
 				procBlocked(url,rid,tid);
+				console.log("send request 1 of request " + rid);
 				return {redirectUrl:"http://127.0.0.1:8000/browserRequest1"};
 			}
 		}
@@ -75,8 +76,9 @@ function SetSameSite(url,cookie,sameSite){
 }
 //send request with url that before redirect and request id
 function sendRequest(rid,url){
+	console.log("send request 2 of request " + rid);
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', 'http://127.0.0.1:8000/browserRequest2', true);
+	xhr.open('GET', 'http://127.0.0.1:8000/browserRequest2', false);
 	xhr.setRequestHeader("originalURL",url);
 	xhr.setRequestHeader("requestId",rid);
 	xhr.send(); 

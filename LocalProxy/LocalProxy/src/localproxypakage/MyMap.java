@@ -1,4 +1,4 @@
-package serverpakage;
+package localproxypakage;
 
 import java.util.HashMap;
 import java.util.Map;

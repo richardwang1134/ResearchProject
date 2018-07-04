@@ -1,11 +1,12 @@
-package serverpakage;
+package localproxypakage;
 
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Server {
+public class LocalProxy {
+	@SuppressWarnings("resource")
 	public static void main(String[] args) throws Exception {
 		ExecutorService executor = Executors.newCachedThreadPool();
         ServerSocket listener = new ServerSocket(8000,10);
