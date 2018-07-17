@@ -1,3 +1,12 @@
+@import "css/Status.css";
+@import "css/Record.css";
+@import "css/WL.css";
+@import "css/BR.css";
+@import "css/CS.css";
+@import "css/CR.css";
+@import "css/Log.css";
+
+
 body {
     background-color: rgb(61, 61, 61);/* rgb(37, 37, 37);*/
     margin:0;
@@ -10,7 +19,12 @@ table{
     font-family:sans-serif;
     font-size: 16px;
 }
-    td, th {
+    th {
+        color: #ffffff;
+        text-align: left;
+        height: 30px;
+    }
+    td{
         color: #ffffff;
         border: 2px solid rgb(61, 61, 61);
         text-align: left;
@@ -24,77 +38,8 @@ table{
         width: 100%;
         background-color: rgb(30, 30, 30);
     }
-    #StatusCS{
-        text-align: center;
-        color: paleturquoise;
-        width: 40%;
-        height: 30px;
-        font-size: 25px;
-        cursor: pointer;
-    }
-    #StatusReturn{
-        text-align: center;
-        width: 40%;
-        height: 40px;
-        cursor: pointer;
-
-        background-image: url("picture/back.png");
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position: center;
-    }
-    #StatusURL{
-        text-align: center;
-        width: 40%;
-        height: 30px;
-    }
-    #RecordReturn{
-        text-align: center;
-        width: 20%;
-        height: 30px;
-        cursor: pointer;
-
-        background-image: url("picture/back.png");
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position: center;
-    }
-    #RecordURL{
-        color: lightgreen;
-        text-align: center;
-        width: 80%;
-        height: 30px;
-    }
-    #RecordWeb{
-        text-align: center;
-        width: 80%;
-        height: 30px;
-        cursor: pointer;
-    }
-    #RecordDelete{
-        text-align: center;
-        height: 30px;
-        cursor: pointer;
-
-        background-image: url("picture/trash.png");
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position: center;
-    }
-    #RecordSave{
-        font-size : 20px;
-        height : 30px;
-        text-indent: 10px;
-        text-align: center;
-        cursor: pointer;
-        
-        background-image: url("picture/save.png");
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position: center;
-    }
-
     #label{
+        color: darkorange;
         text-align :center;
         height: 30px;
     }
@@ -103,117 +48,18 @@ table{
         text-align :center;
         height: 30px;
     }
-    #WLHeader{
-        font-size : 20px;
-        height : 40px;
-        text-align: center;
-    }
-    #WLDel{
-        text-align :center;
-        width : 30px;
-        cursor : pointer;
-    }
     #add{
         text-align :center;
         width : 30px;
         cursor : pointer;
-    }
-    /*BR*/
-    #BRHeader{
-        color: aquamarine;
-        text-align: center;
-        font-size : 20px;
-        height : 30px;
-        width: 200px;
-    }
-    #BRHeaderTime{
-        background-image: url("picture/time.png");
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position: center;
-        
-        height : 40px;
-        text-align: center;
-        width: 30%;
-        font-size : 20px;
-    }
-    .BRItem{
-        text-align: center;
-    }
-    #BRUrl{
-        cursor: pointer;
-    }
-    /*Cookie Status*/
-    #CSHeader{
-        color: aqua;
-        text-align: center;
-        font-size : 20px;
-        height : 40px;
-        width: 150px;
-    }
-    .CSItem{
-        text-align: center;
-        font-size : 20px;
-    }
-    .CSButton{
-        cursor: pointer;
-        text-align: center;
-        background-image: url("picture/change.png");
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position: center;
-        
-    }
-    #CRHeader{
-        font-size : 20px;
-        height : 40px;
-        text-indent: 10px;
-        text-align: center;
-    }
-    #CRDelete{
-        width: 30px;
-        text-align: center;
-        background-image: url("picture/trash.png");
-        background-repeat: no-repeat;
-        background-size: contain;
-    }
-    #CRURL{
-        text-align :center;
-        cursor: pointer;
-    }
-    #CRDel{
-        text-align :center;
-        width : 30px;
-        cursor : pointer;
-    }
-    #CRButton{
-        font-size : 20px;
-        height : 40px;
-        text-indent: 10px;
-        text-align: center;
-        cursor: pointer;      
-    }
-    #CRSaveButton{
-        font-size : 20px;
-        height : 40px;
-        text-indent: 10px;
-        text-align: center;
-        cursor: pointer;
-        
-        background-image: url("picture/save.png");
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position: center;
     }
 
 #input{
     background-color: rgb(61, 61, 61);
     border: none;
     outline:none;
-    font-size: 16px;
+    font-size: 18px;
     color: #ffffff;
-    margin-left: 5px;
-    margin-right: 5px;
     width:400px;
 
 }
@@ -257,28 +103,6 @@ button{
         background-color: rgb(45, 45, 45);
         color:rgb(173, 173, 173);
     }
-#Status{
-    cursor : pointer;
-    font-weight:bold;
-    outline:none;
-    width: 50%;
-    height: 50px;
-    float: left;
-    border: none;
-    font-size: 20px;
-    font-family:sans-serif;
-}
-#Record{
-    cursor : pointer;
-    font-weight:bold;
-    outline:none;
-    width: 50%;
-    height: 50px;
-    float: left;
-    border: none;
-    font-size: 20px;
-    font-family:sans-serif;
-}
 #LEDGreen{
     background-image: url("picture/Green.png");
     background-repeat: no-repeat;
@@ -287,6 +111,20 @@ button{
 }
 #LEDRed{
     background-image: url("picture/Red.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+#uncheckbox{
+    cursor: pointer;
+    background-image: url("picture/uncheck.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+#checkbox{
+    cursor: pointer;
+    background-image: url("picture/check.png");
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
