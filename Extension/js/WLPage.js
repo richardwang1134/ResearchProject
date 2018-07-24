@@ -45,7 +45,6 @@ function add2WL(url){//新增新的url到白名單、更新白名單、刷新頁
         {get:"wl"},
         (response)=>{
             wl = JSON.parse(response.wl);
-            //console.log("wl:",typeof(wl));
             if(wl.indexOf(url)==-1){
                 wl.push(escapeHtml(url));
                 updateWL();
@@ -65,7 +64,7 @@ function addWLRows(url){//依照url在頁面上新增一頁
             ShowInfo(url);
         };
     var del = document.createElement("td");
-        del.id = "WLDel";
+        del.id = "Del";
         del.onmouseover =()=>{del.innerHTML = "—";};
         del.onmouseout =()=>{del.innerHTML = "";};
         del.onclick =()=>{delWLRow(url);delCRRow(url);};
@@ -84,6 +83,7 @@ function delWLRow(url){
     wl.pop();
     updateWL();
 }
+
 
 function updateWL(){//更新白名單並刷新頁面
     var json_str = JSON.stringify(wl);

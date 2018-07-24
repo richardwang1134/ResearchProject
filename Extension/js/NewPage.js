@@ -4,12 +4,13 @@ function NewPage(){
         table.removeChild(table.lastChild);
     }
     var tr1 = document.createElement("tr");
+    
     var Return = document.createElement("td");
         Return.id = "LogReturn";
-        Return.onclick=()=>{ReturnHome();};
+        Return.onclick=()=>{AccountPage();};
     var Save = document.createElement("td");
         Save.id = "LogSave";
-        Save.onclick=()=>{ReturnHome();}
+        Save.onclick=()=>{SaveAccountData(NameInput.value,AccountInput.value,PasswordInput.value);}
 
     var tr2 = document.createElement("tr");
     var Name = document.createElement("th");
@@ -45,4 +46,28 @@ function NewPage(){
     table.appendChild(tr4);
     tr4.appendChild(Password);
     tr4.appendChild(PasswordInput);
+}
+async function SaveAccountData(Name,Account,Password){
+    var Key = await GetKey1();
+    var Label = Name + "_"+ Account ; 
+    var Cipertext = Aes.Ctr.encrypt(Password, Key, 256);
+    var AccountLabel = await GetAccountLabel();
+    try{
+        AccountLabel.push(Label);
+    }catch(err){
+        AccountLabel = [];
+        AccountLabel.push(Label);
+    }
+    chrome.storage.local.set({[Label]:[Cipertext]},function(){});
+    chrome.storage.local.set({"AccountLabel":AccountLabel},function(){});
+    AccountPage();
+}
+function GetAccountLabel(){
+	return new Promise(
+		(resolve)=>{
+			chrome.storage.local.get("AccountLabel",function(items){
+                    resolve(items.AccountLabel);
+			})
+		}
+	);
 }

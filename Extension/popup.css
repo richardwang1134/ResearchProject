@@ -1,3 +1,12 @@
+@import "css/Status.css";
+@import "css/Record.css";
+@import "css/WL.css";
+@import "css/BR.css";
+@import "css/CS.css";
+@import "css/CR.css";
+@import "css/Log.css";
+
+
 body {
     background-color: rgb(61, 61, 61);/* rgb(37, 37, 37);*/
     margin:0;
@@ -10,102 +19,61 @@ table{
     font-family:sans-serif;
     font-size: 16px;
 }
-    td, th {
+    th {
+        color: #ffffff;
+        text-align: left;
+        height: 30px;
+    }
+    td{
         color: #ffffff;
         border: 2px solid rgb(61, 61, 61);
         text-align: left;
         height: 30px;
     }
     tr:nth-child(even) {
+        width: 100%;
         background-color: rgb(45, 45, 45);
     }
     tr:nth-child(odd) {
+        width: 100%;
         background-color: rgb(30, 30, 30);
     }
-    /*WL*/
-    #WLURL{
+    #label{
+        color: darkorange;
         text-align :center;
+        height: 30px;
     }
-    #WLHeader{
-        font-size : 20px;
-        height : 40px;
-        text-indent: 10px;
-    }
-    #WLDel{
+    #label1{
+        color: gold;
         text-align :center;
-        width : 30px;
-        cursor : pointer;
+        height: 30px;
     }
+    #label2{
+        color: cornflowerblue;
+        text-align :center;
+        height: 30px;
+    }
+    #AccountDataPassword{
+        color: cornflowerblue;
+        text-align :center;
+        height: 30px;
+        cursor: pointer;
+    }
+
     #add{
         text-align :center;
         width : 30px;
         cursor : pointer;
-    }
-    /*BR*/
-    #BRHeader{
-        text-align: center;
-        font-size : 20px;
-        height : 40px;
-        width: 150px;
-    }
-    #BRHeaderTime{
-        height : 40px;
-        text-align: center;
-        width: 100px;
-        font-size : 20px;
-    }
-    .BRItem{
-        text-align: center;
-    }
-    #BRUrl{
-        cursor: pointer;
-    }
-    /*Cookie Status*/
-    #CSHeader{
-        text-align: center;
-        font-size : 20px;
-        height : 40px;
-        width: 150px;
-    }
-    .CSItem{
-        text-align: center;
-        font-size : 20px;
-    }
-    .CSButton{
-        cursor: pointer;
-        text-align: center;
-    }
-    #CRHeader{
-        font-size : 20px;
-        height : 40px;
-        text-indent: 10px;
-        text-align: center;
-    }
-    #CRURL{
-        text-align :center;
-        cursor: pointer;
-    }
-    #CRDel{
-        text-align :center;
-        width : 30px;
-        cursor : pointer;
-    }
-    #CRButton{
-        font-size : 20px;
-        height : 40px;
-        text-indent: 10px;
-        text-align: center;
-        cursor: pointer;
     }
 
 #input{
     background-color: rgb(61, 61, 61);
     border: none;
     outline:none;
-    font-size: 16px;
+    font-size: 18px;
     color: #ffffff;
-    margin-left: 30px;
-    width:350px;
+    width:400px;
+
 }
 /*---DIV---*/
 .tab{
@@ -129,11 +97,47 @@ button{
     font-size: 20px;
     font-family:sans-serif;
 }
-    .tab-button-on{
-        background-color: rgb(30, 30, 30);
-        color:#ffffff;
+    .tab-onmouseover{
+        color:#ffffff;     
+        background: linear-gradient(90deg, rgba(65, 151, 255, 0.4)0%, rgba(0, 0, 0, 0.5)30%);
+        background: -moz-linear-gradient(90deg, rgba(65, 151, 255, 0.4)0%, rgba(0, 0, 0, 0.5)30%);
+        background: -webkit-linear-gradient(90deg, rgba(65, 151, 255, 0.4)0%, rgba(0, 0, 0, 0.5)30%);
+        background: -o-linear-gradient(90deg, rgba(65, 151, 255, 0.4)0%, rgba(0, 0, 0, 0.5)30%);
+
+    }
+  .tab-button-on{
+	    background-color: rgb(30, 30, 30);
+	    color: rgb(13, 240, 252);
+        text-shadow: rgb(250, 242, 242) 3px 3px 12px;
+
     }
     .tab-button-off{
         background-color: rgb(45, 45, 45);
         color:rgb(173, 173, 173);
     }
+#LEDGreen{
+    background-image: url("picture/Green.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+#LEDRed{
+    background-image: url("picture/Red.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+#uncheckbox{
+    cursor: pointer;
+    background-image: url("picture/uncheck.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+#checkbox{
+    cursor: pointer;
+    background-image: url("picture/check.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
