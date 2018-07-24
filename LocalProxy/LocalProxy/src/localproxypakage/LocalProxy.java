@@ -9,8 +9,8 @@ public class LocalProxy {
 	@SuppressWarnings("resource")
 	public static void main(String[] args) throws Exception {
 		ExecutorService executor = Executors.newCachedThreadPool();
-        ServerSocket listener = new ServerSocket(8000,10);
-        System.out.println("Waiting for Connecting...");
+        ServerSocket listener = new ServerSocket(8000,50);
+        Printer.print("Waiting for Connecting...");
         while(true) {
             Socket socket = listener.accept();
             MyHandler handler = new MyHandler(socket);

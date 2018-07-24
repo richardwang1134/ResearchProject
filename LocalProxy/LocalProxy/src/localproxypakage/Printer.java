@@ -12,7 +12,11 @@ public class Printer {
 		System.out.println();
 	}
 	static void print(String s) {
-		System.out.println(s);
-		System.out.println();
+		//System.out.println(s);
+		//System.out.println();
+	}
+	static void printId(String s) {
+		//System.out.println(s);
+		//System.out.println();
 	}
 }

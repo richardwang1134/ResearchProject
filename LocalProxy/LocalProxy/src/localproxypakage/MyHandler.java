@@ -26,20 +26,28 @@ public class MyHandler implements Runnable {
 			browserRequest = browserSocket.receive();
 			switch (browserRequest.type) {
 				case "1":
-					String url = getFromMap(browserRequest.id);
-					Printer.printThread(browserRequest.id+" get "+url);
-					ServerSocket serverSocket = new ServerSocket(url);
-					browserSocket.sendHeader(serverSocket.head);
-					if(serverSocket.responseIsChunked) {
-						browserSocket.sendChunkedBody(serverSocket.bufferedReader);
+					Printer.print(browserRequest.id + " browser >> proxy   : request 1");
+					ServerConnection serverConnection = new ServerConnection(browserRequest.url);
+					Printer.print(browserRequest.id + " proxy   >> server  : GET script request");
+					ServerResponse serverResponse = serverConnection.getResponse();
+					Printer.print(browserRequest.id + " server  >> proxy   : response, for GET script request");
+					wait(browserRequest.id);
+					browserSocket.sendHeader(serverResponse.head);
+					if(serverResponse.isChunked) {
+						Printer.print(browserRequest.id + " proxy   >> browser : chunked script response, for request 1");
+						browserSocket.sendChunkedBody(serverResponse.bufferedReader);
 					}else {
-						browserSocket.sendBody(serverSocket.bufferedReader);
+						Printer.print(browserRequest.id + " proxy   >> browser : script response, for request 1");
+						browserSocket.sendBody(serverResponse.bufferedReader);
 					}
+					browserSocket.close();
+					Printer.print(browserRequest.id + " Complete!");
 					break;
 				case "2":
-					setToMap(browserRequest.id,browserRequest.url);
-					Printer.printThread(browserRequest.id+" set "+browserRequest.url);
-					browserSocket.sendHeader("HTTP/1.0 200 OK\r\n");
+					Printer.print(browserRequest.id + " browser >> proxy   : request 2");
+					signal(browserRequest.id);
+					Printer.print(browserRequest.id + " proxy   >> browser : 200 OK empty response, for request 2");
+					browserSocket.sendHeader("HTTP/1.1 200 OK\r\nContent-Length:7\r\n\r\nnothing\r\n\r\n");
 					browserSocket.close();
 					break;
 				default:
@@ -57,27 +65,20 @@ public class MyHandler implements Runnable {
 		if(ip.equals("/127.0.0.1")) return true;
 		else		return false;	
 	}
-	private void setToMap(String id, String url) {
-		if(id!=null && url!=null) {
-			lock.lock();
-			MyMap.set(id, url);
-			condition.signalAll();
-			lock.unlock();
-		}
+	private void wait(String id) throws InterruptedException {
+		lock.lock();
+		Printer.printId(id+" waiting");
+		while(!BlockingIDs.contains(browserRequest.id)) condition.await();
+		Printer.printId(id + " removed");
+		BlockingIDs.remove(browserRequest.id);
+		lock.unlock();
 	}
-	private String getFromMap(String id) throws InterruptedException {
-		String url = null;
-		if(id != null) {
-			lock.lock();			
-			url = MyMap.get(id);
-			while(url == null) {
-				condition.await();
-				url = MyMap.get(id);
-			}
-			MyMap.del(id);
-			lock.unlock();
-		}
-		return url;
+	private void signal(String id) throws InterruptedException {
+		lock.lock();
+		BlockingIDs.add(browserRequest.id);
+		Printer.printId(id + " signaled");
+		condition.signalAll();
+		lock.unlock();
 	}
 }
 

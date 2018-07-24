@@ -9,16 +9,13 @@ import java.util.List;
 import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
-public class ServerSocket {
+public class ServerConnection {
 	
 	private Map<String, List<String>> mapHead = null;
+	private String encoding = "UTF-8";	
+	BufferedReader bufferedReader = null;	
 	
-	public BufferedReader bufferedReader = null;	
-	public String encoding = "UTF-8";	
-	public String head = "HTTP/1.1 200 OK\r\n";
-	public boolean responseIsChunked = false;
-	
-	public ServerSocket(String urll) throws IOException {
+	ServerConnection(String urll) throws IOException {
 		URL url = new URL(urll);
 		String protocol = url.getProtocol();
 		if(protocol.equals("https")) {
@@ -27,24 +24,29 @@ public class ServerSocket {
 			encoding = connection.getContentEncoding();
 			encoding = encoding == null ? "UTF-8" : encoding;
 			bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), encoding));
-			head = "";
 		}else{
 			HttpURLConnection connection = (HttpURLConnection)url.openConnection();
 			mapHead = connection.getHeaderFields();
 			encoding = connection.getContentEncoding();
 			encoding = encoding == null ? "UTF-8" : encoding;
 			bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), encoding));
-			head = "";
 		}
+	}
+	ServerResponse getResponse() {
+		ServerResponse response = new ServerResponse();
+		response.enCoding = encoding;
+		response.bufferedReader = bufferedReader;
 		for (Map.Entry<String, List<String>> entry : mapHead.entrySet()) {
 			if(entry.getKey()==null) {
-				head = entry.getValue().toArray()[0] + "\r\n" + head;
+				response.head = entry.getValue().toArray()[0] + "\r\n" + response.head;
 			}else{
-				head 	= head + entry.getKey() + ": " + entry.getValue().toArray()[0] + "\r\n";
+				response.head 	= response.head + entry.getKey() + ": " + entry.getValue().toArray()[0] + "\r\n";
 				if(entry.getKey().equals("Transfer-Encoding") && entry.getValue().toArray()[0].equals("chunked")) {
-					responseIsChunked = true;
+					response.isChunked = true;
 				}
 			}
 		}
+		response.head = response.head + "\r\n";
+		return response;
 	}
 }

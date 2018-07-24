@@ -13,10 +13,8 @@ public class BrowserSocket {
 	private Socket socket;
 	private BufferedReader bufferedReader;
 	private BufferedWriter bufferedWriter;
-	public String id  = null;
-	public String url = null;
-	public String requestType  = null;
-	public String head  = "";
+	String id  = null;
+	String url = null;
 
 	public BrowserSocket(Socket socket) throws IOException {
 		this.socket = socket;
@@ -25,32 +23,36 @@ public class BrowserSocket {
 		bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF8"));
 	}
 	public BrowserRequest receive(){
-		BrowserRequest browserRequst = new BrowserRequest();
+		BrowserRequest browserRequest = new BrowserRequest();
 		String line = "line";
 		int beginIndex,endIndex;
 		try {
 			while(line!=null && !line.equals("")) {				
 				line = bufferedReader.readLine();
-				endIndex = line.indexOf(": ");
-				beginIndex = endIndex+2;
-				if(beginIndex>0 && endIndex >0) {
-					if(line.substring(0,endIndex).equals("requestId")) {
-						browserRequst.id = line.substring(beginIndex);
-					}else if(line.substring(0,endIndex).equals("originalURL")) {
-						browserRequst.url = line.substring(beginIndex);
+				Printer.printThread(line);
+				if(line.contains("/request1")) {
+					browserRequest.type = "1";
+					beginIndex = line.indexOf("/request1")+10;
+					endIndex = line.indexOf("/",beginIndex);
+					if(beginIndex>0 && endIndex >0) {
+						browserRequest.id = line.substring(beginIndex,endIndex);
 					}
-				}
-				beginIndex = line.indexOf(" ")+1;
-				endIndex = line.indexOf(" ",beginIndex);
-				if(beginIndex>0 && endIndex >0) {
-					if(line.substring(beginIndex,endIndex).equals("/browserRequest1")) {
-						browserRequst.type = "1";
-					}else if(line.substring(beginIndex,endIndex).equals("/browserRequest2")){
-						browserRequst.type = "2";
+					beginIndex = line.indexOf("/",endIndex)+1;
+					endIndex = line.indexOf(" ",beginIndex);
+					if(beginIndex>0 && endIndex >0) {
+						browserRequest.url = line.substring(beginIndex,endIndex);
+					}
+					break;
+				}else if(line.contains("/request2")){
+					browserRequest.type = "2";
+					beginIndex = line.indexOf("/request2")+10;
+					endIndex = line.indexOf(" ",beginIndex);
+					if(beginIndex>0 && endIndex >0) {
+						browserRequest.id = line.substring(beginIndex,endIndex);
 					}
 				}
 			}
-			return browserRequst;
+			return browserRequest;
 		}catch(Exception e) {	
 			Printer.printException("BrowserSocket.receive", e.getMessage());
 			return null;
@@ -59,21 +61,21 @@ public class BrowserSocket {
 	public void sendHeader(String header) throws IOException {
 		bufferedWriter.write(header);
 	}
-
 	public void sendBody(BufferedReader bufferedReader) throws IOException {
-		String buffer;
-		while((buffer = bufferedReader.readLine())!=null) {
-			bufferedWriter.write(buffer+"\r\n");
+		String line;
+		while(true) {
+			line = bufferedReader.readLine();
+			if(line==null) break;
+			bufferedWriter.write(line + "\r\n");
 		}
+		bufferedWriter.write("\r\n");
+		bufferedWriter.close();
 	}
 
 	@SuppressWarnings({ "resource", "null" })
 	public void sendChunkedBody(BufferedReader bufferedReader){
 		try {
-			File file=new File("log.txt");
-			FileWriter fileWriter = new FileWriter(file);
-			String line = "";
-			//bufferedWriter.write("11\r\n/*start*/\r\n\r\n");
+			String line;
 			while(true) {
 				line = bufferedReader.readLine();
 				if(line==null) break;
@@ -81,14 +83,9 @@ public class BrowserSocket {
 					Integer.toHexString(line.length()+2) + "\r\n"
 					+ line + "\r\n"
 					+ "\r\n");
-				fileWriter.write(
-					Integer.toHexString(line.length()+2) + "\r\n"
-					+ line + "\r\n"
-					+ "\r\n");
 			}
 			bufferedWriter.write("0\r\n\r\n");
 			bufferedWriter.close();
-			fileWriter.close();
 		}catch(Exception e) {
 			Printer.printException("BrowserSocket.sendChunkedBody", e.getMessage());
 		}

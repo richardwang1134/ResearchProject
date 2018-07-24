@@ -4,11 +4,12 @@ var BR = []; //Block Record	[time,url,ref]
 var CS = []; //當前頁面的Cookie Status
 var CR = []; //各網頁的Cookie設定
 var URL = "";//當前頁面url
+var PROXY_ADDR = "http://127.0.0.1:8000";
 
 //redirect request, then process blocked request
 chrome.webRequest.onBeforeRequest.addListener(
 	(details)=>{
-		if(details.url!="http://127.0.0.1:8000/browserRequest1"){
+		if(!details.url.includes(PROXY_ADDR + "/request1")){
 			var url = details.url;
 			var rid = details.requestId.toString();
 			var tid = details.tabId;
@@ -16,8 +17,9 @@ chrome.webRequest.onBeforeRequest.addListener(
 				return;
 			}else{
 				procBlocked(url,rid,tid);
-				console.log("send request 1 of request " + rid);
-				return {redirectUrl:"http://127.0.0.1:8000/browserRequest1"};
+				var redirected = PROXY_ADDR+"/request1/"+rid+"/"+url;
+				console.log(rid+" send request 1 : "+redirected);
+				return {redirectUrl:redirected};
 			}
 		}
 	}
@@ -25,20 +27,6 @@ chrome.webRequest.onBeforeRequest.addListener(
 		types: ["script"]
 	}
 , 	["blocking"]
-);
-
-//add new header -- requestId
-chrome.webRequest.onBeforeSendHeaders.addListener(
-	(details)=>{
-		var rid = details.requestId.toString();
-		var obj = {"name":"requestId","value":rid};
-		details.requestHeaders.push(obj);
-		return {requestHeaders: details.requestHeaders};
-	}
-,	{	urls: ["http://127.0.0.1:8000/browserRequest1"],
-		types: ["script"]	}
-
-, 	["blocking","requestHeaders"]
 );
 
 //process blocked request
@@ -51,8 +39,9 @@ async function procBlocked(url,rid,tid){
 	}else{
 		add2BR(ref,url);
 		var resulet = await delCookie(ref);
+		console.log(rid+" deleted cookie of "+ref);
 	}
-	sendRequest(rid,url);
+	sendRequest(rid);
 }
 
 function SetSameSite(url,cookie,sameSite){
@@ -75,13 +64,13 @@ function SetSameSite(url,cookie,sameSite){
 	})
 }
 //send request with url that before redirect and request id
-function sendRequest(rid,url){
-	console.log("send request 2 of request " + rid);
+function sendRequest(rid){
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', 'http://127.0.0.1:8000/browserRequest2', false);
-	xhr.setRequestHeader("originalURL",url);
-	xhr.setRequestHeader("requestId",rid);
-	xhr.send(); 
+	var url ='http://127.0.0.1:8000/request2/'+rid;
+	xhr.open('GET', url, true);
+	xhr.setRequestHeader("content-type", "text/plain");
+	xhr.send();
+	console.log(rid+" send request 2 : "+url );
 }
 
 //get url by tabId
