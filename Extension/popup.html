@@ -7,22 +7,27 @@
     </head>
     <body>
         <div class="tab">
-            <button id="B1" class="tab-button-on" onclick="openPage('Record')">BlockRecord</button>
-            <button id="B2" class="tab-button-off" onclick="openCity('WhiteList')">WhiteList</button>
-            <button id="B3" class="tab-button-off" onclick="openCookieStatus('CookieStatus')">CookieStatus</button>
-            <button id="B4" class="tab-button-off" onclick="openCookieRecord('CookieRecord')">CookieRecord</button>
+            <button id="Setting" width="50" style="width: 100px ;" class="tab-button-off" onclick="openPage('Setting')">Setting</button>
+            <button id="Status" width="50" style="width: 250px ;" class="tab-button-off" onclick="openPage('Status')">Status</button>
+            <button id="Record" width="50" style="width: 250px ;" class="tab-button-off" onclick="openPage('Record')">Record</button>
+            <button id="AccountData" width="50" style="width: 600px ;" class="tab-button-off" onclick="openPage('AccountData')">AccountData</button>
+            <button id="Log" width="50" style="width: 600px ;" class="tab-button-off" onclick="openPage('Log')">Login/Logout</button>
+           
+            <div id = "Psetting" class = "page" style="display:none">
+                    <table id = "Tsetting"></table>
+            </div>
+            <div id = "Pstatus" class="page">
+                <table id = "Tstatus"></table>
+            </div>
+            <div id = "Precord" class = "page" style="display:none">
+                <table id = "Trecord"></table>
+            </div>
+            <div id = "PaccountData" class="page">
+                <table id = "TAccountData"></table>
+            </div>
+            <div id = "Plog" class="page">
+                <table id = "TLog"></table>
+            </div>
         </div>
-        <div id = "P1" class = "page">
-            <table id = "T1"></table>
-        </div>
-        <div id = "P2" class = "page" style="display:none">
-            <table id = "T2"></table>
-        </div>
-        <div id = "P3" class = "page" style="display:none">
-            <table id = "T3"></table>
-        </div>
-        <div id = "P4" class = "page" style="display:none">
-            <table id = "T4"></table>
-        </div>  
     </body>
 </html>

@@ -1,12 +1,19 @@
 //----INIT----
-var WL = []; //White List	[ref]
-var BR = []; //Block Record	[time,url,ref]
+var WL = ["tw.yahoo.com"]; //White List	[ref]
+var BR = [["www.google.com","tw.yahoo.com","21:04:05"],["tw.yahoo.com66666666666666666666","192.168.0.1666666666666666666666666666666666666666666666/example2.js","21:04:05"],["tw.yahoo.com","192.168.0.1/example.js","21:04:05"]] //Block Record	[time,url,ref]
 var CS = []; //當前頁面的Cookie Status
 var CR = []; //各網頁的Cookie設定
 var URL = "";//當前頁面url
 var PROXY_ADDR = "http://127.0.0.1:8000";
+var Status = "Logout";
+var TwoPhaseLock = "off";
 
-//redirect request, then process blocked request
+chrome.storage.local.clear();
+chrome.storage.local.set({"password":"admin"},function(){});
+chrome.storage.local.set({"key1":[GenerateKey()]},function(){});
+chrome.storage.local.set({"key2":[GenerateKey()]},function(){});
+
+//redirect to proxy (request 1)
 chrome.webRequest.onBeforeRequest.addListener(
 	(details)=>{
 		if(!details.url.includes(PROXY_ADDR + "/request1")){
@@ -28,8 +35,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 	}
 , 	["blocking"]
 );
-
-//process blocked request
+//on redirect, delcookie and send request 2
 async function procBlocked(url,rid,tid){
 	var ref = await getTabURL(tid);
 	var refDomain = ref.split("/")[2];
@@ -43,36 +49,13 @@ async function procBlocked(url,rid,tid){
 	}
 	sendRequest(rid);
 }
-
-function SetSameSite(url,cookie,sameSite){
-	return new Promise((resolve)=>{
-			chrome.cookies.set(
-			{	
-			 	url:url
-				,name:cookie.name
-				,value:cookie.value
-				,domain:cookie.domain
-				,path:cookie.path
-				,secure:cookie.secure
-				,httpOnly:cookie.httpOnly
-				,sameSite:sameSite
-				,expirationDate:cookie.expirationDate
-				,storeId:cookie.storeId
-			},(cookie)=>{
-			resolve(cookie);
-		})
-	})
+function inWL(domain){
+	if(WL){
+		for(var i =0; i < WL.length; i++)
+			if(domain == WL[i])	return true;
+	}
+	return false;
 }
-//send request with url that before redirect and request id
-function sendRequest(rid){
-	var xhr = new XMLHttpRequest();
-	var url ='http://127.0.0.1:8000/request2/'+rid;
-	xhr.open('GET', url, true);
-	xhr.setRequestHeader("content-type", "text/plain");
-	xhr.send();
-	console.log(rid+" send request 2 : "+url );
-}
-
 //get url by tabId
 function getTabURL(tid){
 	return new Promise(
@@ -84,6 +67,52 @@ function getTabURL(tid){
 		}
 	)
 }
+//send request 2
+function sendRequest(rid){
+	var xhr = new XMLHttpRequest();
+	var url ='http://127.0.0.1:8000/request2/'+rid;
+	xhr.open('GET', url, true);
+	xhr.setRequestHeader("content-type", "text/plain");
+	xhr.send();
+	console.log(rid+" send request 2 : "+url );
+}
+chrome.tabs.onSelectionChanged.addListener(
+	function (tabId,selectinfo) {
+	chrome.tabs.getSelected(null,
+		async function(tab){
+			var ON_CR = false;
+			var ON_WL = false;
+			CS = [];
+			URL = tab.url.split("/")[2];
+			CR = await getCookieRecord();
+			WL = await getWhiteList();
+			if(CR){
+				for(var i = 0 ; i < CR.length ; i++){
+					if( URL == CR[i]){
+						ON_CR = true;
+					}
+				}
+			}
+			if(WL){
+				for(var i = 0 ; i < WL.length ; i++){
+					if(URL == WL[i]){
+						ON_WL = true;
+					}
+				}
+			}
+			CS = await getCookie(tab.url);
+			if(!ON_WL){
+				console.log("not in WL");
+				for(var i = 0 ; i < CS.length ; i++){
+					CS[i] = await SetSameSite(tab.url,CS[i],'strict');
+				}
+			}
+			if(ON_CR){
+				var CSCR = await getCS(URL);
+				CS = await CompareCS(tab.url,CSCR,CS);
+			}
+	});
+  });
 chrome.tabs.onUpdated.addListener(
 	async function (tabId, props, tab) {
 		if (props.status == "loading" && tab.selected) {
@@ -109,6 +138,7 @@ chrome.tabs.onUpdated.addListener(
 		}
 		CS = await getCookie(tab.url);
 		if(!ON_WL){
+			//console.log("not in WL");
 			for(var i = 0 ; i < CS.length ; i++){
 				CS[i] = await SetSameSite(tab.url,CS[i],'strict');
 			}
@@ -120,52 +150,23 @@ chrome.tabs.onUpdated.addListener(
 		}
 	}
 });
-function CompareCS(url,CSCR,CS){
-	return new Promise(
-	async function(resolve){
-		for(var i = 0 ; i < CS.length ; i++){
-			for(var j = 0 ; j < CSCR.length ; j++){
-				if(CS[i].name == CSCR[j].name){
-					CS[i] = await SetSameSite(url,CS[i],CSCR[j].sameSite);
-					//console.log(CS[i]);
-				}
-			}
-		}
-		//console.log(CS);
-		resolve(CS);
-	}
-	);
-}
-//confirm wheather domain is in WL
-function inWL(domain){
-	if(WL){
-		for(var i =0; i < WL.length; i++)
-			if(domain == WL[i])	return true;
-	}
-	return false;
-}
-
-//add record to block record list
-function add2BR(ref,url){
-	refDomain = ref.split("/")[2];
-	urlDomain = url.split("/")[2];
+function add2BR(refDomain,urlDomain){
 	for(var i = 0; i < BR.length; i++){
 		if(refDomain == BR[i][2]){
-			BR[i][0]=getTime();
+			BR[i][2]=getTime();
 			return{cancel:false};
 		}
 	}
 	if(i >= BR.length)
 		BR.push([getTime(),urlDomain,refDomain]);
 }
-
-//get white list
+//----GET_WHITELIST----
 function getWhiteList(){
 	return new Promise(
 		(resolve)=>{
 			chrome.storage.sync.get(
 				"whiteList",
-				(item)=>{resolve(item.whiteList)}
+				(item)=>{resolve(item["whiteList"])}
 			)
 		}
 	);
@@ -190,8 +191,7 @@ function getCS(url){
 		}
 	);
 }
-
-//delete cookie by url
+//----DELETE COOKIE----
 function delCookie(url){
 	return new Promise(
 		(resolve,reject)=>{
@@ -216,8 +216,10 @@ function delCookie(url){
 		}
 	);
 }
-
-//get cookie by url
+async function printCoockie(url){
+	var c = await getCookie(url);
+	console.log("cccc",c);
+}
 function getCookie(url){
 	return new Promise(
 		(resolve)=>{
@@ -231,8 +233,6 @@ function getCookie(url){
 		}
 	)
 }
-
-//get time
 function getTime(){
 	var d = new(Date);
 	var h = d.getHours();
@@ -243,7 +243,7 @@ function getTime(){
 	if(s < 10) s = "0" + s;
 	return(h + ":" + m + ":" + s);
 }
-
+/*----SEND MSG OF [WHITELIST & BLOCK RECORD]----*/
 chrome.runtime.onMessage.addListener(
 	(request, sender, sendResponse)=>{
 	  	if (request.get == "wl"){
@@ -276,8 +276,20 @@ chrome.runtime.onMessage.addListener(
 			sendResponse({ack:JSON.stringify("OK")});
 			chrome.storage.sync.set({"cookieRecord":CR},function(){});
 			console.log("UpdateCR:",CR);
-		}
-		else if(request.get=="cs"){
+		}else if(request.Statusupdate){
+			var json_strs = JSON.parse(request.Statusupdate);
+			Status = json_strs;
+			sendResponse({ack:JSON.stringify("OK")});
+			chrome.storage.local.set({"Status":Status},function(){});
+			console.log("UpdateStatus:",Status);
+		}else if(request.Twophaseupdate){
+			var json_strs = JSON.parse(request.Twophaseupdate);
+			TwoPhaseLock = json_strs;
+			sendResponse({ack:JSON.stringify("OK")});
+			chrome.storage.local.set({"Twophase":TwoPhaseLock},function(){});
+			console.log("UpdateTwophase:",TwoPhaseLock);
+			
+		}else if(request.get=="cs"){
 			var json_str ;
 			if(CS){json_str = JSON.stringify(CS);}
 			else{json_str = JSON.stringify([]);}
@@ -300,9 +312,85 @@ chrome.runtime.onMessage.addListener(
 			sendResponse({cr: json_str});
 			chrome.storage.sync.set({[URL]:CS},function(){});
 			console.log("Add ",CS,"on ",URL,"into CR");
+		}else if(request.get=="Status"){
+			var json_str = JSON.stringify(Status);
+			sendResponse({status: json_str});
+			chrome.storage.local.set({"Status":Status},function(){});
+			console.log("Status:",Status);
+		}else if(request.get=="TwoPhase"){
+			var json_str = JSON.stringify(TwoPhaseLock);
+			sendResponse({TwoPhaseLock: json_str});
+			chrome.storage.local.set({TwoPhase:TwoPhaseLock},function(){});
 		}
 		else{
 			console.log("error!");
 		}	
 	}
 );
+function SetSameSite(url,cookie,sameSite){
+	return new Promise((resolve)=>{
+			chrome.cookies.set(
+			{	
+			 	url:url
+				,name:cookie.name
+				,value:cookie.value
+				,domain:cookie.domain
+				,path:cookie.path
+				,secure:cookie.secure
+				,httpOnly:cookie.httpOnly
+				,sameSite:sameSite
+				,expirationDate:cookie.expirationDate
+				,storeId:cookie.storeId
+			},(cookie)=>{
+			resolve(cookie);
+		})
+	})
+}
+function CompareCS(url,CSCR,CS){
+	return new Promise(
+	async function(resolve){
+		for(var i = 0 ; i < CS.length ; i++){
+			for(var j = 0 ; j < CSCR.length ; j++){
+				if(CS[i].name == CSCR[j].name){
+					CS[i] = await SetSameSite(url,CS[i],CSCR[j].sameSite);
+					//console.log(CS[i]);
+				}
+			}
+		}
+		//console.log(CS);
+		resolve(CS);
+	}
+	);
+}
+function GenerateKey(){
+    var Key = '';
+    var word = '';
+
+    for(var i = 0 ; i < 64 ; i++){
+        var Random = Math.floor(Math.random()*16);
+        switch (Random){
+            case 10:
+                word = 'A';
+                break;
+            case 11:
+                word = 'B';
+                break;
+            case 12:
+                word = 'C';
+                break;
+            case 13:
+                word = 'D';
+                break;
+            case 14:
+                word = 'E';
+                break;
+            case 15:
+                word = 'F';
+                break;
+            default:
+                word = String(Random);
+        }
+        Key = Key + word;
+    }
+    return Key;
+}
