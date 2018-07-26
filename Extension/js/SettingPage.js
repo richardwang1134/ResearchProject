@@ -99,15 +99,19 @@ function updateTwoPhase(){
 }
 async function SaveSetting(CurrentPassword,ChangePassword,AssurePassword,TwoPhaseID){
     var correct = await GetPassword();
-    if(CurrentPassword == correct){
+    if(sha256(CurrentPassword) == correct){
         if(TwoPhaseID == "uncheckbox"){
+            if(TwoPhaseLock == "on"){
+                DecryptAllData();
+            }
             TwoPhaseLock = "off";
             updateTwoPhase();
         }
         else if(TwoPhaseID == "checkbox"){
+            if(TwoPhaseLock == "off"){
+                EncryptAllData();
+            }
             TwoPhaseLock = "on";
-            var Key = await GetKey2();
-            QRcode(Key);
             updateTwoPhase();
         }
         else{
@@ -115,7 +119,7 @@ async function SaveSetting(CurrentPassword,ChangePassword,AssurePassword,TwoPhas
         }
         if(ChangePassword != "" && AssurePassword != ""){
             if(ChangePassword == AssurePassword){
-                chrome.storage.local.set({"password":ChangePassword},function(){});
+                chrome.storage.sync.set({"password":sha256(ChangePassword)},function(){});
                 console.log("成功改變密碼");
                 ReturnHome();
             }
@@ -131,5 +135,89 @@ async function SaveSetting(CurrentPassword,ChangePassword,AssurePassword,TwoPhas
         alert("密碼錯誤!");
     }
 }
+async function DecryptAllData(){
+    //將所有現有資料讀取出來並解密
+    Key2 = await GetKey2();
+    if(Key2 == ""){
+        alert("讀不到Key，請重新匯入KEY");
+        ReturnHome();
+    }else{
+        var AccountLabels = await GetAccountLabel();
+        try{
+            for(var i = 0 ; i < AccountLabels.length; i++){
+                var passwd = await GetAccountPassword(AccountLabels[i]);
+                var Cipertext = Aes.Ctr.decrypt(passwd,Key2, 256);
+                chrome.storage.sync.set({[AccountLabels[i]]:[Cipertext]},function(){});
+            }
+        }catch(error){
+            ;
+        }
+    }
+}
+async function EncryptAllData(){
+    Key2 = GenerateKey();
+    saveTextAsFile("Key2",Key2);
+    //將所有現有資料讀取出來並加密
+    var AccountLabels = await GetAccountLabel();
+    try{
+        for(var i = 0 ; i < AccountLabels.length; i++){
+            var passwd = await GetAccountPassword(AccountLabels[i]);
+            var Cipertext = Aes.Ctr.encrypt(passwd,Key2, 256);
+            chrome.storage.sync.set({[AccountLabels[i]]:[Cipertext]},function(){});
+        }
+    }catch(error){
 
+    }
+    await updateKey2();
+}
+function saveTextAsFile( _fileName, _text ) {
+    var textFileAsBlob = new Blob([_text], {type:'text/plain'});
 
+    var downloadLink = document.createElement("a");
+    downloadLink.download = _fileName;
+    downloadLink.innerHTML = "Download File";
+    if (window.webkitURL != null) {
+        // Chrome allows the link to be clicked
+        // without actually adding it to the DOM.
+        downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+    } else {
+        // Firefox requires the link to be added to the DOM
+        // before it can be clicked.
+        downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+        downloadLink.onclick = destroyClickedElement;
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+    }
+
+    downloadLink.click();
+}
+
+function destroyClickedElement(event) {
+    document.body.removeChild(event.target);
+}
+
+function updateKey2(){
+    var json_str = JSON.stringify(Key2);
+    chrome.runtime.sendMessage(
+        {Key2update: json_str },
+        (response)=>{
+            var ack = JSON.parse(response.ack);
+            if(ack == "OK"){
+            }else{
+                console("Key update failed");
+            }
+        }
+    );
+}
+function GetKey2(){
+	return new Promise(
+		(resolve)=>{
+			chrome.runtime.sendMessage(
+                {get:"Key2"},
+                (response)=>{
+                    resolve(JSON.parse(response.Key2));
+                }
+            );
+		}
+	);
+}

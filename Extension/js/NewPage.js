@@ -49,18 +49,43 @@ function NewPage(){
 }
 async function SaveAccountData(Name,Account,Password){
     var Key = await GetKey1();
-    var Label = Name + "_"+ Account ; 
-    var Cipertext = Aes.Ctr.encrypt(Password, Key, 256);
-    var AccountLabel = await GetAccountLabel();
-    try{
-        AccountLabel.push(Label);
-    }catch(err){
-        AccountLabel = [];
-        AccountLabel.push(Label);
+    var Cipertext;
+    if(TwoPhaseLock == "on"){
+        Key2 = await GetKey2();
+        if(Key2 == ""){
+            alert("讀不到Key，請重新匯入Key資料");
+            ReturnHome();
+        }
+        else{
+            Cipertext = Aes.Ctr.encrypt(Password, Key, 256);
+            var Label = Name + "_"+ Account ; 
+            Cipertext = Aes.Ctr.encrypt(Cipertext, Key2, 256);
+            var AccountLabel = await GetAccountLabel();
+            try{
+                AccountLabel.push(Label);
+            }catch(err){
+                AccountLabel = [];
+                AccountLabel.push(Label);
+            }
+            chrome.storage.local.set({[Label]:[Cipertext]},function(){});
+            chrome.storage.local.set({"AccountLabel":AccountLabel},function(){});
+            AccountPage();
+        }
     }
-    chrome.storage.local.set({[Label]:[Cipertext]},function(){});
-    chrome.storage.local.set({"AccountLabel":AccountLabel},function(){});
-    AccountPage();
+    else{
+        var Label = Name + "_"+ Account ; 
+        Cipertext = Aes.Ctr.encrypt(Password, Key, 256);
+        var AccountLabel = await GetAccountLabel();
+        try{
+            AccountLabel.push(Label);
+        }catch(err){
+            AccountLabel = [];
+            AccountLabel.push(Label);
+        }
+        chrome.storage.local.set({[Label]:[Cipertext]},function(){});
+        chrome.storage.local.set({"AccountLabel":AccountLabel},function(){});
+        AccountPage();
+    }
 }
 function GetAccountLabel(){
 	return new Promise(

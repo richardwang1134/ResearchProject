@@ -141,3 +141,8 @@ button{
     background-size: contain;
     background-position: center;
 }
+.label1{
+    color: aqua;
+    text-align :center;
+    height: 30px;
+}

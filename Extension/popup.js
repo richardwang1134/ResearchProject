@@ -8,6 +8,7 @@ var urlcs = [];
 
 var Status = "";
 var TwoPhaseLock = "";
+var Key2 = "";
 
 document.write('<script src="js/BRPage.js"></script>');
 document.write('<script src="js/WLPage.js"></script>');
@@ -20,6 +21,10 @@ document.write('<script src="js/AccountDataPage.js"></script>');
 document.write('<script src="js/sha256.js"></script>');
 document.write('<script src="js/AES.js"></script>');
 
+window.onload = function () {
+    document.getElementById('FileInput').onchange = ReadFile;
+};
+
 document.addEventListener(
     "DOMContentLoaded",
     ()=>{
@@ -28,6 +33,7 @@ document.addEventListener(
         var Record = document.querySelector("#Record");
         var AccountData = document.querySelector("#AccountData");
         var Log = document.querySelector("#Log");
+        var FileInput = document.querySelector("#FileInput");
 
         var Psetting = document.querySelector("#Psetting");
         var Pstatus = document.querySelector("#Pstatus");
@@ -59,6 +65,8 @@ function ChangeColor(Ba,Bb,Bc,Bd,Be){
 }
 function tabButtonClicked(Ba,Bb,Bc,Bd,Be,Pa,Pb,Pc,Pd,Pe){
     if(Ba.className!="tab-button-on"){
+
+        FileInput.style.display = "none";
 
         Ba.style.display = "none";
         Bb.style.display = "none";
@@ -167,7 +175,7 @@ function ReturnHome(){
     while(table.firstChild){
         table.removeChild(table.lastChild);
     }
-    table = document.querySelector("#TaccountData");
+    table = document.querySelector("#TAccountData");
     while(table.firstChild){
         table.removeChild(table.lastChild);
     }
@@ -178,12 +186,13 @@ function ReturnHome(){
     var AccountData = document.querySelector("#AccountData");
     var Log = document.querySelector("#Log");
 
-
     Setting.style.display = "block";
     Status.style.display = "block";
     Record.style.display = "block";
     AccountData.style.display = "block";
     Log.style.display = "block";
+    FileInput.style.display = "block";
+
 }
 function ReturnRecord(){
     var table = document.querySelector("#Trecord");
@@ -254,6 +263,7 @@ function GenerateKey(){
     }
     return Key;
 }
+/*
 function TwoPhaseLockVerify(Key){
     
     var Signature = "NCYU@CSIE@SECURITY";
@@ -280,7 +290,7 @@ function TwoPhaseLockVerify(Key){
     //console.log(Aes.Ctr.encrypt('big secret', "665", 256));
     //console.log(Aes.Ctr.decrypt('bQDJE6wKR1swbQRPSMPisHIP', "666", 256));
     //console.log(sha256.hmac(VerifyKey,"TEST111111"));
-}
+}*/
 function GetKey1(){
 	return new Promise(
 		(resolve)=>{
@@ -290,15 +300,15 @@ function GetKey1(){
 		}
 	);
 }
-function GetKey2(){
-	return new Promise(
-		(resolve)=>{
-			chrome.storage.local.get("key2",function(items){
-				resolve(items["key2"]);
-			})
-		}
-	);
+function ReadFile() {
+    file = this.files[0];
+    var fReader = new FileReader();
+    fReader.onload = function (event) {
+        FileInputData(event);
+    };
+    fReader.readAsText(file);
 }
-function QRcode(Key){
-    chrome.tabs.create({url:"http://chart.apis.google.com/chart?cht=qr&chl="+ Key + "&chs=120x120"});
+function FileInputData(){
+    Key2 = event.target.result;
+    updateKey2();
 }

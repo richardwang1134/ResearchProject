@@ -7,11 +7,11 @@ var URL = "";//當前頁面url
 var PROXY_ADDR = "http://127.0.0.1:8000";
 var Status = "Logout";
 var TwoPhaseLock = "off";
+var Key2 = "";
 
 chrome.storage.local.clear();
-chrome.storage.local.set({"password":"admin"},function(){});
+chrome.storage.local.set({"password":"8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"},function(){});
 chrome.storage.local.set({"key1":[GenerateKey()]},function(){});
-chrome.storage.local.set({"key2":[GenerateKey()]},function(){});
 
 //redirect to proxy (request 1)
 chrome.webRequest.onBeforeRequest.addListener(
@@ -287,8 +287,13 @@ chrome.runtime.onMessage.addListener(
 			TwoPhaseLock = json_strs;
 			sendResponse({ack:JSON.stringify("OK")});
 			chrome.storage.local.set({"Twophase":TwoPhaseLock},function(){});
-			console.log("UpdateTwophase:",TwoPhaseLock);
-			
+			console.log("UpdateTwophase:",TwoPhaseLock);		
+		}else if(request.Key2update){
+			var json_strs = JSON.parse(request.Key2update);
+			Key2 = json_strs;
+			sendResponse({ack:JSON.stringify("OK")});
+			console.log("UpdateKey2:",Key2);
+			RefreshKey2();
 		}else if(request.get=="cs"){
 			var json_str ;
 			if(CS){json_str = JSON.stringify(CS);}
@@ -321,6 +326,9 @@ chrome.runtime.onMessage.addListener(
 			var json_str = JSON.stringify(TwoPhaseLock);
 			sendResponse({TwoPhaseLock: json_str});
 			chrome.storage.local.set({TwoPhase:TwoPhaseLock},function(){});
+		}else if(request.get=="Key2"){
+			var json_str = JSON.stringify(Key2);
+			sendResponse({Key2: json_str});
 		}
 		else{
 			console.log("error!");
@@ -393,4 +401,13 @@ function GenerateKey(){
         Key = Key + word;
     }
     return Key;
+}
+
+function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+  }
+async function RefreshKey2() {
+	await sleep(54000000);
+	Key2 = "";
+	console.log("Key2 has been refresh");
 }

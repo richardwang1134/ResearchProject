@@ -1,5 +1,7 @@
 async function AccountPage(){
     Status = await GetStatus();
+    TwoPhaseLock = await GetTwoPhase();
+
     if(Status == "Login"){
         var table = document.querySelector("#TAccountData");
         while(table.firstChild){
@@ -108,14 +110,34 @@ async function DeleteData(label){
 }
 async function Decrypt(Cipertext) {
     var Key = await GetKey1();
-    var Plaintext = Aes.Ctr.decrypt(Cipertext, Key, 256);
+    var Plaintext ;
     var clip_area = document.createElement('textarea');
-
-    clip_area.textContent = Plaintext;
-    document.body.appendChild(clip_area);
-    clip_area.select();
-      
-    document.execCommand('copy');
-    clip_area.remove();
-    
+    if(TwoPhaseLock == "on"){
+        Key2 = await GetKey2();
+        if(Key2 == ""){
+            alert("讀不到KEY,請重新匯入KEY資料");
+            ReturnHome();
+        }
+        else{
+            Cipertext = Aes.Ctr.decrypt(Cipertext, Key2, 256);
+            Plaintext = Aes.Ctr.decrypt(Cipertext, Key, 256);
+            clip_area.textContent = Plaintext;
+            document.body.appendChild(clip_area);
+            clip_area.select();
+            document.execCommand('copy');
+            clip_area.remove();
+        }
+    }
+    else{
+        Plaintext = Aes.Ctr.decrypt(Cipertext, Key, 256);
+        clip_area.textContent = Plaintext;
+        document.body.appendChild(clip_area);
+        clip_area.select();
+        document.execCommand('copy');
+        clip_area.remove();
+    }
+    await sleep(10000);
+}
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
