@@ -50,22 +50,10 @@ async function LogPage(){
     }
 }
 
-async function DataVerify(Password,VerifyData){
+async function DataVerify(Password){
     var correct = await GetPassword();
-
-    if(TwoPhaseLock == "on"){
-        var Key = await GetKey2();
-        console.log(TwoPhaseLockVerify(Key));
-        if(TwoPhaseLockVerify(Key) == VerifyData && Password == correct){
-            Status = "Login";
-            updateStatus();
-            console.log("成功登入!");
-            ReturnHome();
-        }else{
-            alert("認證失敗");
-        }
-    }
-    else{
+    Password = sha256(Password);
+    //缺開2階情況下的認證
         if(Password == correct){
             Status = "Login";
             updateStatus();
@@ -74,13 +62,11 @@ async function DataVerify(Password,VerifyData){
         }else{
             alert("密碼錯誤");
         }
-    }
 }
 function GetPassword(){
 	return new Promise(
 		(resolve)=>{
 			chrome.storage.local.get("password",function(items){
-                console.log(items["password"]);
 				resolve(items["password"]);
 			})
 		}
