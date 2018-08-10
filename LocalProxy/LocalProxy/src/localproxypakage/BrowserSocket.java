@@ -5,29 +5,53 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.net.Socket;
+import java.util.stream.Collectors;
+
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
 
 public class BrowserSocket {
-	private Socket socket;
+	private SSLSocket socket;
 	private BufferedReader bufferedReader;
 	private BufferedWriter bufferedWriter;
 	String id  = null;
 	String url = null;
 
-	public BrowserSocket(Socket socket) throws IOException {
+	public BrowserSocket(SSLSocket socket) throws IOException {
 		this.socket = socket;
-		socket.setSoTimeout(3000);
-		bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		InputStream is = socket.getInputStream();
+		SSLSession sslSession = socket.getSession();
+        System.out.println("SSLSession :");
+        System.out.println("\tProtocol : "+sslSession.getProtocol());
+        System.out.println("\tCipher suite : "+sslSession.getCipherSuite());
+		bufferedReader = new BufferedReader(new InputStreamReader(is));
 		bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF8"));
 	}
 	public BrowserRequest receive(){
 		BrowserRequest browserRequest = new BrowserRequest();
 		String line = "line";
+        try {
+			while((line = bufferedReader.readLine()) != null){
+			    System.out.println("Inut : "+line);
+			    if(line.trim().isEmpty()){
+			        break;
+			    }
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return browserRequest;
+		/*String line = "line";
 		int beginIndex,endIndex;
 		try {
-			while(line!=null && !line.equals("")) {				
+			while(line!=null && !line.equals("")) {	
+				Printer.printThread(line);
 				line = bufferedReader.readLine();
 				Printer.printThread(line);
 				if(line.contains("/request1")) {
@@ -56,7 +80,7 @@ public class BrowserSocket {
 		}catch(Exception e) {	
 			Printer.printException("BrowserSocket.receive", e.getMessage());
 			return null;
-		}
+		}*/
 	}
 	public void sendHeader(String header) throws IOException {
 		bufferedWriter.write(header);

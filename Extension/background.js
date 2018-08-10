@@ -4,7 +4,7 @@ var BR = [] //Block Record	[time,url,ref]
 var CS = []; //當前頁面的Cookie Status
 var CR = []; //各網頁的Cookie設定
 var URL = "";//當前頁面url
-var PROXY_ADDR = "http://127.0.0.1:8000";
+var PROXY_ADDR = "https://127.0.0.1:8000";
 var Status = "Logout";
 var TwoPhaseLock = "off";
 var Key2 = "";
@@ -34,6 +34,15 @@ chrome.webRequest.onBeforeRequest.addListener(
 		types: ["script"]
 	}
 , 	["blocking"]
+);
+chrome.webRequest.onBeforeRedirect.addListener(
+	(details)=>{
+		console.log(details.requestId+" redirected");
+	}
+,	{	urls: ["<all_urls>"],
+	types: ["script"]
+	}
+, 	[]
 );
 //on redirect, delcookie and send request 2
 async function procBlocked(url,rid,tid){
@@ -70,7 +79,7 @@ function getTabURL(tid){
 //send request 2
 function sendRequest(rid){
 	var xhr = new XMLHttpRequest();
-	var url ='http://127.0.0.1:8000/request2/'+rid;
+	var url =PROXY_ADDR+'/request2/'+rid;
 	xhr.open('GET', url, true);
 	xhr.setRequestHeader("content-type", "text/plain");
 	xhr.send();

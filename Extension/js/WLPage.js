@@ -12,11 +12,11 @@ function refreshWL(){//根據WL刷新頁面
     var add = document.createElement("td");
     var input = document.createElement("input");
         input.id = "input";
-        input.onkeypress =()=>{if(event.keyCode == 13) add2WL(input.value);};
+        input.onkeypress =()=>{if(event.keyCode == 13) add2WL(input.value); refreshWL();};
     var add = document.createElement("td");
         add.id = "add";
         add.innerHTML= "＋";
-        add.onclick =()=>{add2WL(input.value)};
+        add.onclick =()=>{add2WL(input.value); refreshWL();};
     var tr2 = document.createElement("tr");
 
     var URL = document.createElement("td");
