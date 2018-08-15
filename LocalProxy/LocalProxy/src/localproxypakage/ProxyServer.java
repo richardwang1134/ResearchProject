@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.security.KeyStore;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,15 +14,22 @@ import java.util.stream.Collectors;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
+import com.sun.net.httpserver.HttpsConfigurator;
+import com.sun.net.httpserver.HttpsParameters;
+import com.sun.net.httpserver.HttpsServer;
+
 
 public class ProxyServer {
 	private int port = 8000;
+	private String ipv4 = "127.0.0.1";
      
     public static void main(String[] args){
     	ProxyServer server = new ProxyServer();
@@ -53,26 +62,37 @@ public class ProxyServer {
     }
     
     public void run(){
-        SSLContext sslContext = this.createSSLContext(); 
+    	SSLContext sslContext = this.createSSLContext(); 
         try{
-        	ExecutorService executor = Executors.newCachedThreadPool();
-            SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();
-            SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(this.port);
-            System.out.println("SSL server started");
-            while(true){
-                SSLSocket sslSocket = (SSLSocket) sslServerSocket.accept();
-                InputStream is = sslSocket.getInputStream();
-        		BufferedReader bf = new BufferedReader(new InputStreamReader(is));
-        		String line = "123";
-        		while((line = bf.readLine()) != null){
-    			    System.out.println("Input : "+line);
-    			    if(line.trim().isEmpty()){
-    			        break;
-    			    }
-    			}
-        		HandlerThread thread = new HandlerThread(sslSocket);
-                executor.execute(thread);
-            }
+        	//set socket address
+        	InetSocketAddress address = new InetSocketAddress ( ipv4, port );
+        	//init and start HTTPS server
+        	HttpsServer httpsServer = HttpsServer.create ( address, 0 );
+        	httpsServer.setHttpsConfigurator ( new HttpsConfigurator( sslContext )
+            {
+                public void configure ( HttpsParameters params )
+                {
+                    try
+                    {
+                        SSLContext c = SSLContext.getDefault ();
+                        SSLEngine engine = c.createSSLEngine ();
+                        params.setNeedClientAuth ( false );
+                        params.setCipherSuites ( engine.getEnabledCipherSuites () );
+                        params.setProtocols ( engine.getEnabledProtocols () );
+                        SSLParameters defaultSSLParameters = c.getDefaultSSLParameters ();
+                        params.setSSLParameters ( defaultSSLParameters );
+                    }
+                    catch ( Exception ex )
+                    {
+                    	Printer.print(ex.getMessage());
+                    }
+                }
+            } );
+        	httpsServer.createContext("/request1", new Request1Handler());
+        	httpsServer.createContext("/request2", new Request2Handler());
+        	httpsServer.setExecutor(Executors.newCachedThreadPool());
+        	httpsServer.start();
+        	Printer.print("HTTPS Server Started at "+ipv4+":"+port);
         } catch (Exception ex){
             ex.printStackTrace();
         }

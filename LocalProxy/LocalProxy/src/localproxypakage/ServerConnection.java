@@ -1,52 +1,50 @@
 package localproxypakage;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import javax.net.ssl.HttpsURLConnection;
 
 public class ServerConnection {
 	
-	private Map<String, List<String>> mapHead = null;
-	private String encoding = "UTF-8";	
-	BufferedReader bufferedReader = null;	
+	Map<String, List<String>> head = null;	
+	BufferedReader bufferedReader = null;
+	InputStream inputStream = null;
+	String encoding = "UTF-8";	
 	
 	ServerConnection(String urll) throws IOException {
 		URL url = new URL(urll);
 		String protocol = url.getProtocol();
 		if(protocol.equals("https")) {
 			HttpsURLConnection connection = (HttpsURLConnection)url.openConnection();
-			mapHead = connection.getHeaderFields();
-			encoding = connection.getContentEncoding();
 			encoding = encoding == null ? "UTF-8" : encoding;
-			bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), encoding));
+			head = connection.getHeaderFields();
+			inputStream = connection.getInputStream();
 		}else{
 			HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-			mapHead = connection.getHeaderFields();
-			encoding = connection.getContentEncoding();
 			encoding = encoding == null ? "UTF-8" : encoding;
-			bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), encoding));
+			head = connection.getHeaderFields();
+			inputStream = connection.getInputStream();
 		}
 	}
-	ServerResponse getResponse() {
-		ServerResponse response = new ServerResponse();
-		response.enCoding = encoding;
-		response.bufferedReader = bufferedReader;
-		for (Map.Entry<String, List<String>> entry : mapHead.entrySet()) {
-			if(entry.getKey()==null) {
-				response.head = entry.getValue().toArray()[0] + "\r\n" + response.head;
-			}else{
-				response.head 	= response.head + entry.getKey() + ": " + entry.getValue().toArray()[0] + "\r\n";
-				if(entry.getKey().equals("Transfer-Encoding") && entry.getValue().toArray()[0].equals("chunked")) {
-					response.isChunked = true;
-				}
-			}
+	Map<String, List<String>> getHead(){
+		return head;
+	}
+	String getBody() throws IOException {
+		ByteArrayOutputStream result = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		int length;
+		while ((length = inputStream.read(buffer)) != -1) {
+		    result.write(buffer, 0, length);
 		}
-		response.head = response.head + "\r\n";
-		return response;
+		return result.toString(encoding);
 	}
 }
