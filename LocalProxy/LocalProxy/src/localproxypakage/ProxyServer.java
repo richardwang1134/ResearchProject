@@ -29,7 +29,7 @@ import com.sun.net.httpserver.HttpsServer;
 
 public class ProxyServer {
 	private int port = 8000;
-	private String ipv4 = "127.0.0.1";
+	private String ipv4 = "120.113.173.51";
      
     public static void main(String[] args){
     	ProxyServer server = new ProxyServer();
@@ -42,7 +42,7 @@ public class ProxyServer {
     private SSLContext createSSLContext(){
         try{
             KeyStore keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(new FileInputStream("kserver.jks"),"123456".toCharArray());
+            keyStore.load(new FileInputStream("keystore.jks"),"123456".toCharArray());
             // Create key manager
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
             keyManagerFactory.init(keyStore, "123456".toCharArray());

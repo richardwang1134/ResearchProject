@@ -4,7 +4,7 @@ var BR = [] //Block Record	[time,url,ref]
 var CS = []; //當前頁面的Cookie Status
 var CR = []; //各網頁的Cookie設定
 var URL = "";//當前頁面url
-var PROXY_ADDR = "https://127.0.0.1:8000";
+var PROXY_ADDR = "https://cs051.csie.ncyu.edu.tw:8000";
 var Status = "Logout";
 var TwoPhaseLock = "off";
 var Key2 = "";
@@ -34,15 +34,6 @@ chrome.webRequest.onBeforeRequest.addListener(
 		types: ["script"]
 	}
 , 	["blocking"]
-);
-chrome.webRequest.onBeforeRedirect.addListener(
-	(details)=>{
-		console.log(details.requestId+" redirected");
-	}
-,	{	urls: ["<all_urls>"],
-	types: ["script"]
-	}
-, 	[]
 );
 //on redirect, delcookie and send request 2
 async function procBlocked(url,rid,tid){
@@ -81,7 +72,14 @@ function sendRequest(rid){
 	var xhr = new XMLHttpRequest();
 	var url =PROXY_ADDR+'/request2/'+rid;
 	xhr.open('GET', url, true);
-	xhr.setRequestHeader("content-type", "text/plain");
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4) {
+			console.log(rid+" checking result : "+xhr.responseText );
+		  	if (xhr.responseText == "fail"){	
+				alert('This webpage may redirected to other website, please check the url before entering sensitive information')
+		  	}
+		}
+	  }
 	xhr.send();
 	console.log(rid+" send request 2 : "+url );
 }
