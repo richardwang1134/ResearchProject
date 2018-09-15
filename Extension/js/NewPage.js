@@ -1,4 +1,5 @@
-function NewPage(){
+async function NewPage(){
+
     var table = document.querySelector("#TAccountData");
     while(table.firstChild){
         table.removeChild(table.lastChild);
@@ -10,7 +11,7 @@ function NewPage(){
         Return.onclick=()=>{AccountPage();};
     var Save = document.createElement("td");
         Save.id = "LogSave";
-        Save.onclick=()=>{SaveAccountData(NameInput.value,AccountInput.value,PasswordInput.value);}
+        Save.onclick=()=>{SaveAccountData(NameInput.value,AccountInput.value,PasswordInput.value,TwoPhaseLockCheckBox.id);}
 
     var tr2 = document.createElement("tr");
     var Name = document.createElement("th");
@@ -33,6 +34,19 @@ function NewPage(){
     var PasswordInput = document.createElement("input");
         PasswordInput.id = "input";
     var tr5 = document.createElement("tr");
+    var StartTwoPhaseLock = document.createElement("th")
+            StartTwoPhaseLock.id = "label";
+            StartTwoPhaseLock.innerHTML = "TwoPhaseLock"
+    var TwoPhaseLockCheckBox = document.createElement("th");
+        TwoPhaseLockCheckBox.id = "uncheckbox";
+        TwoPhaseLockCheckBox.onclick=()=>{
+            if(TwoPhaseLockCheckBox.id == "uncheckbox"){
+                TwoPhaseLockCheckBox.id = "checkbox";
+            }
+            else{
+                TwoPhaseLockCheckBox.id = "uncheckbox";
+            }
+        }
 
     table.appendChild(tr1);
     tr1.appendChild(Save);
@@ -46,51 +60,67 @@ function NewPage(){
     table.appendChild(tr4);
     tr4.appendChild(Password);
     tr4.appendChild(PasswordInput);
+
+    table.appendChild(tr5);
+    tr5.appendChild(StartTwoPhaseLock);
+    tr5.appendChild(TwoPhaseLockCheckBox);
+    
 }
-async function SaveAccountData(Name,Account,Password){
+async function SaveAccountData(Name,Account,Password,Phase){
     var Key = await GetKey1();
+    var SHAPassword = await GetPassword();
+    var Label = Name + "_" + Account ;
+    var AccountLabel = await GetAccountLabel();
+    var PhaseLabel = Label + "_" + "Phase";  
     var Cipertext;
-    if(TwoPhaseLock == "on"){
+    
+    if(Phase == "checkbox"){
         Key2 = await GetKey2();
         if(Key2 == ""){
-            alert("讀不到Key，請重新匯入Key資料");
-            ReturnHome();
+            alert("目前讀不到KEY2，請重新匯入");
         }
         else{
-            Cipertext = Aes.Ctr.encrypt(Password, Key, 256);
-            var Label = Name + "_"+ Account ; 
-            Cipertext = Aes.Ctr.encrypt(Cipertext, Key2, 256);
-            var AccountLabel = await GetAccountLabel();
+            Cipertext = Aes.Ctr.encrypt(Password,SHAPassword, 256);
+            Cipertext = Aes.Ctr.encrypt(Cipertext,Key, 256);
+            Cipertext = Aes.Ctr.encrypt(Cipertext,Key2, 256);
+
             try{
                 AccountLabel.push(Label);
             }catch(err){
                 AccountLabel = [];
                 AccountLabel.push(Label);
             }
-            chrome.storage.local.set({[Label]:[Cipertext]},function(){});
-            chrome.storage.local.set({"AccountLabel":AccountLabel},function(){});
+
+            chrome.storage.sync.set({[Label]:[Cipertext]},function(){});
+            chrome.storage.sync.set({[PhaseLabel]:[Phase]},function(){});
+            chrome.storage.sync.set({"AccountLabel":AccountLabel},function(){});
+
             AccountPage();
         }
     }
     else{
-        var Label = Name + "_"+ Account ; 
-        Cipertext = Aes.Ctr.encrypt(Password, Key, 256);
-        var AccountLabel = await GetAccountLabel();
+        Cipertext = Aes.Ctr.encrypt(Password,SHAPassword, 256);
+        Cipertext = Aes.Ctr.encrypt(Cipertext,Key, 256);
+        
         try{
             AccountLabel.push(Label);
         }catch(err){
             AccountLabel = [];
             AccountLabel.push(Label);
         }
-        chrome.storage.local.set({[Label]:[Cipertext]},function(){});
-        chrome.storage.local.set({"AccountLabel":AccountLabel},function(){});
+
+        chrome.storage.sync.set({[Label]:[Cipertext]},function(){});
+        chrome.storage.sync.set({[PhaseLabel]:[Phase]},function(){});
+        chrome.storage.sync.set({"AccountLabel":AccountLabel},function(){});
+
         AccountPage();
     }
 }
+
 function GetAccountLabel(){
 	return new Promise(
 		(resolve)=>{
-			chrome.storage.local.get("AccountLabel",function(items){
+			chrome.storage.sync.get("AccountLabel",function(items){
                     resolve(items.AccountLabel);
 			})
 		}
