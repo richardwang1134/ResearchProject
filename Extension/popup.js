@@ -6,9 +6,8 @@ var ad = [];
 var URL ="";
 var urlcs = [];
 
-var Status = "";
-var TwoPhaseLock = "";
 var Key2 = "";
+var Password = "";
 
 document.write('<script src="js/BRPage.js"></script>');
 document.write('<script src="js/WLPage.js"></script>');
@@ -135,7 +134,10 @@ function tabButtonClicked(Ba,Bb,Bc,Bd,Be,Pa,Pb,Pc,Pd,Pe){
             );
         }
         else if(Ba.id=="Setting"){
-            SettingPage();
+            Key2 = GenerateKey();
+            saveTextAsFile("Key2",Key2);
+            updateKey2();
+            ReturnHome();
         }
         else if(Ba.id=="AccountData"){
             AccountPage();
@@ -257,44 +259,16 @@ function GenerateKey(){
                 word = 'F';
                 break;
             default:
-                word = String(Random);
+                word = Random.toString(16);
         }
         Key = Key + word;
     }
     return Key;
 }
-/*
-function TwoPhaseLockVerify(Key){
-    
-    var Signature = "NCYU@CSIE@SECURITY";
-    var VerifyKey = Key + Signature;
-    var Timer = new(Date);
-    var Second = Timer.getSeconds();
-    var input = String(parseInt(Second/30));
-    var hmac = sha256.hmac(VerifyKey,input);
-    var fourbyte = "";
-    for(var i = hmac.length-5 ; i < hmac.length-1 ; i++ ){
-        fourbyte = fourbyte + hmac[i];
-    }
-    var temp = "";
-    for(var i = 0 ; i < 4 ; i++){
-        temp = temp + String(fourbyte[i].charCodeAt());
-    }
-    var LargeInt = parseInt(temp);
-    var SmallInt = LargeInt % 1000000;
-    while(SmallInt < 100000){
-        SmallInt = SmallInt * 10;
-    }
-
-    return SmallInt;
-    //console.log(Aes.Ctr.encrypt('big secret', "665", 256));
-    //console.log(Aes.Ctr.decrypt('bQDJE6wKR1swbQRPSMPisHIP', "666", 256));
-    //console.log(sha256.hmac(VerifyKey,"TEST111111"));
-}*/
 function GetKey1(){
 	return new Promise(
 		(resolve)=>{
-			chrome.storage.local.get("key1",function(items){
+			chrome.storage.sync.get("key1",function(items){
 				resolve(items["key1"]);
 			})
 		}
@@ -311,4 +285,16 @@ function ReadFile() {
 function FileInputData(){
     Key2 = event.target.result;
     updateKey2();
+}
+function XOR_hex(a, b) {
+    var res = "",
+        i = a.length,
+        j = b.length;
+    while (i>0 && j>0)
+    {
+        res = (parseInt(a.charAt(i), 16) ^ parseInt(b.charAt(j), 16)).toString(16) + res;
+        i--;
+        j--;
+    }
+    return res;
 }
