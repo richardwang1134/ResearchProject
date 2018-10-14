@@ -1,16 +1,15 @@
 <html>
     <head>
-        <meta charset="UTF-8">
         <title>嘉大留言板</title> 
         <link rel="stylesheet" type="text/css" href="login.css">
-        <script src="jquery-3.3.1.js" type="text/javascript"></script>
+        <script src="jquery-1.2.6.js" type="text/javascript"></script>
         <script>
             function login(){
                 $.ajax({
                     url: 'main.php',
                     type: 'GET',
                     data: {
-                        username: $('#username').val(),
+                        account: $('#account').val(),
                         password: $('#password').val()
                     },
                     error: function(xhr) {
@@ -29,7 +28,7 @@
         </div>
         <div>
             <form>
-                <a>帳號&nbsp</a><input type="text" id="username"><br><br>
+                <a>帳號&nbsp</a><input type="text" id="account"><br><br>
                 <a>密碼&nbsp</a><input type="text" id="password">
             </form>
         </div>

@@ -1,4 +1,32 @@
-login
-    點按鈕
-    送出請求到php
-    php比對資料庫
+login.html
+    client點按鈕
+    client送出請求到php
+    server比對資料庫
+    比對成功
+        +server讓client設cookie
+        client轉換頁面
+    比對失敗
+        client提示失敗
+
+index.php
+    server讀取client的cookie
+    server從cookie抽取帳密比對
+    比對成功
+        echo html內容
+    比對失敗
+        引導到login.html
+
+register
+    client點按鈕
+    client送出請求到php
+    server比對資料庫
+    存在
+        client提示失敗
+    尚未存在
+        server新增
+        client提示成功
+
+
+
+
+
