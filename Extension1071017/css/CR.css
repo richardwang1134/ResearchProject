@@ -1,0 +1,41 @@
+#CRHeader{
+    font-size : 20px;
+    height : 40px;
+    text-indent: 10px;
+    text-align: center;
+}
+#CRDelete{
+    width: 30px;
+    text-align: center;
+    background-image: url("picture/trash.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+#CRURL{
+    text-align :center;
+    cursor: pointer;
+}
+#CRDel{
+    text-align :center;
+    width : 30px;
+    cursor : pointer;
+}
+#CRButton{
+    font-size : 20px;
+    height : 40px;
+    text-indent: 10px;
+    text-align: center;
+    cursor: pointer;      
+}
+#CRSaveButton{
+    font-size : 20px;
+    height : 40px;
+    text-indent: 10px;
+    text-align: center;
+    cursor: pointer;
+    
+    background-image: url("picture/save.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
