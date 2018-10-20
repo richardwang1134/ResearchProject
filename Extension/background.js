@@ -1,6 +1,11 @@
 //----INIT----
+<<<<<<< HEAD
 var WL = ["tw.yahoo.com"]; //White List	[ref]
 var BR = [["www.gstatic.com","www.google.com","21:04:05"],["apis.google.com","www.google.com","21:04:05"]] //Block Record	[time,url,ref]
+=======
+var WL = []; //White List	[ref]
+var BR = [] //Block Record	[time,url,ref]
+>>>>>>> 6820db6ad2aa867601c7ba5cb67e17b2cd70cfdb
 var CS = []; //當前頁面的Cookie Status
 var CR = []; //各網頁的Cookie設定
 var URL = "";//當前頁面url
@@ -40,14 +45,15 @@ async function procBlocked(url,rid,tid){
 	var ref = await getTabURL(tid);
 	var refDomain = ref.split("/")[2];
 	var urlDomain = url.split("/")[2];
-	if(refDomain.match(urlDomain)){;
+	sameSite = refDomain.match(urlDomain);
+	if(sameSite){;
 	}else if(inWL(ref)){;
 	}else{
 		add2BR(ref,url);
 		var resulet = await delCookie(ref);
 		console.log(rid+" deleted cookie of "+ref);
 	}
-	sendRequest(rid);
+	sendRequest(rid,sameSite);
 }
 function inWL(domain){
 	if(WL){
@@ -68,14 +74,14 @@ function getTabURL(tid){
 	)
 }
 //send request 2
-function sendRequest(rid){
+function sendRequest(rid,sameSite){
 	var xhr = new XMLHttpRequest();
 	var url =PROXY_ADDR+'/request2/'+rid;
 	xhr.open('GET', url, true);
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
 			console.log(rid+" checking result : "+xhr.responseText );
-		  	if (xhr.responseText == "fail"){	
+		  	if (xhr.responseText == "fail"&&!sameSite){	
 				alert('This webpage may redirected to other website, please check the url before entering sensitive information')
 		  	}
 		}
