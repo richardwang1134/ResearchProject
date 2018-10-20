@@ -1,6 +1,6 @@
 //----INIT----
 var WL = ["tw.yahoo.com"]; //White List	[ref]
-var BR = [["www.google.com","tw.yahoo.com","21:04:05"],["tw.yahoo.com66666666666666666666","192.168.0.1666666666666666666666666666666666666666666666/example2.js","21:04:05"],["tw.yahoo.com","192.168.0.1/example.js","21:04:05"]] //Block Record	[time,url,ref]
+var BR = [["www.gstatic.com","www.google.com","21:04:05"],["apis.google.com","www.google.com","21:04:05"]] //Block Record	[time,url,ref]
 var CS = []; //當前頁面的Cookie Status
 var CR = []; //各網頁的Cookie設定
 var URL = "";//當前頁面url
