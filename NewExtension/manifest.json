@@ -1,7 +1,7 @@
 {  "manifest_version"  : 2
-,  "name"              : "NoXSS"
-,  "description"       : "偵測到危險的網站後自動登出"
-,  "version"           : "1.0"
+,  "name"              : "WebDefender"
+,  "description"       : "避免使用者受到特定攻擊手法影響"
+,  "version"           : "5.5"
 ,  "browser_action"    : 
     {   "default_icon"      : "icon.png",
         "default_popup"     : "popup.html"
@@ -15,7 +15,7 @@
     ,   "cookies"
     ]
 ,  "background"         : 
-    {   "scripts"           :   [   "jquery.min.js",
+    {   "scripts"           :   [   "js/jquery.js",
                                     "background.js"
                                 ]
     ,   "persistent"        : true

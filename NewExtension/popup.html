@@ -5,7 +5,10 @@
     <meta charset="utf-8">
     <title>popup</title>
     <link rel="stylesheet" href="popup.css">
-    <script src="jquery.js"></script>
+    <script src="js/jquery.js"></script>
+    <script src="js/password.js"></script>
+    <script src="js/cookie.js"></script>
+    <script src="js/source.js"></script>
     <script src="popup.js"></script>
   </head>
   <body>
@@ -17,31 +20,47 @@
     </div>
     <!-- 主選單>>密碼管理 -->
     <div id="password" class="Rows" display="none">
-      <div class="FixRow">
-        <div class="Item">主密碼</div>
-        <div class="Item Flex3 Clickable">輸入欄位</div>
-        <div class="Item Clickable">確定</div>
+      <div class="FixRow" id="MainKeyRow">
+        <div class="Tab Clickable Flex2" id="changeMainKey">主密碼</div>
+        <div class="Item Flex9">
+          <input type="password" id="mainKeyText" class="inputArea">
+        </div>
+        <div class="Tab Clickable Flex2" id="confirmMainKey">登入</div>
+      </div>
+      <div class="FixRow" id="fileKeyRow">
+        <div class="Tab Clickable Flex2" id="downloadFileKey">檔案密碼</div>
+        <div class="Item Flex9" id="fileStatus">尚未上傳</div>
+        <div class="Tab Clickable Flex2" id="chooseFileKey">選擇</div>
+        <input type="file" id="fileInput">
+      </div>
+      <div class="FixRow" id="addAccountRow">
+        <div class="Tab Clickable Flex2" id="newSecurityLV">1</div>
+        <div class="Item Flex3">
+          <input type="textarea" class="inputArea" id="newSiteName">
+        </div>
+        <div class="Item Flex3">
+          <input type="textarea" class="inputArea" id="newAccount">
+        </div>
+        <div class="Item Flex3">
+          <input type="password" class="inputArea" id="newPassword">
+        </div>
+        <div class="Tab Clickable Flex2" id="addAccount">新增</div>
       </div>
       <div class="FixRow">
-        <div class="Item">檔案密碼</div>
-        <div class="Item Flex3 Clickable">檔案來源</div>
-        <div class="Item Clickable">選擇</div>
-      </div>
-      <div class="FixRow">
-        <div class="Title Item">安全等級</div>
-        <div class="Title Item Flex2">網站名稱</div>
-        <div class="Title Item Flex2">帳號</div>
-        <div class="Title Item">密碼</div>
-        <div class="Title Item">刪除</div>
+        <div class="Title Item Flex2">安全等級</div>
+        <div class="Title Item Flex3">網站名稱</div>
+        <div class="Title Item Flex3">帳號</div>
+        <div class="Title Item Flex3">密碼</div>
+        <div class="Title Item Flex2"></div>
       </div>
       <div class="Rows">
-        <div class="Scroll">
-          <div class="FixRow"><!-- 範例，實際上要動態生成 -->
-            <div class="Item">1</div>
-            <div class="Item Flex2">google</div>
-            <div class="Item Flex2 Clickable">richardwang1134</div>
-            <div class="Item Clickable">複製密碼</div>
-            <div class="Item Clickable">—</div>
+        <div class="Scroll" id="accountScroll">
+          <div class="FixRow" id="accountRow"><!-- 範例，實際上要動態生成 -->
+            <div class="Item Flex2">1</div>
+            <div class="Item Flex3">google</div>
+            <div class="Item Flex3 Clickable">richardwang1134</div>
+            <div class="Item Flex3 Clickable">複製密碼</div>
+            <div class="Item Clickable Flex2">刪除</div>
           </div>
         </div>
       </div>
@@ -54,33 +73,33 @@
     <!-- 主選單>>信任的腳本來源>>新增 -->
     <div class="Rows"  id="addSource">
       <div class="FixRow">
-        <div class="Item Flex2 Title">URL</div>
-        <div class="Item Flex2 Title">Referer</div>
-        <div class="Item Title">Time</div>
-      </div>
-      <div class="Rows">
-        <div class="Scroll">
-          <div class="FixRow"><!-- 範例，實際上要動態生成 -->
-            <div class="Item Flex2 Clickable">www.gstatic.com</div>
-            <div class="Item Flex2 Clickable">www.google.com</div>
-            <div class="Item">20:08:54</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- 主選單>>信任的腳本來源>>管理 -->
-    <div class="Rows"  id="manSource">
-      <div class="FixRow">
-        <div class="Item Flex3">URL</div>
-        <div class="Item Flex3">Referer</div>
-        <div class="Item">刪除</div>
+        <div class="Tab Flex3">URL</div>
+        <div class="Tab Flex3">Referer</div>
+        <div class="Tab">Time</div>
       </div>
       <div class="Rows">
         <div class="Scroll">
           <div class="FixRow"><!-- 範例，實際上要動態生成 -->
             <div class="Item Flex3 Clickable">www.gstatic.com</div>
             <div class="Item Flex3 Clickable">www.google.com</div>
-            <div class="Item Clickable">—</div>
+            <div class="Item">20:08:54</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 主選單>>信任的腳本來源>>管理 -->
+    <div class="Rows"  id="mngSource">
+      <div class="FixRow">
+        <div class="Tab Flex3">URL</div>
+        <div class="Tab Flex3">Referer</div>
+        <div class="Tab Clickable">新增</div>
+      </div>
+      <div class="Rows">
+        <div class="Scroll">
+          <div class="FixRow"><!-- 範例，實際上要動態生成 -->
+            <div class="Item Flex3 Clickable">www.gstatic.com</div>
+            <div class="Item Flex3 Clickable">www.google.com</div>
+            <div class="Tab Clickable">刪除</div>
           </div>
         </div>
       </div>
