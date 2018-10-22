@@ -28,7 +28,8 @@ function loginOnLoad(){
             mainKey = response.mainKey;
             $("#mainKeyText").css("background-color","#2196f3");
             $("#mainKeyText").css("color","#E3F2FD");
-            $("#mainKeyText").val("已登入");
+            $("#mainKeyText").val("*********");
+            $("#mainKeyText").attr("placeholder", "");
             $("#confirmMainKey").html("登出");
         }
     });
@@ -75,6 +76,15 @@ function reloadAccountData(){
         }
     });
 }
+function enJSON2D(array){
+    var jsonArray = [];
+    var json;
+    for(var i=0;i<array.length;i++){
+      jsonArray.push(JSON.stringify(array[i]));
+    }
+    json = JSON.stringify(jsonArray);
+    return json;
+  }
 function deJSON2D(json){
     var array =[];
     var jsonArray = JSON.parse(json);
@@ -105,7 +115,10 @@ function copy(str){
 function copyPassword(account){
     var securityLV = account[0];
     var encryptedPassword = account[3];
+    console.log("copy",encryptedPassword);
     var password1 = Aes.Ctr.decrypt(encryptedPassword,mainKey,256);
+    console.log("copy",password1);
+    console.log("copy",mainKey);
     if(securityLV=="1"){
         copy(password1);
     }else if(!fileKey){
@@ -166,28 +179,36 @@ function changeMainKeyClick(){
         alert("請先輸入主密碼並按下「登入」!");
         return;
     }
-    var newKey = sha256(prompt("請輸入新密碼"));
-    if(emptyString(newPassword)){
+    var newPassword = prompt("請輸入新密碼");
+    if(!newPassword){
         alert("新密碼不可為空");
         return;
     }
+    newKey = sha256(newPassword);
+    newTestData = Aes.Ctr.encrypt("1234567890",newKey,256);
     chrome.runtime.sendMessage({
         type:"getAccount"
     },(response)=>{
         accountData = deJSON2D(response.accountData);
         for(var i = 0; i < accountData.length; i++){
             d = Aes.Ctr.decrypt(accountData[i][3],mainKey,256);
-            accountData[i][3] = Aes.Ctr.decrypt(d,newKey);
+            console.log(d);
+            accountData[i][3] = Aes.Ctr.encrypt(d,newKey,256);
+            console.log(accountData[i][3]);
+            console.log(newKey);
         }
         chrome.runtime.sendMessage({
             type:"updateAccountData",
-            accountData:enJSON2D(accountData)
+            accountData:enJSON2D(accountData),
+            newTestData:newTestData
         },(response)=>{
             if(response.check=="pass"){
                 mainKey = newKey;
-                alert("更改主密碼成功");
+                console.log(mainKey);
+                reloadAccountData();
+                alert("更改成功");
             }else{
-                alert("更改主密碼失敗");
+                alert("更改失敗");
             }
         });
     });
@@ -195,6 +216,7 @@ function changeMainKeyClick(){
     //加密
     //存入
 }
+
 function confirmMainKeyClick(){
     if(mainKey==""){
         var password = sha256($("#mainKeyText").val());
@@ -206,7 +228,8 @@ function confirmMainKeyClick(){
                 mainKey = password;
                 $("#mainKeyText").css("background-color","#2196f3");
                 $("#mainKeyText").css("color","#E3F2FD");
-                $("#mainKeyText").val("已登入");
+                $("#mainKeyText").val("*********");
+                $("#mainKeyText").attr("placeholder", "");
                 $("#confirmMainKey").html("登出");
             }else{
                 alert("密碼驗證錯誤");
@@ -221,6 +244,7 @@ function confirmMainKeyClick(){
                 $("#mainKeyText").css("background-color","#E3F2FD");
                 $("#mainKeyText").css("color","#212121");
                 $("#mainKeyText").val("");
+                $("#mainKeyText").attr("placeholder", "main password");
                 $("#confirmMainKey").html("登入");
             }else{
                 alert("登出失敗");

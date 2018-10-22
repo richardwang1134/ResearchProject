@@ -195,9 +195,11 @@ chrome.runtime.onMessage.addListener(
         return true;
       case 'updateAccountData':
         chrome.storage.sync.set({
-          "accountData":request.accountData
+          "accountData":request.accountData,
+          "mainKeyTestData":request.newTestData
         },()=>{
-          console.log("更新帳號資料 :",deJSON2D(request.accountData));
+          accountData = deJSON2D(request.accountData)
+          console.log("更新帳號資料 :",accountData);
           sendResponse({check:"pass"});
         });
         return true;
