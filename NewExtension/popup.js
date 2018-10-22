@@ -8,44 +8,18 @@ todo
 document.addEventListener(
   "DOMContentLoaded",
   ()=>{
-    setClickEvents();
-    setMouseEvents();
-    reloadAccountData();
-    setFileHandler();
-    loginOnLoad();
+    setTopTabs();
+    setPasswordPage();
+    setSourcePage();
+    setCookiePage();
   }
 );
-function setClickEvents(){
+// ↓ setTopTabs ↓ 
+function setTopTabs(){
   $("#passwordTab").click(passwordTabClick);
   $("#sourceTab").click(sourceTabClick);
   $("#cookieTab").click(cookieTabClick);
-  $("#addSourceTab").click(addSourceTabClick);
-  $("#mngSourceTab").click(mngSourceTabClick);
-  $("#setCookieTab").click(setCookieTabClick);
-  $("#mngCookieTab").click(mngCookieTabClick);
-  //password
-  $("#newSecurityLV").click(newSecurityLVClick);
-  $("#addAccount").click(addAccountClick);
-  $("#changeMainKey").click(changeMainKeyClick);
-  $("#confirmMainKey").click(confirmMainKeyClick);
-  $("#chooseFileKey").click(chooseFileKeyClick);
-  $("#downloadFileKey").click(downloadFileKeyClick);
 }
-function setMouseEvents(){
-  $("#changeMainKey").mouseenter(()=>{
-    $("#changeMainKey").html("變更");
-  });
-  $("#changeMainKey").mouseleave(()=>{
-    $("#changeMainKey").html("主密碼");
-  });
-  $("#downloadFileKey").mouseenter(()=>{
-    $("#downloadFileKey").html("下載");
-  });
-  $("#downloadFileKey").mouseleave(()=>{
-      $("#downloadFileKey").html("檔案密碼");
-  });
-}
-//top tabs
 function passwordTabClick(){
   /* tabs */
   $("#passwordTab.Clickable").removeClass("Clickable");
@@ -91,6 +65,6 @@ function cookieTabClick(){
     $("#setCookie").css("display","flex");
     $("#mngCookie").css("display","none");
 }
+// ↑ setTopTabs ↑ 
 
-//可移動到cookie.js與source.js
 

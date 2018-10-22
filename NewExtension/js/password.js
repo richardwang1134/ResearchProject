@@ -1,27 +1,22 @@
-var fileKey="";
 
-function reloadAccountData(){
-    $("#accountScroll").empty();
-    chrome.runtime.sendMessage({
-        type:"getAccount"
-    },(response)=>{
-        if(response.response){
-            jAccountData = JSON.parse(response.response);
-            for(var i=0; i<jAccountData.length;i++){
-                var account = JSON.parse(jAccountData[i]);
-                $("#accountScroll").append(
-                    "<div class='FixRow'>"+
-                        "<div class='Item Flex2'>"+account[0]+"</div>"+
-                        "<div class='Item Flex3'>"+account[1]+"</div>"+
-                        "<div class='Item Flex3 Clickable' onclick='copyAccount()'>"+account[2]+"</div>"+
-                        "<div class='Item Flex3 Clickable' onclick='copyPassword()'>複製密碼</div>"+
-                        "<div class='Item Flex2 Clickable' onclick='removeAccount()'>刪除</div>"+
-                    "</div>"
-                )
-            }
-        }
-    });
+//outline of password page
+function setPasswordPage(){
+    loginOnLoad();
+    reloadAccountData();
+    $("#newSecurityLV").click(newSecurityLVClick);
+    $("#addAccount").click(addAccountClick);
+    $("#changeMainKey").click(changeMainKeyClick);
+    $("#changeMainKey").mouseenter(()=>{$("#changeMainKey").html("變更");});
+    $("#changeMainKey").mouseleave(()=>{$("#changeMainKey").html("主密碼");});
+    $("#confirmMainKey").click(confirmMainKeyClick);
+    $("#chooseFileKey").click(chooseFileKeyClick);
+    setFileHandler();
+    $("#downloadFileKey").click(downloadFileKeyClick);
+    $("#downloadFileKey").mouseenter(()=>{$("#downloadFileKey").html("下載");});
+    $("#downloadFileKey").mouseleave(()=>{$("#downloadFileKey").html("檔案密碼");});
+    
 }
+var fileKey="";
 function loginOnLoad(){
     chrome.runtime.sendMessage({
         type:"getMainKey"
@@ -33,6 +28,178 @@ function loginOnLoad(){
             $("#confirmMainKey").html("登出");
         }
     });
+}
+// ↓ reloadAccountData ↓ 
+function reloadAccountData(){
+    $("#accountScroll").empty();
+    chrome.runtime.sendMessage({
+        type:"getAccount"
+    },(response)=>{
+        if(response.response){
+            accountData = deJSON2D(response.response);
+            for(var i=0; i<accountData.length;i++){
+                var account = accountData[i];
+                //動態產生帳號資料列表
+                var item1 = document.createElement("div");
+                item1.className = 'Item Flex2';
+                item1.innerHTML = account[0];
+                var item2 = document.createElement("div");
+                item2.className = 'Item Flex3';
+                item2.innerHTML = account[1];
+                var item3 = document.createElement("div");
+                item3.className = 'Item Flex3 Clickable';
+                item3.innerHTML = account[2];
+                item3.onclick = ()=>{ copy(account[2]) };
+                var item4 = document.createElement("div");
+                item4.className = 'Item Flex3 Clickable';
+                item4.innerHTML = "複製密碼";
+                var item5 = document.createElement("div");
+                item5.className = 'Item Flex2 Clickable';
+                item5.innerHTML = "刪除";
+                item5.onclick = ()=>{ deleteAccount(account) };
+                var fixRow = document.createElement("div");
+                fixRow.className = "FixRow";
+                fixRow.appendChild(item1);
+                fixRow.appendChild(item2);
+                fixRow.appendChild(item3);
+                fixRow.appendChild(item4);
+                fixRow.appendChild(item5);
+                var scroll = document.getElementById("accountScroll");
+                scroll.appendChild(fixRow);
+            }
+        }
+    });
+}
+function deJSON2D(json){
+    var array =[];
+    var jsonArray = JSON.parse(json);
+    for(var i=0;i<jsonArray.length;i++){
+      array.push(JSON.parse(jsonArray[i]));
+    }
+    return array;
+}
+function deleteAccount(account){
+    chrome.runtime.sendMessage({
+        type:"deleteAccount",
+        value:JSON.stringify(account)
+    },(response)=>{
+        if(response.response="success")
+            reloadAccountData(); 
+        else
+            alert("刪除失敗");
+    });
+    var newAccountData = [];
+    for(var i=0;i<accountData.length;i++){
+        var match = true;
+        for(var j=0;j<4;j++){
+            if(accountData[i][j]!=account[j]){
+                match = false;
+            }
+        }
+        if(!match) newAccountData.push(accountData[i]);
+    }
+    console.log(newAccountData);
+}
+function copy(str){
+    el = document.createElement('textarea');
+    el.value = str;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+}
+function copyPassword(){
+}
+// ↑ reloadAccountData ↑ 
+function newSecurityLVClick(){
+    if($("#newSecurityLV").html()=="1") $("#newSecurityLV").html("2");
+    else $("#newSecurityLV").html("1");
+}
+function addAccountClick(){
+    if($("#confirmMainKey").html()=="登入"){
+        alert("請先輸入主密碼並按下「登入」!");
+        return;
+    }
+    if($("#addAccountRow div:first-child").html=="2"){
+        alert("檔案密碼待製作")
+    }
+    var mainKey = $("#mainKeyText").val();
+    var secure = $("#newSecurityLV").html();
+    var name = $("#newSiteName").val();
+    var account =  $("#newAccount").val();
+    var password = $("#newPassword").val();
+    if(!(name&&account&&password)){
+        alert("請確認所有欄位皆已填寫完成");
+        return;
+    }
+    chrome.runtime.sendMessage({
+        type:"addAccount",
+        secure:secure,
+        name:name,
+        account:account,
+        password:password,
+        mainKey:mainKey
+    },(response)=>{
+        if(response.response=="success"){
+            reloadAccountData();
+            $("#newSecurityLV").html("1");
+            $("#newSiteName").val("");
+            $("#newAccount").val("");
+            $("#newPassword").val("");
+        }else{
+            alert("新增失敗");
+        }
+    })
+}
+function changeMainKeyClick(){
+    if($("#confirmMainKey").html()=="確定"){
+        alert("請先輸入主密碼並按下「登入」!");
+        return;
+    }
+    var newPassword = prompt("請輸入新密碼");
+    if(emptyString(newPassword)){
+        alert("請確認所有欄位皆已填寫完成");
+        return;
+    }
+    //從資料庫取得帳號資料
+    //解密
+    //加密
+    //存入
+}
+function confirmMainKeyClick(){
+    if($("#confirmMainKey").html()=="登入"){
+        var password = $("#mainKeyText").val();
+        chrome.runtime.sendMessage({
+            type:"confirmMainKey",
+            value:password
+        },(response)=>{
+            if(response.response=="pass"){
+                $("#mainKeyText").css("background-color","#2196f3");
+                $("#mainKeyText").css("color","#E3F2FD");
+                $("#mainKeyText").val("已登入");
+                $("#confirmMainKey").html("登出");
+            }else{
+                alert("密碼驗證錯誤");
+            }
+        });
+    }else{
+        $("#mainKeyText").css("background-color","#E3F2FD");
+        $("#mainKeyText").css("color","#212121");
+        $("#mainKeyText").val("");
+        $("#confirmMainKey").html("登入");
+    }
+}
+// ↓ chooseFileKeyClick ↓ 
+function chooseFileKeyClick(){
+    if($("#chooseFileKey").html()=="選擇"){
+        $("#fileInput").click();
+        return;
+    }else{
+        $("#fileStatus").css("background-color","#E3F2FD");
+        $("#fileStatus").css("color","#212121");
+        $("#fileStatus").html("未上傳");
+        $("#chooseFileKey").html('選擇');
+    }
 }
 function setFileHandler(){
     var fileInput = document.getElementById("fileInput");
@@ -64,98 +231,7 @@ function confirmFileKey(key){
         }
     });
 }
-
-//click events
-
-function newSecurityLVClick(){
-    if($("#newSecurityLV").html()=="1") $("#newSecurityLV").html("2");
-    else $("#newSecurityLV").html("1");
-}
-function addAccountClick(){
-    if($("#confirmMainKey").html()=="確定"){
-        alertMainKey();
-        return;
-    }
-    if($("#addAccountRow div:first-child").html=="2"){
-        alert("檔案密碼待製作")
-    }
-    var mainKey = $("#mainKeyText").val();
-    var secure = $("#newSecurityLV").html();
-    var name = $("#newSiteName").val();
-    var account =  $("#newAccount").val();
-    var password = $("#newPassword").val();
-    if(emptyString(name)||emptyString(account)||emptyString(password)){
-        alertEmptyInput();
-        return;
-    }
-    chrome.runtime.sendMessage({
-        type:"addAccount",
-        secure:secure,
-        name:name,
-        account:account,
-        password:password,
-        mainKey:mainKey
-    },(response)=>{
-        if(response.response=="success"){
-            reloadAccountData();
-            $("#newSecurityLV").html("1");
-            $("#newSiteName").val("");
-            $("#newAccount").val("");
-            $("#newPassword").val("");
-        }else{
-            alert("新增失敗");
-        }
-    })
-}
-function changeMainKeyClick(){
-    if($("#confirmMainKey").html()=="確定"){
-        alertMainKey();
-        return;
-    }
-    var newPassword = prompt("請輸入新密碼");
-    if(emptyString(newPassword)){
-    alertEmptyInput();
-    return;
-    }
-    //從資料庫取得帳號資料
-    //解密
-    //加密
-    //存入
-}
-function confirmMainKeyClick(){
-    if($("#confirmMainKey").html()=="登入"){
-        var password = $("#mainKeyText").val();
-        chrome.runtime.sendMessage({
-            type:"confirmMainKey",
-            value:password
-        },(response)=>{
-            if(response.response=="pass"){
-                $("#mainKeyText").css("background-color","#2196f3");
-                $("#mainKeyText").css("color","#E3F2FD");
-                $("#mainKeyText").val("已登入");
-                $("#confirmMainKey").html("登出");
-            }else{
-                alert("密碼驗證錯誤");
-            }
-        });
-    }else{
-        $("#mainKeyText").css("background-color","#E3F2FD");
-        $("#mainKeyText").css("color","#212121");
-        $("#mainKeyText").val("");
-        $("#confirmMainKey").html("登入");
-    }
-}
-function chooseFileKeyClick(){
-    if($("#chooseFileKey").html()=="選擇"){
-        $("#fileInput").click();
-        return;
-    }else{
-        $("#fileStatus").css("background-color","#E3F2FD");
-        $("#fileStatus").css("color","#212121");
-        $("#fileStatus").html("未上傳");
-        $("#chooseFileKey").html('選擇');
-    }
-}
+// ↑ chooseFileKeyClick ↑ 
 function downloadFileKeyClick(){
     var s = [];
     var hexDigits = "0123456789abcdef";
@@ -170,16 +246,4 @@ function downloadFileKeyClick(){
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
-}
-
-//reuse codes
-function alertMainKey(){
-alert("請先輸入主密碼並按下「登入」!");
-}
-function alertEmptyInput(){
-alert("請確認所有欄位皆已填寫完成");
-}
-function emptyString(s){
-if(s==null||s=="") return true;
-else return false;
 }

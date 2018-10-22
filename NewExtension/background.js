@@ -4,7 +4,9 @@ chrome.storage.sync.clear();
 //------------以上測試用-------------------------
 /*
   todo
-    2階檔案加密功能
+    刪除資料
+    複製密碼
+    複製帳號
     改變MainKey
       password產生click事件
         檢查登入狀態 含一階二階
@@ -20,8 +22,6 @@ chrome.storage.sync.clear();
         把accountData轉回去
         把accountData存起來
 
-    產生檔案密碼
-    選擇檔案密碼
     
     
 */
@@ -35,6 +35,7 @@ document.write('<script src="js/sha256.js"></script>');
 document.write('<script src="js/AES.js"></script>');
 
 var mainKey = "";
+var accountData=[];
 
 chrome.runtime.onMessage.addListener(
   (request, sender, sendResponse)=>{
@@ -126,7 +127,16 @@ chrome.runtime.onMessage.addListener(
         console.log("          以sha256(mainKey)對該帳號的密碼進行AES加密");
         else
         console.log("          以sha256(mainKey)與fileKey對該帳號的密碼各進行一次AES加密");
-        chrome.storage.sync.get(
+        accountData.push(thisAcountData);
+        console.log(accountData);
+        jAccountData=enJSON2D(accountData);
+        console.log(jAccountData);
+        chrome.storage.sync.set({
+          "accountData":jAccountData
+        },()=>{
+          sendResponse({response:"success"});
+        });
+        /*chrome.storage.sync.get(
           "accountData",
           (response)=>{
             if(response.accountData){
@@ -137,24 +147,47 @@ chrome.runtime.onMessage.addListener(
             chrome.storage.sync.set({"accountData":accountData});
             sendResponse({response:"success"});
           }
-        );
+        );*/
         return true;
       /*
         回傳帳號
       */
       case 'getAccount':
-        chrome.storage.sync.get(
-          "accountData",
-          (response)=>{
-            sendResponse({response:response.accountData});
-          }
-        )
+        jAccountData=enJSON2D(accountData);
+        chrome.storage.sync.set({"accountData":jAccountData});
+        sendResponse({response:jAccountData});
         return true;
       /*
         回傳MainKey
       */
       case 'getMainKey':
-        sendResponse('mainKey');
+        if(mainKey) console.log("登入狀態 : 已登入")
+        else console.log("登入狀態 : 未登入")
+        sendResponse({response:mainKey});
+        return true;
+      /*
+        刪除帳號
+      */
+      case 'deleteAccount':
+        var account = JSON.parse(request.value);
+        var newAccountData = [];
+        for(var i=0;i<accountData.length;i++){
+            var match = true;
+            for(var j=0;j<4;j++){
+                if(accountData[i][j]!=account[j]){
+                    match = false;
+                }
+            }
+            if(!match) newAccountData.push(accountData[i]);
+        }
+        accountData = newAccountData;
+        jAccountData=enJSON2D(accountData);
+        chrome.storage.sync.set({
+          "accountData":jAccountData
+        },()=>{
+          sendResponse({response:"success"});
+        });
+        return true;
     }
   }
 );

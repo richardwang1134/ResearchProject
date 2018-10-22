@@ -1,3 +1,8 @@
+function setSourcePage(){
+  $("#addSourceTab").click(addSourceTabClick);
+  $("#mngSourceTab").click(mngSourceTabClick);
+}
+
 function addSourceTabClick(){
     $("#addSourceTab").removeClass("Clickable");
     $("#mngSourceTab").addClass("Clickable");
