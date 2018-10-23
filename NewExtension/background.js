@@ -4,29 +4,19 @@ chrome.storage.sync.clear();
 //------------以上測試用-------------------------
 /*
   todo
-    修改
-      加解密在前端完成
-
-    改變MainKey
-      password產生click事件
-        檢查登入狀態 含一階二階
-        檢查完成跳出輸入視窗
-        送出新密碼到後端
-        收到後端回覆後自動登出
-        提醒重新登入
-      背景
-        收到新密碼
-        讀accountData
-        轉成陣列
-        針對陣列中每個帳號的密碼解密再加密
-        把accountData轉回去
-        把accountData存起來
+    source.js
+      展開腳本網域
+      新增到白名單
+      管理白名單
+    background.js
+      
          
 */
 /*
   sync area keys
     mainKeyTetData  測設主密碼
     accountData     JSON([JSON[安全等級,網站名稱,帳號,加密後的密碼],JSON[.....]])
+    whiteList       {ref1:[url,url,....],ref2:[url,url,....]}
 */
 
 document.write('<script src="js/sha256.js"></script>');
@@ -34,6 +24,67 @@ document.write('<script src="js/AES.js"></script>');
 
 var mainKey = "";
 var accountData=[];
+var delCookieRecord={};
+var whiteList={};
+
+chrome.webRequest.onBeforeRequest.addListener(
+	(details)=>{
+			var url = details.url;
+			var rid = details.requestId.toString();
+			var tid = details.tabId;
+			if(tid == -1) return;
+      chrome.tabs.get(
+				tid,
+				(items)=>{
+          var ref = items.url;
+          var refDomain = ref.split("/")[2];
+          var urlDomain = url.split("/")[2];
+          var pass = checkSameSiteWL(refDomain,urlDomain);
+          if(!pass){
+            add2DelCookieRecord(refDomain,urlDomain);
+            //delete coockie, then(()=>{sendRequest2})
+          }
+        }
+			)
+      return ;
+	},{
+    urls: ["<all_urls>"],
+		types: ["script"]
+  },
+    ["blocking"]
+);
+function checkSameSiteWL(refDomain,urlDomain){
+  var pass = false;
+  var samesite = refDomain.match(urlDomain);
+  if(samesite){
+    pass = true;
+  }else if(whiteList[refDomain]){
+    var urlList = whiteList[refDomain];
+    for(var i=0; i<urlList.length; i++){
+      if(urlList[i]==urlDomain) pass = true;
+    }
+    alert("在"+refDomain+"偵測到新的腳本來源 : "+urlDomain);
+  }
+  return pass;
+}
+function add2DelCookieRecord(refDomain,urlDomain){
+    var record = delCookieRecord[refDomain];
+    if(record){
+      if(record.includes(urlDomain)){
+        record.splice(record.indexOf(urlDomain),1);
+        //避免log太雜亂，重複的只調換順序不印到log
+      }else{
+        console.log("刪除cookie :",refDomain);
+        console.log("             觸發的腳本來源網域 :",urlDomain);
+      }
+    }else{
+      record=[];
+      console.log("刪除cookie :",refDomain);
+      console.log("             觸發的腳本來源網域 :",urlDomain);
+    }
+    record.push(urlDomain);
+    delCookieRecord[refDomain] = record;
+}
 
 chrome.runtime.onMessage.addListener(
   (request, sender, sendResponse)=>{
@@ -203,6 +254,11 @@ chrome.runtime.onMessage.addListener(
           sendResponse({check:"pass"});
         });
         return true;
+      case 'getRecord':
+        sendResponse({check:"pass",recordData:delCookieRecord});
+        console.log(delCookieRecord);
+        return true;
+      
     }
   }
 );
@@ -225,4 +281,3 @@ function deJSON2D(json){
   }
   return array;
 }
-

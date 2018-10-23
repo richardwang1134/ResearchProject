@@ -17,7 +17,7 @@
     <!-- 主選單 -->
     <div class="Tabs">
       <div class="Tab" id="passwordTab">密碼管理</div>
-      <div class="Tab Source Clickable" id="sourceTab">信任的腳本來源</div>
+      <div class="Tab Source Clickable" id="sourceTab">腳本網域白名單</div>
       <div class="Tab Cookie Clickable" id="cookieTab">Samesite Cookie</div>
     </div>
     <!-- 主選單>>密碼管理 -->
@@ -25,7 +25,7 @@
       <div class="FixRow" id="MainKeyRow">
         <div class="Tab Clickable Flex2" id="changeMainKey">主密碼</div>
         <div class="Item Flex9">
-          <input type="password" id="mainKeyText" class="inputArea" placeholder="main password">
+          <input type="password" id="mainKeyText" class="inputArea">
         </div>
         <div class="Tab Clickable Flex2" id="confirmMainKey">登入</div>
       </div>
@@ -38,13 +38,13 @@
       <div class="FixRow" id="addAccountRow">
         <div class="Tab Clickable Flex2" id="newSecurityLV">1</div>
         <div class="Item Flex3">
-          <input type="textarea" class="inputArea" id="newSiteName" placeholder="new site">
+          <input type="textarea" class="inputArea" id="newSiteName">
         </div>
         <div class="Item Flex3">
-          <input type="textarea" class="inputArea" id="newAccount" placeholder="new account">
+          <input type="textarea" class="inputArea" id="newAccount">
         </div>
         <div class="Item Flex3">
-          <input type="password" class="inputArea" id="newPassword" placeholder="new password">
+          <input type="password" class="inputArea" id="newPassword">
         </div>
         <div class="Tab Clickable Flex2" id="addAccount">新增</div>
       </div>
@@ -75,16 +75,13 @@
     <!-- 主選單>>信任的腳本來源>>新增 -->
     <div class="Rows"  id="addSource">
       <div class="FixRow">
-        <div class="Tab Flex3">URL</div>
-        <div class="Tab Flex3">Referer</div>
-        <div class="Tab">Time</div>
+        <div class="Tab Flex5">發出腳本請求的網域</div>
+        <div class="Tab">新增</div>
       </div>
       <div class="Rows">
-        <div class="Scroll">
+        <div class="Scroll" id="recordScroll">
           <div class="FixRow"><!-- 範例，實際上要動態生成 -->
-            <div class="Item Flex3 Clickable">www.gstatic.com</div>
-            <div class="Item Flex3 Clickable">www.google.com</div>
-            <div class="Item">20:08:54</div>
+            <div class="Item">www.facebook.com</div>
           </div>
         </div>
       </div>
@@ -98,18 +95,13 @@
       </div>
       <div class="Rows">
         <div class="Scroll">
-          <div class="FixRow"><!-- 範例，實際上要動態生成 -->
-            <div class="Item Flex3 Clickable">www.gstatic.com</div>
-            <div class="Item Flex3 Clickable">www.google.com</div>
-            <div class="Tab Clickable">刪除</div>
-          </div>
         </div>
       </div>
     </div>
     <!-- 主選單>>SamsiteCookie -->
     <div class="Tabs" id="cookieTabs">
-      <div class="Tab" id="setCookieTab">目前頁面</div>
-      <div class="Tab" id="mngCookieTab">歷史紀錄</div>
+      <div class="Tab" id="setCookieTab">設定</div>
+      <div class="Tab" id="mngCookieTab">管理</div>
     </div>
     <!-- 主選單>>SamsiteCookie>>目前頁面 -->
     <div class="Rows"  id="setCookie">
