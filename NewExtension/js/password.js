@@ -43,7 +43,7 @@ function reloadAccountData(){
         if(response.check=="pass"){
             accountData = deJSON2D(response.accountData);
             for(var i=0; i<accountData.length;i++){
-                var account = accountData[i];
+                let account = accountData[i];
                 //動態產生帳號資料列表
                 var item1 = document.createElement("div");
                 item1.className = 'Item Flex2';

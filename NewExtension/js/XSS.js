@@ -1,7 +1,7 @@
-function setXSSPage(){
+function setSourcePage(){
   reloadRecordData();
-  $("#addXSSTab").click(addXSSTabClick);
-  $("#mngXSSTab").click(mngXSSTabClick);
+  $("#addSourceTab").click(addSourceTabClick);
+  $("#mngSourceTab").click(mngSourceTabClick);
 }
 function reloadRecordData(){
   var scroll = document.getElementById("recordScroll");
@@ -68,15 +68,15 @@ function addToWhiteList(key,scriptDomains){
     console.log(response);
   });
 }
-function addXSSTabClick(){
-  $("#addXSSTab").removeClass("Clickable");
-  $("#mngXSSTab").addClass("Clickable");
-  $("#addXSS").css("display","flex");
-  $("#mngXSS").css("display","none");
+function addSourceTabClick(){
+  $("#addSourceTab").removeClass("Clickable");
+  $("#mngSourceTab").addClass("Clickable");
+  $("#addSource").css("display","flex");
+  $("#mngSource").css("display","none");
 }
-function mngXSSTabClick(){
-  $("#addXSSTab").addClass("Clickable");
-  $("#mngXSSTab").removeClass("Clickable");
-  $("#addXSS").css("display","none");
-  $("#mngXSS").css("display","flex");
+function mngSourceTabClick(){
+  $("#addSourceTab").addClass("Clickable");
+  $("#mngSourceTab").removeClass("Clickable");
+  $("#addSource").css("display","none");
+  $("#mngSource").css("display","flex");
 }

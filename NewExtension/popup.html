@@ -10,15 +10,15 @@
     <script src="js/jquery.js"></script>
     <script src="js/password.js"></script>
     <script src="js/cookie.js"></script>
-    <script src="js/source.js"></script>
+    <script src="js/XSS.js"></script>
     <script src="popup.js"></script>
   </head>
   <body>
     <!-- 主選單 -->
     <div class="Tabs">
       <div class="Tab" id="passwordTab">密碼管理</div>
-      <div class="Tab Source Clickable" id="sourceTab">腳本網域白名單</div>
-      <div class="Tab Cookie Clickable" id="cookieTab">Samesite Cookie</div>
+      <div class="Tab XSS Clickable" id="XSSTab">XSS防禦</div>
+      <div class="Tab Cookie Clickable" id="cookieTab">CSRF白名單</div>
     </div>
     <!-- 主選單>>密碼管理 -->
     <div id="password" class="Rows" display="none">
@@ -68,15 +68,15 @@
       </div>
     </div>
     <!-- 主選單>>信任的腳本來源 -->
-    <div class="Tabs" id="sourceTabs">
-      <div class="Tab" id="addSourceTab">新增</div>
-      <div class="Tab" id="mngSourceTab">管理</div>
+    <div class="Tabs" id="XSSTabs">
+      <div class="Tab" id="addXSSTab">加入白名單</div>
+      <div class="Tab" id="mngXSSTab">管理白名單</div>
     </div>
     <!-- 主選單>>信任的腳本來源>>新增 -->
-    <div class="Rows"  id="addSource">
+    <div class="Rows"  id="addXSS">
       <div class="FixRow">
-        <div class="Tab Flex5">發出腳本請求的網域</div>
-        <div class="Tab">新增</div>
+        <div class="Tab Flex5">網域</div>
+        <div class="Tab">詳情</div>
       </div>
       <div class="Rows">
         <div class="Scroll" id="recordScroll">
@@ -87,7 +87,7 @@
       </div>
     </div>
     <!-- 主選單>>信任的腳本來源>>管理 -->
-    <div class="Rows"  id="mngSource">
+    <div class="Rows"  id="mngXSS">
       <div class="FixRow">
         <div class="Tab Flex3">URL</div>
         <div class="Tab Flex3">Referer</div>

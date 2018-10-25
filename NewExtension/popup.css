@@ -132,7 +132,7 @@ div.Flex5{
 div.Flex9{
   flex: 9;
 }
-#cookieTabs,#mngCookie,#addSource,#mngSource,#sourceTabs,#setCookie{
+#cookieTabs,#mngCookie,#addXSS,#mngXSS,#XSSTabs,#setCookie{
   display: none;
 }
 #password{

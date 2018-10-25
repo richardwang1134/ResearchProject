@@ -4,10 +4,26 @@ chrome.storage.sync.clear();
 //------------以上測試用-------------------------
 /*
   todo
+    cookie.js
+      
+
     source.js
-      展開腳本網域
-      新增到白名單
-      管理白名單
+
+
+      處理方式
+        記錄所有攻擊者的腳本來源
+        檢查是否在防禦範圍內?
+        是>>
+          攔截並檢查腳本是否在白名單內
+          是>>
+            送出request2 "pass"
+          否>>
+            檢查腳本是否在黑名單內
+            是>>
+              送出request2 "block"
+            否>>
+              送出request2 "pass"
+              
     background.js
       
          
@@ -24,7 +40,7 @@ document.write('<script src="js/AES.js"></script>');
 
 var mainKey = "";
 var accountData=[];
-var delCookieRecord={};
+var records=[];
 var whiteList={};
 
 chrome.webRequest.onBeforeRequest.addListener(
@@ -39,9 +55,9 @@ chrome.webRequest.onBeforeRequest.addListener(
           var ref = items.url;
           var refDomain = ref.split("/")[2];
           var urlDomain = url.split("/")[2];
-          var pass = checkSameSiteWL(refDomain,urlDomain);
+          var pass = checkWhiteList(refDomain,urlDomain);
           if(!pass){
-            add2DelCookieRecord(refDomain,urlDomain);
+            addToRecords(refDomain,urlDomain);
             //delete coockie, then(()=>{sendRequest2})
           }
         }
@@ -53,7 +69,7 @@ chrome.webRequest.onBeforeRequest.addListener(
   },
     ["blocking"]
 );
-function checkSameSiteWL(refDomain,urlDomain){
+function checkWhiteList(refDomain,urlDomain){
   var pass = false;
   var samesite = refDomain.match(urlDomain);
   if(samesite){
@@ -63,27 +79,33 @@ function checkSameSiteWL(refDomain,urlDomain){
     for(var i=0; i<urlList.length; i++){
       if(urlList[i]==urlDomain) pass = true;
     }
-    alert("在"+refDomain+"偵測到新的腳本來源 : "+urlDomain);
+    if(!pass) alert("在"+refDomain+"偵測到新的腳本來源 : "+urlDomain);
   }
   return pass;
 }
-function add2DelCookieRecord(refDomain,urlDomain){
-    var record = delCookieRecord[refDomain];
-    if(record){
-      if(record.includes(urlDomain)){
-        record.splice(record.indexOf(urlDomain),1);
-        //避免log太雜亂，重複的只調換順序不印到log
-      }else{
-        console.log("刪除cookie :",refDomain);
-        console.log("             觸發的腳本來源網域 :",urlDomain);
+function addToRecords(refDomain,urlDomain){
+  var refExist = false;
+  var urlExist = true;
+  for(var i=0; i<records.length; i++){
+    if(records[i].hasOwnProperty(refDomain)){
+      refExist = true;
+      urlDomains = records[i][refDomain];
+      if(!urlDomains.includes(urlDomain)){
+        urlExist = false;
+        records[i][refDomain].push(urlDomain);
       }
-    }else{
-      record=[];
-      console.log("刪除cookie :",refDomain);
-      console.log("             觸發的腳本來源網域 :",urlDomain);
     }
-    record.push(urlDomain);
-    delCookieRecord[refDomain] = record;
+  }
+  if(!refExist){
+    urlExist = false;
+    var obj = {};
+    obj[refDomain] = [urlDomain];
+    records.push(obj);
+  }
+  if(!urlExist){
+    console.log("刪除cookie紀錄 : 被刪除cookie的網域",refDomain);
+    console.log("                觸發的腳本來源網域",urlDomain);
+  }
 }
 
 chrome.runtime.onMessage.addListener(
@@ -255,10 +277,21 @@ chrome.runtime.onMessage.addListener(
         });
         return true;
       case 'getRecord':
-        sendResponse({check:"pass",recordData:delCookieRecord});
-        console.log(delCookieRecord);
+        sendResponse({check:"pass",records:JSON.stringify(records)});
         return true;
-      
+      case 'addToWhiteList':
+        var url = request.url;
+        var scriptDomains = JSON.parse(request.scriptDomains);
+        whiteList[url] = scriptDomains;
+        console.log("白名單更新 : 避免此網站",url);
+        console.log("            因引用以下腳本被刪除cookie");
+        console.log("           ",scriptDomains);
+        chrome.storage.sync.set({
+          "whiteList":whiteList
+        },()=>{
+          sendResponse({check:"pass"});
+        });
+        return true;
     }
   }
 );
