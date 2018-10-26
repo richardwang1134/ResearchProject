@@ -70,7 +70,11 @@ div.FixRow{
   display: flex;
   flex-direction:row;
 }
+div.Hide{
+  display:none;
+}
 div.ThinRow{
+  display:flex;
   color:rgb(158, 158, 158);
   background-color: rgb(33,33,33);
   height: 25px;
@@ -80,6 +84,15 @@ div.ThinRow{
   justify-content: center;
   align-items: center;
   flex-direction:row;
+}
+div.ThinItem{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+div.ThinItem.Clickable:hover{
+  color:rgb(250, 250, 250);
 }
 div.Row{
   /*flex container*/

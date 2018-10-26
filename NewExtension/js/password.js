@@ -29,7 +29,6 @@ function loginOnLoad(){
             $("#mainKeyText").css("background-color","#2196f3");
             $("#mainKeyText").css("color","#E3F2FD");
             $("#mainKeyText").val("*********");
-            $("#mainKeyText").attr("placeholder", "");
             $("#confirmMainKey").html("登出");
         }
     });
@@ -229,7 +228,6 @@ function confirmMainKeyClick(){
                 $("#mainKeyText").css("background-color","#2196f3");
                 $("#mainKeyText").css("color","#E3F2FD");
                 $("#mainKeyText").val("*********");
-                $("#mainKeyText").attr("placeholder", "");
                 $("#confirmMainKey").html("登出");
             }else{
                 alert("密碼驗證錯誤");
@@ -244,7 +242,6 @@ function confirmMainKeyClick(){
                 $("#mainKeyText").css("background-color","#E3F2FD");
                 $("#mainKeyText").css("color","#212121");
                 $("#mainKeyText").val("");
-                $("#mainKeyText").attr("placeholder", "main password");
                 $("#confirmMainKey").html("登入");
             }else{
                 alert("登出失敗");

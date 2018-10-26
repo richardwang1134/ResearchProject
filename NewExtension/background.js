@@ -4,35 +4,23 @@ chrome.storage.sync.clear();
 //------------以上測試用-------------------------
 /*
   todo
-    cookie.js
-      
 
-    source.js
+    開管理load pbList<<
+    依照pbList建列表
+    建好可以更改存檔刪除
 
-
-      處理方式
-        記錄所有攻擊者的腳本來源
-        檢查是否在防禦範圍內?
-        是>>
-          攔截並檢查腳本是否在白名單內
-          是>>
-            送出request2 "pass"
-          否>>
-            檢查腳本是否在黑名單內
-            是>>
-              送出request2 "block"
-            否>>
-              送出request2 "pass"
-              
-    background.js
-      
+    建立cookie list
+    印看看
+    傳回背景頁面
+  
          
 */
 /*
   sync area keys
-    mainKeyTetData  測設主密碼
-    accountData     JSON([JSON[安全等級,網站名稱,帳號,加密後的密碼],JSON[.....]])
-    whiteList       {ref1:[url,url,....],ref2:[url,url,....]}
+    mainKeyTestData   主密碼測試資料
+    accoountDat       帳號資料
+    records           引用跨站腳本的紀錄 [ref1:[url,url,....],ref2:[url,url,....],...]
+    trustLists        信任與不信任的名單 [ref1:[url/block,url/pass,....],....]
 */
 
 document.write('<script src="js/sha256.js"></script>');
@@ -41,7 +29,8 @@ document.write('<script src="js/AES.js"></script>');
 var mainKey = "";
 var accountData=[];
 var records=[];
-var whiteList={};
+var trustLists=[];
+var cookieSettings;
 
 chrome.webRequest.onBeforeRequest.addListener(
 	(details)=>{
@@ -55,11 +44,9 @@ chrome.webRequest.onBeforeRequest.addListener(
           var ref = items.url;
           var refDomain = ref.split("/")[2];
           var urlDomain = url.split("/")[2];
-          var pass = checkWhiteList(refDomain,urlDomain);
-          if(!pass){
-            addToRecords(refDomain,urlDomain);
-            //delete coockie, then(()=>{sendRequest2})
-          }
+          //var pass = checkTrustList(refDomain,urlDomain);
+          var samesite = refDomain.match(urlDomain);
+          if(!samesite) addToRecords(refDomain,urlDomain);
         }
 			)
       return ;
@@ -69,7 +56,7 @@ chrome.webRequest.onBeforeRequest.addListener(
   },
     ["blocking"]
 );
-function checkWhiteList(refDomain,urlDomain){
+function checkTrustList(refDomain,urlDomain){
   var pass = false;
   var samesite = refDomain.match(urlDomain);
   if(samesite){
@@ -103,8 +90,8 @@ function addToRecords(refDomain,urlDomain){
     records.push(obj);
   }
   if(!urlExist){
-    console.log("刪除cookie紀錄 : 被刪除cookie的網域",refDomain);
-    console.log("                觸發的腳本來源網域",urlDomain);
+    console.log("跨站腳本紀錄 : 發出的網域",refDomain);
+    console.log("              腳本來源網域",urlDomain);
   }
 }
 
@@ -279,18 +266,20 @@ chrome.runtime.onMessage.addListener(
       case 'getRecord':
         sendResponse({check:"pass",records:JSON.stringify(records)});
         return true;
-      case 'addToWhiteList':
-        var url = request.url;
-        var scriptDomains = JSON.parse(request.scriptDomains);
-        whiteList[url] = scriptDomains;
-        console.log("白名單更新 : 避免此網站",url);
-        console.log("            因引用以下腳本被刪除cookie");
-        console.log("           ",scriptDomains);
+      case 'newTrustList':
+        var key = request.key;
+        var list = request.list;
+        var newItem = {};
+        newItem[key] = list;
+        trustLists.push(newItem);
         chrome.storage.sync.set({
-          "whiteList":whiteList
+          trustLists:trustLists
         },()=>{
           sendResponse({check:"pass"});
         });
+        chrome.storage.sync.set({trustLists:trustLists});
+        console.log("新增防禦目標 :",key);
+        console.log("             ",list);
         return true;
     }
   }

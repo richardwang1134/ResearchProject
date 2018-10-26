@@ -1,9 +1,21 @@
 function setCookiePage(){
+  reloadCookieData();
   $("#setCookieTab").click(setCookieTabClick);
   $("#mngCookieTab").click(mngCookieTabClick);
 }
 
+function reloadCookieData(){
+  chrome.tabs.getSelected(null,(tab)=>{
+    chrome.cookies.getAll({
+      url:tab.url
+    },(cookie)=>{
+      if(cookie){
+        //console.log(cookie);
+      }
+    });
+  });
 
+}
 
 function setCookieTabClick(){
     $("#setCookieTab").removeClass("Clickable");
