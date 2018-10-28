@@ -5,22 +5,28 @@ chrome.storage.sync.clear();
 /*
   todo
 
-    開管理load pbList<<
-    依照pbList建列表
-    建好可以更改存檔刪除
+    更新target資料
+    更新cookie的資料
 
-    建立cookie list
-    印看看
-    傳回背景頁面
-  
+    一開始讀取資料到記憶體
+    之後從記憶體讀取
+    確保所有更新資料動作都有set
+    確保一開始讀取資料是get讀出來的
+    重新命名
          
+*/
+/*
+  block inline 筆記
+    偵測關鍵字document.cookie
+    偵測eval
 */
 /*
   sync area keys
     mainKeyTestData   主密碼測試資料
     accoountDat       帳號資料
-    records           引用跨站腳本的紀錄 [ref1:[url,url,....],ref2:[url,url,....],...]
-    trustLists        信任與不信任的名單 [ref1:[url/block,url/pass,....],....]
+    recordData        引用跨站腳本的紀錄 [ref1:[url,url,....],ref2:[url,url,....],...]
+    targets           信任與不信任的名單 [ref1:[url/block,url/pass,....],....]
+    cookieData        針對特定網域的cookie特殊設定 [ref1:[name,samesite]] samesite = strict lax default
 */
 
 document.write('<script src="js/sha256.js"></script>');
@@ -28,27 +34,42 @@ document.write('<script src="js/AES.js"></script>');
 
 var mainKey = "";
 var accountData=[];
-var records=[];
-var trustLists=[];
-var cookieSettings;
+var recordData=[];
+var targets=[];
+var cookieData=[];
 
+loadDatas();
+
+function loadDatas(){
+
+}
+//
 chrome.webRequest.onBeforeRequest.addListener(
 	(details)=>{
 			var url = details.url;
 			var rid = details.requestId.toString();
-			var tid = details.tabId;
-			if(tid == -1) return;
-      chrome.tabs.get(
-				tid,
-				(items)=>{
-          var ref = items.url;
-          var refDomain = ref.split("/")[2];
-          var urlDomain = url.split("/")[2];
-          //var pass = checkTrustList(refDomain,urlDomain);
-          var samesite = refDomain.match(urlDomain);
-          if(!samesite) addToRecords(refDomain,urlDomain);
-        }
-			)
+      var tid = details.tabId;
+      var type = details.type;
+			if(tid != -1){
+        chrome.tabs.get(
+          tid,
+          (items)=>{
+            var ref = items.url;
+            var refDomain = ref.split("/")[2];
+            var urlDomain = url.split("/")[2];
+            var samesite = refDomain.match(urlDomain);
+            var result = checkTargets(refDomain,urlDomain);
+            if(result == "stranger"){
+              if(confirm("發現未知的跨站腳本，來自"+urlDomain+"，是否預覽內容?")){
+                window.open(url);
+              }
+            }
+            //send result request2 to proxy
+            if(!samesite && type=="script") addToRecord(refDomain,urlDomain);
+            else addRecord(refDomain);
+          }
+        )
+      }
       return ;
 	},{
     urls: ["<all_urls>"],
@@ -56,30 +77,53 @@ chrome.webRequest.onBeforeRequest.addListener(
   },
     ["blocking"]
 );
-function checkTrustList(refDomain,urlDomain){
-  var pass = false;
+function checkTargets(refDomain,urlDomain){
+  var result = "pass";
   var samesite = refDomain.match(urlDomain);
-  if(samesite){
-    pass = true;
-  }else if(whiteList[refDomain]){
-    var urlList = whiteList[refDomain];
-    for(var i=0; i<urlList.length; i++){
-      if(urlList[i]==urlDomain) pass = true;
+  if(!samesite){
+    for(var i=0; i<targets.length; i++){
+      var key = Object.keys(targets[i])[0];
+      if(key == refDomain){//和目標網域相同
+        var match = false;
+        for(var j=0; j<targets[i][key].length; j++){
+          var arr = targets[i][key][j].split('/');
+          if(arr[0]==urlDomain){
+            match = true;
+            result = arr[1];
+          }
+        }
+        if(!match)  result = "stranger";
+      }
     }
-    if(!pass) alert("在"+refDomain+"偵測到新的腳本來源 : "+urlDomain);
   }
-  return pass;
+  return result;
 }
-function addToRecords(refDomain,urlDomain){
+function addRecord(refDomain){
+  var refExist = false;
+  for(var i=0; i<recordData.length; i++){
+    if(recordData[i].hasOwnProperty(refDomain)){
+      refExist = true;
+      urlDomains = recordData[i][refDomain];
+      break;
+    }
+  }
+  if(!refExist){
+    var obj = {};
+    obj[refDomain] = [];
+    recordData.push(obj);
+  }
+}
+function addToRecord(refDomain,urlDomain){
   var refExist = false;
   var urlExist = true;
-  for(var i=0; i<records.length; i++){
-    if(records[i].hasOwnProperty(refDomain)){
+  for(var i=0; i<recordData.length; i++){
+    if(recordData[i].hasOwnProperty(refDomain)){
       refExist = true;
-      urlDomains = records[i][refDomain];
+      urlDomains = recordData[i][refDomain];
       if(!urlDomains.includes(urlDomain)){
         urlExist = false;
-        records[i][refDomain].push(urlDomain);
+        recordData[i][refDomain].push(urlDomain);
+        break;
       }
     }
   }
@@ -87,7 +131,7 @@ function addToRecords(refDomain,urlDomain){
     urlExist = false;
     var obj = {};
     obj[refDomain] = [urlDomain];
-    records.push(obj);
+    recordData.push(obj);
   }
   if(!urlExist){
     console.log("跨站腳本紀錄 : 發出的網域",refDomain);
@@ -98,192 +142,246 @@ function addToRecords(refDomain,urlDomain){
 chrome.runtime.onMessage.addListener(
   (request, sender, sendResponse)=>{
     switch(request.type){
-      /*
-        密碼驗證
-        1.  第一次登入，以hash(mainKey)對"1234567890"加密，產生mainKeyTestData並存起來
-        2.  第二次起，以hash(mainKey)對mainKeyTestData解密，若解出1234567890表示成功
-        3.  驗證完成密碼存在background，存活週期為重開瀏覽器或重開擴充功能
-      */
       case 'confirmMainKey':
-        var key = request.value;
-        chrome.storage.sync.get(
-          "mainKeyTestData",
-          (response)=>{
-            if(response.mainKeyTestData){//已登入
-              data = response.mainKeyTestData;
-              var decryptedData = Aes.Ctr.decrypt(data,key,256);
-              if(decryptedData=="1234567890"){
-                mainKey = key;
-                sendResponse({check: "pass"});
-                console.log("主密碼驗證 : 嘗試以sha256(mainKey)");
-                console.log("           ",key);
-                console.log("            對",data,"解密");
-                console.log("            預期結果: 1234567890，解密結果:",decryptedData);
-                console.log("            密碼驗證通過");
-              }else{
-                sendResponse({check:"fail"});
-                console.log("主密碼驗證 : 嘗試以sha256(mainKey)");
-                console.log("           ",key);
-                console.log("            對",data,"解密");
-                console.log("            預期結果: 1234567890，解密結果:",decryptedData);
-                console.log("            密碼驗證失敗");
-              }
-            }
-            else{//第一次登入
-              mainKey = key;
-              var mainKeyTestData = Aes.Ctr.encrypt("1234567890",key,256);
-              chrome.storage.sync.set({"mainKeyTestData":mainKeyTestData});
-              sendResponse({check: "pass"});
-              console.log("主密碼驗證 : 第一次登入，以sha256(mainKey)");
-              console.log("           ",mainKey);
-              console.log("            建立新密碼的驗證資料",mainKeyTestData);
-            }
-           
-          }
-        )
+        confirmMainKey(request,sendResponse);
         return true;
-      /*
-        登出
-      */
       case 'forgetMainKey':
         mainKey = "";
         sendResponse({check:"pass"});
         return true;
-      /*
-        檔案密碼驗證
-        1.  第一次登入，以hash(fileKey)對"1234567890"加密，產生fileKeyTestData並存起來
-        2.  第二次起，以hash(fileKey)對mainKeyTestData解密，若解出1234567890表示成功
-        3.  驗證完成密碼存在popup，存活週期為popup頁面開啟期間
-      */
       case 'confirmFileKey':
-        var fileKey = request.value;
-        chrome.storage.sync.get(
-          "fileKeyTestData",
-          (response)=>{
-            if(response.fileKeyTestData){//已登入
-              data = response.fileKeyTestData;
-              var decryptedData = Aes.Ctr.decrypt(data,fileKey,256);
-              if(decryptedData=="1234567890"){
-                sendResponse({check: "pass"});
-                console.log("檔案密碼驗證 : 嘗試以檔案密碼");
-                console.log("             ",fileKey);
-                console.log("              對",data,"解密");
-                console.log("              預期結果: 1234567890，解密結果:",decryptedData);
-                console.log("              密碼驗證通過");
-              }else{
-                sendResponse({check:"fail"});
-                console.log("檔案密碼驗證 : 嘗試以檔案密碼");
-                console.log("             ",fileKey);
-                console.log("              對",data,"解密");
-                console.log("              預期結果: 1234567890，解密結果:",decryptedData);
-                console.log("              密碼驗證失敗");
-              }
-            }else{//第一次登入
-              var fileKeyTestData = Aes.Ctr.encrypt("1234567890",fileKey,256);
-              chrome.storage.sync.set({"fileKeyTestData":fileKeyTestData});
-              sendResponse({check: "pass"});
-              console.log("檔案密碼驗證 : 第一次上傳，以檔案密碼");
-              console.log("             ",fileKey);
-              console.log("              建立新密碼的驗證資料",fileKeyTestData);
-            }
-          });
-          return true;
-      /*
-        新增帳號
-      */
+        confirmFileKey(request,sendResponse);
+        return true;
       case 'addAccount':
-        var thisAcountData = 
-        [request.security,request.name,request.account,request.password];
-        console.log("新增帳號 :",thisAcountData);
-        accountData.push(thisAcountData);
-        jAccountData=enJSON2D(accountData);
-        chrome.storage.sync.set({
-          "accountData":jAccountData
-        },()=>{
-          sendResponse({check:"pass"});
-        });
+        addAccount(request,sendResponse);
         return true;
-      /*
-        回傳帳號
-      */
       case 'getAccount':
-        jAccountData=enJSON2D(accountData);
-        sendResponse({
-          check:"pass",
-          accountData:jAccountData
-        });
+        sendResponse({check:"pass",accountData:enJSON2D(accountData)});
         return true;
-      /*
-        回傳MainKey
-      */
       case 'getMainKey':
-        if(mainKey){
-          console.log("登入狀態 : 已登入");
-          sendResponse({
-            check:"pass",
-            mainKey:mainKey
-          });
-        }else{
-          console.log("登入狀態 : 未登入");
-          sendResponse({check:"fail"});
-        }
-        
-        return true;
-      /*
-        刪除帳號
-      */
+        getMainKey(sendResponse);
+        return true
       case 'deleteAccount':
-        var account = JSON.parse(request.value);
-        var newAccountData = [];
-        for(var i=0;i<accountData.length;i++){
-            var match = true;
-            for(var j=0;j<4;j++){
-                if(accountData[i][j]!=account[j]){
-                    match = false;
-                }
-            }
-            if(!match) newAccountData.push(accountData[i]);
-        }
-        accountData = newAccountData;
-        jAccountData=enJSON2D(accountData);
-        chrome.storage.sync.set({
-          "accountData":jAccountData
-        },()=>{
-          console.log("刪除帳號 :",account);
-          sendResponse({check:"pass"});
-        });
+        deleteAccount(request,sendResponse);
         return true;
       case 'updateAccountData':
-        chrome.storage.sync.set({
-          "accountData":request.accountData,
-          "mainKeyTestData":request.newTestData
-        },()=>{
-          accountData = deJSON2D(request.accountData)
-          console.log("更新帳號資料 :",accountData);
-          sendResponse({check:"pass"});
-        });
+        updateAccountData(request,sendResponse)
         return true;
       case 'getRecord':
-        sendResponse({check:"pass",records:JSON.stringify(records)});
+        sendResponse({check:"pass",recordData:JSON.stringify(recordData)});
         return true;
-      case 'newTrustList':
-        var key = request.key;
-        var list = request.list;
-        var newItem = {};
-        newItem[key] = list;
-        trustLists.push(newItem);
-        chrome.storage.sync.set({
-          trustLists:trustLists
-        },()=>{
-          sendResponse({check:"pass"});
-        });
-        chrome.storage.sync.set({trustLists:trustLists});
-        console.log("新增防禦目標 :",key);
-        console.log("             ",list);
+      case 'addTarget':
+        addTarget(request,sendResponse);
+        return true;
+      case 'getTargets':
+        sendResponse({check:"pass",targets:JSON.stringify(targets)});
+        return true;
+      case 'deleteTarget':
+        deleteTarget(request,sendResponse);
         return true;
     }
   }
 );
+function confirmMainKey(request,sendResponse){
+  var key = request.value;
+  chrome.storage.sync.get(
+    "mainKeyTestData",
+    (response)=>{
+      if(response.mainKeyTestData){//已登入
+        data = response.mainKeyTestData;
+        var decryptedData = Aes.Ctr.decrypt(data,key,256);
+        if(decryptedData=="1234567890"){
+          mainKey = key;
+          sendResponse({check: "pass"});
+          console.log("主密碼驗證 : 嘗試以sha256(mainKey)");
+          console.log("           ",key);
+          console.log("            對",data,"解密");
+          console.log("            預期結果: 1234567890，解密結果:",decryptedData);
+          console.log("            密碼驗證通過");
+        }else{
+          sendResponse({check:"fail"});
+          console.log("主密碼驗證 : 嘗試以sha256(mainKey)");
+          console.log("           ",key);
+          console.log("            對",data,"解密");
+          console.log("            預期結果: 1234567890，解密結果:",decryptedData);
+          console.log("            密碼驗證失敗");
+        }
+      }
+      else{//第一次登入
+        mainKey = key;
+        var mainKeyTestData = Aes.Ctr.encrypt("1234567890",key,256);
+        chrome.storage.sync.set({"mainKeyTestData":mainKeyTestData});
+        sendResponse({check: "pass"});
+        console.log("主密碼驗證 : 第一次登入，以sha256(mainKey)");
+        console.log("           ",mainKey);
+        console.log("            建立新密碼的驗證資料",mainKeyTestData);
+      }
+    }
+  )
+}
+function confirmFileKey(request,sendResponse){
+  var fileKey = request.value;
+  chrome.storage.sync.get(
+    "fileKeyTestData",
+    (response)=>{
+      if(response.fileKeyTestData){//已登入
+        data = response.fileKeyTestData;
+        var decryptedData = Aes.Ctr.decrypt(data,fileKey,256);
+        if(decryptedData=="1234567890"){
+          sendResponse({check: "pass"});
+          console.log("檔案密碼驗證 : 嘗試以檔案密碼");
+          console.log("             ",fileKey);
+          console.log("              對",data,"解密");
+          console.log("              預期結果: 1234567890，解密結果:",decryptedData);
+          console.log("              密碼驗證通過");
+        }else{
+          sendResponse({check:"fail"});
+          console.log("檔案密碼驗證 : 嘗試以檔案密碼");
+          console.log("             ",fileKey);
+          console.log("              對",data,"解密");
+          console.log("              預期結果: 1234567890，解密結果:",decryptedData);
+          console.log("              密碼驗證失敗");
+        }
+      }else{//第一次登入
+        var fileKeyTestData = Aes.Ctr.encrypt("1234567890",fileKey,256);
+        chrome.storage.sync.set({"fileKeyTestData":fileKeyTestData});
+        sendResponse({check: "pass"});
+        console.log("檔案密碼驗證 : 第一次上傳，以檔案密碼");
+        console.log("             ",fileKey);
+        console.log("              建立新密碼的驗證資料",fileKeyTestData);
+      }
+    });
+}
+function addAccount(request,sendResponse){
+  var thisAcountData = [request.security,request.name,request.account,request.password];
+  console.log("新增帳號 :",thisAcountData);
+  accountData.push(thisAcountData);
+  jAccountData=enJSON2D(accountData);
+  chrome.storage.sync.set({
+    "accountData":jAccountData
+  },()=>{
+    sendResponse({check:"pass"});
+  });
+}
+function getMainKey(sendResponse){
+  if(mainKey){
+    console.log("登入狀態 : 已登入");
+    sendResponse({
+      check:"pass",
+      mainKey:mainKey
+    });
+  }else{
+    console.log("登入狀態 : 未登入");
+    sendResponse({check:"fail"});
+  }
+  
+}
+function deleteAccount(request,sendResponse){
+  var account = JSON.parse(request.value);
+  var newAccountData = [];
+  for(var i=0;i<accountData.length;i++){
+      var match = true;
+      for(var j=0;j<4;j++){
+          if(accountData[i][j]!=account[j]){
+              match = false;
+          }
+      }
+      if(!match) newAccountData.push(accountData[i]);
+  }
+  accountData = newAccountData;
+  jAccountData=enJSON2D(accountData);
+  chrome.storage.sync.set({
+    "accountData":jAccountData
+  },()=>{
+    console.log("刪除帳號 :",account);
+    sendResponse({check:"pass"});
+  });
+}
+function updateAccountData(request,sendResponse){
+  chrome.storage.sync.set({
+    "accountData":request.accountData,
+    "mainKeyTestData":request.newTestData
+  },()=>{
+    accountData = deJSON2D(request.accountData)
+    console.log("更新帳號資料 :",accountData);
+    sendResponse({check:"pass"});
+  });
+}
+function addTarget(request,sendResponse){
+  var key = request.key;
+  var list = request.list;
+  var exist = false;
+  var newTarget = {};
+  newTarget[key] = list;
+  for(var i=0;i<targets.length;i++){
+    if(Object.keys(targets[i])[0]==key){
+      targets[i] = newTarget;
+      exist = true;
+      console.log("更新防禦目標 :",key);
+      console.log("             ",list);
+      break;
+    }    
+  }
+  if(!exist){
+    targets.push(newTarget);
+    console.log("新增防禦目標 :",key);
+    console.log("             ",list);
+  }
+  chrome.storage.sync.set({
+    targets:targets
+  },()=>{
+    sendResponse({check:"pass"});
+  });
+  
+}
+function deleteTarget(request,sendResponse){
+  var url = request.target;
+  var match = false;
+  for(var i=0;i<targets.length;i++){
+    var key = Object.keys(targets[i])[0];
+    if(key == url){
+      targets.splice(i,1);
+    }
+  }
+  chrome.storage.sync.set({
+    targets:targets
+  },()=>{
+    sendResponse({check:"pass"});
+    console.log("刪除防禦目標 :",url);
+  });
+}
+/*
+chrome.cookies.onChanged.addListener((info)=>{
+  var cDomain = info.cookie.domain;
+  if(info.cause=="explicit"){
+    for(var i=0; i<targets.length;i++){
+      var tDomain = Object.keys(targets[i])[0];
+      if(tDomain.match(cDomain)&&info.cookie.sameSite!="lax"){
+        setCookieStrict(info.cookie,"https://"+tDomain);
+      }
+    }
+  }
+});*/
+function setCookieStrict(cookie,url){
+  chrome.cookies.remove({
+    url:url
+    ,name:cookie.name
+  })
+  chrome.cookies.set({
+    url:url
+    ,name:cookie.name
+    ,value:cookie.value
+    ,domain:cookie.domain
+    ,path:cookie.path
+    ,secure:cookie.secure
+    ,httpOnly:cookie.httpOnly
+    ,sameSite:"strict"
+    ,expirationDate:cookie.expirationDate
+    ,storeId:cookie.storeId
+  },(cookie)=>{
+    //console.log(cookie);
+  })
+}
 
 function enJSON2D(array){
   var jsonArray = [];
@@ -294,7 +392,6 @@ function enJSON2D(array){
   json = JSON.stringify(jsonArray);
   return json;
 }
-
 function deJSON2D(json){
   var array =[];
   var jsonArray = JSON.parse(json);
@@ -303,3 +400,5 @@ function deJSON2D(json){
   }
   return array;
 }
+
+

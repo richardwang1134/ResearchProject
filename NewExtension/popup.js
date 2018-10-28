@@ -64,6 +64,7 @@ function cookieTabClick(){
     $("#cookieTabs").css("display","flex");
     $("#setCookie").css("display","flex");
     $("#mngCookie").css("display","none");
+    reloadTargets();
 }
 // ↑ setTopTabs ↑ 
 

@@ -73,12 +73,27 @@ div.FixRow{
 div.Hide{
   display:none;
 }
+div.Hidden{
+  display:none;
+}
 div.ThinRow{
   display:flex;
   color:rgb(158, 158, 158);
   background-color: rgb(33,33,33);
-  height: 25px;
-  font-size: 12px;
+  height: 30px;
+  font-size: 14px;
+  /*flex container*/
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction:row;
+}
+div.CookieRow{
+  display:flex;
+  color:rgb(158, 158, 158);
+  background-color: rgb(33,33,33);
+  height: 30px;
+  font-size: 14px;
   /*flex container*/
   display: flex;
   justify-content: center;
@@ -138,6 +153,9 @@ div.Flex2{
 }
 div.Flex3{
   flex: 3;
+}
+div.Flex4{
+  flex: 4;
 }
 div.Flex5{
   flex: 5;

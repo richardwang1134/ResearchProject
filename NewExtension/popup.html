@@ -9,18 +9,18 @@
     <script src="js/AES.js"></script>
     <script src="js/jquery.js"></script>
     <script src="js/password.js"></script>
-    <script src="js/cookie.js"></script>
-    <script src="js/XSS.js"></script>
+    <script src="js/mngTargets.js"></script>
+    <script src="js/addTarget.js"></script>
     <script src="popup.js"></script>
   </head>
   <body>
     <!-- 主選單 -->
     <div class="Tabs">
       <div class="Tab" id="passwordTab">管理密碼</div>
-      <div class="Tab XSS Clickable" id="XSSTab">XSS防禦</div>
-      <div class="Tab Cookie Clickable" id="cookieTab">CSRF防禦</div>
+      <div class="Tab XSS Clickable" id="XSSTab">新增防禦目標</div>
+      <div class="Tab Cookie Clickable" id="cookieTab">管理防禦目標</div>
     </div>
-    <!-- 主選單>>密碼管理 -->
+    <!-- 主選單>>管理密碼 -->
     <div id="password" class="Rows" display="none">
       <div class="FixRow" id="MainKeyRow">
         <div class="Tab Clickable Flex2" id="changeMainKey">主密碼</div>
@@ -67,72 +67,27 @@
         </div>
       </div>
     </div>
-    <!-- 主選單>>信任的腳本來源 -->
-    <div class="Tabs" id="XSSTabs">
-      <div class="Tab" id="addXSSTab">新增防禦目標</div>
-      <div class="Tab" id="mngXSSTab">管理防禦目標</div>
-    </div>
-    <!-- 主選單>>信任的腳本來源>>新增 -->
+    <!-- 主選單>>新增防禦目標 -->
     <div class="Rows"  id="addXSS">
       <div class="FixRow">
-        <div class="Tab Flex5">網站</div>
+        <div class="Tab Flex5">近期瀏覽的網域</div>
+        <div class="Tab">詳情</div>
         <div class="Tab">新增</div>
       </div>
       <div class="Rows">
-        <div class="Scroll" id="recordScroll">
-          <div class="FixRow"><!-- 範例，實際上要動態生成 -->
-            <div class="Item">www.facebook.com</div>
-          </div>
-        </div>
+        <div class="Scroll" id="recordScroll"></div>
       </div>
     </div>
-    <!-- 主選單>>信任的腳本來源>>管理 -->
-    <div class="Rows"  id="mngXSS">
-      <div class="FixRow">
-        <div class="Tab Flex3">URL</div>
-        <div class="Tab Flex3">Referer</div>
-        <div class="Tab Clickable">新增</div>
-      </div>
-      <div class="Rows">
-        <div class="Scroll">
-        </div>
-      </div>
-    </div>
-    <!-- 主選單>>SamsiteCookie -->
-    <div class="Tabs" id="cookieTabs">
-      <div class="Tab" id="setCookieTab">設定</div>
-      <div class="Tab" id="mngCookieTab">管理</div>
-    </div>
-    <!-- 主選單>>SamsiteCookie>>目前頁面 -->
+    <!-- 主選單>>管理防禦目標 -->
     <div class="Rows"  id="setCookie">
       <div class="FixRow">
-        <div class="Item Flex3 Title">Cookie名稱</div>
-        <div class="Item Flex3 Title">Samesite狀態</div>
-        <div class="Item Clickable Title">確認</div>
-      </div>
-      <div class="Rows">
-        <div class="Scroll">
-          <div class="FixRow"><!-- 範例，實際上要動態生成 -->
-            <div class="Item Flex3">username</div>
-            <div class="Item Flex3">no-restrict</div>
-            <div class="Item Clickable">切換</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- 主選單>>SamsiteCookie>>歷史紀錄 -->
-    <div class="Rows"  id="mngCookie">
-      <div class="FixRow">
-        <div class="Item Flex5 Title">Domain</div>
+        <div class="Item Flex5 Title">防禦目標網域</div>
+        <div class="Item Flex2 Title">XSS防禦</div>
+        <div class="Item Flex2 Title">CSRF防禦</div>
         <div class="Item Title">刪除</div>
       </div>
       <div class="Rows">
-        <div class="Scroll">
-          <div class="FixRow"><!-- 範例，實際上要動態生成 -->
-            <div class="Item Flex5 Clickable">Cookie名稱</div>
-            <div class="Item Clickable">—</div>
-          </div>
-        </div>
+        <div class="Scroll" id="mngTargetsScroll"></div>
       </div>
     </div>
   </body>
