@@ -4,7 +4,6 @@ chrome.storage.sync.clear();
 //------------以上測試用-------------------------
 /*
   todo
-
     更新target資料
     更新cookie的資料
 
@@ -12,8 +11,7 @@ chrome.storage.sync.clear();
     之後從記憶體讀取
     確保所有更新資料動作都有set
     確保一開始讀取資料是get讀出來的
-    重新命名
-         
+    重新命名    
 */
 /*
   block inline 筆記
@@ -179,9 +177,24 @@ chrome.runtime.onMessage.addListener(
       case 'deleteTarget':
         deleteTarget(request,sendResponse);
         return true;
+      case 'updateTarget':
+        updateTarget(request,sendResponse);
+        return true;
     }
   }
 );
+function updateTarget(request,sendResponse){
+  var target = request.target;
+  var key = Object.keys(target)[0];
+  for(var i=0;i<targets.length;i++){
+    if(Object.keys(targets[i])[0]==key){
+      targets[i]=target;
+    }
+  }
+  console.log("更新目標 :",key);
+  console.log("         ",target[key]);
+}
+
 function confirmMainKey(request,sendResponse){
   var key = request.value;
   chrome.storage.sync.get(
@@ -327,9 +340,19 @@ function addTarget(request,sendResponse){
     console.log("新增防禦目標 :",key);
     console.log("             ",list);
   }
+  
+  chrome.cookies.getAll({
+    url:"https://"+key
+  },(cookies)=>{
+    for(var i =0;i<cookies.length;i++){
+      setCookieStrict(cookies[i],key);
+    }
+  });
+
   chrome.storage.sync.set({
     targets:targets
   },()=>{
+    
     sendResponse({check:"pass"});
   });
   
@@ -350,25 +373,13 @@ function deleteTarget(request,sendResponse){
     console.log("刪除防禦目標 :",url);
   });
 }
-/*
-chrome.cookies.onChanged.addListener((info)=>{
-  var cDomain = info.cookie.domain;
-  if(info.cause=="explicit"){
-    for(var i=0; i<targets.length;i++){
-      var tDomain = Object.keys(targets[i])[0];
-      if(tDomain.match(cDomain)&&info.cookie.sameSite!="lax"){
-        setCookieStrict(info.cookie,"https://"+tDomain);
-      }
-    }
-  }
-});*/
 function setCookieStrict(cookie,url){
   chrome.cookies.remove({
-    url:url
+    url:"https://"+url
     ,name:cookie.name
   })
   chrome.cookies.set({
-    url:url
+    url:"https://"+url
     ,name:cookie.name
     ,value:cookie.value
     ,domain:cookie.domain
@@ -379,7 +390,6 @@ function setCookieStrict(cookie,url){
     ,expirationDate:cookie.expirationDate
     ,storeId:cookie.storeId
   },(cookie)=>{
-    //console.log(cookie);
   })
 }
 

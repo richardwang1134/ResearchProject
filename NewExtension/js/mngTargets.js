@@ -46,6 +46,7 @@ function addTargetRow(target,scroll){
   for(var i=0; i<trustList.length; i++){
     addScriptDomainRows(trustList[i],scroll);
   }
+  addConfirmChangeRow(fixRow,scroll);
 }
 function switchItem2(fixRow){
   var item2 = fixRow.firstChild.nextSibling;
@@ -113,7 +114,7 @@ function addCookieStatuRows(fixRow,name,sameSite){
   item1.innerHTML = name;
   var item2 = document.createElement("div");
   item2.className = 'ThinItem Clickable Flex4';
-  item2.innerHTML = "default-"+sameSite;
+  item2.innerHTML = sameSite;
   var item3 = document.createElement("div");
   item3.className = 'ThinItem Clickable';
   item3.innerHTML = "-";
@@ -128,20 +129,53 @@ function addScriptDomainRows(trustItem,scroll){
   var thinRow = document.createElement("div");
   thinRow.className = 'Hide';
   var item1 = document.createElement("div");
-  item1.className = 'ThinItem Flex5';
+  item1.className = 'ThinItem';
   item1.innerHTML = url;
   var item2 = document.createElement("div");
-  item2.className = 'ThinItem Clickable Flex4';
+  item2.className = 'ThinItem Clickable';
   if(trust=="pass") item2.innerHTML = "信任";
   else item2.innerHTML = "阻擋";
-  var item3 = document.createElement("div");
-  item3.className = 'ThinItem Clickable';
-  item3.innerHTML = "-";
   item2.onclick= ()=>{trustOrNot(item2)};
   thinRow.appendChild(item1);
   thinRow.appendChild(item2);
-  thinRow.appendChild(item3);
   scroll.appendChild(thinRow);
+}
+function addConfirmChangeRow(fixRow,scroll){
+  var thinRow = document.createElement("div");
+  thinRow.className = 'Hide';
+  var item1 = document.createElement("div");
+  item1.className = 'ThinItem Clickable';
+  item1.innerHTML = "確定";
+  item1.onclick = ()=>{updateTarget(fixRow)};
+  thinRow.appendChild(item1);
+  scroll.appendChild(thinRow);
+}
+function updateTarget(fixRow){
+  var url = fixRow.firstChild.innerHTML;
+  var trustList = [];
+  var thisRow = fixRow;
+  while(thisRow.nextSibling){
+    thisRow = thisRow.nextSibling;
+    if(thisRow.className=="ThinRow"){
+      var trust;
+      if(thisRow.lastChild.innerHTML=="信任") trust = '/pass';
+      else trust = '/block';
+      var source = thisRow.firstChild.innerHTML;
+      if(source!="確定")
+      trustList.push(source + trust);
+    }else{
+      break;
+    }
+  }
+  var obj = {};
+  obj[url]=trustList;
+  chrome.runtime.sendMessage({
+      type:"updateTarget",
+      target:obj
+    },(response)=>{
+      if(response.check!="pass") alert("更新失敗");
+    }
+  );
 }
 function deleteTarget(fixRow){
   var url = fixRow.firstChild.innerHTML;
