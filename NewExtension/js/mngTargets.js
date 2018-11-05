@@ -115,13 +115,37 @@ function addCookieStatuRows(fixRow,name,sameSite){
   var item2 = document.createElement("div");
   item2.className = 'ThinItem Clickable Flex4';
   item2.innerHTML = sameSite;
-  var item3 = document.createElement("div");
-  item3.className = 'ThinItem Clickable';
-  item3.innerHTML = "-";
+  item2.onclick = ()=>{switchCookie(name,item2,fixRow)};
   thinRow.appendChild(item1);
   thinRow.appendChild(item2);
-  thinRow.appendChild(item3);
   fixRow.parentNode.insertBefore(thinRow,fixRow.nextSibling);
+}
+function switchCookie(name,item2,fixRow){
+  var url = fixRow.firstChild.innerHTML;
+  if(item2.innerHTML == "strict") {
+    item2.innerHTML = "lax";
+  }else if(item2.innerHTML == "lax"){
+    item2.innerHTML = "no_restriction";
+  }else{
+    item2.innerHTML = "strict";
+  }
+  chrome.cookies.get({
+    url:"https://"+url,
+    name:name
+  },(cookie)=>{
+    chrome.cookies.set({
+      url:"https://"+url
+      ,name:cookie.name
+      ,value:cookie.value
+      ,domain:cookie.domain
+      ,path:cookie.path
+      ,secure:cookie.secure
+      ,httpOnly:cookie.httpOnly
+      ,sameSite:"strict"
+      ,expirationDate:cookie.expirationDate
+      ,storeId:cookie.storeId
+    })
+  });
 }
 function addScriptDomainRows(trustItem,scroll){
   var url = trustItem.split('/')[0];
@@ -140,7 +164,7 @@ function addScriptDomainRows(trustItem,scroll){
   thinRow.appendChild(item2);
   scroll.appendChild(thinRow);
 }
-function addConfirmChangeRow(fixRow,scroll){
+function addConfirmChangeRow(fixRow,scroll,){
   var thinRow = document.createElement("div");
   thinRow.className = 'Hide';
   var item1 = document.createElement("div");
