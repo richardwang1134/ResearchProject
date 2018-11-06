@@ -116,6 +116,15 @@ div.Row{
   /*flex item*/
   flex: 1;
 }
+div.mLeft{
+  margin: 1px 1px 1px 1px;
+}
+div.mRight{
+  margin: 1px 0px 1px 0px;
+}
+div.mMiddle{
+  margin: 1px 1px 1px 1px;
+}
 div.Item{
   background-color: rgb(227, 242, 253);
   /*flex container*/
@@ -144,6 +153,24 @@ div#fileKeyRow div:nth-child(2){
   background-color: rgb(227, 242, 253);
   color: rgb(33, 33, 33);
   border: 0;
+}
+.inputArea:focus{
+  outline: 0;
+}
+div.border{
+  border-style: solid;
+  border-width: 2px 1px 0px 0px;
+  border-color: rgb(33, 33, 33);
+}
+div.borderLeft{
+  border-style: solid;
+  border-width: 2px 1px 0px 1px;
+  border-color: rgb(33, 33, 33);
+}
+div.borderTop{
+  border-style: solid;
+  border-width: 0px 0px 2px 0px;
+  border-color: rgb(33, 33, 33);
 }
 div.Clickable{
   cursor: pointer;

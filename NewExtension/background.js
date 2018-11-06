@@ -44,30 +44,29 @@ function loadDatas(){
 //
 chrome.webRequest.onBeforeRequest.addListener(
 	(details)=>{
+      //get info
 			var url = details.url;
 			var rid = details.requestId.toString();
       var tid = details.tabId;
-      var type = details.type;
-			if(tid != -1){
-        chrome.tabs.get(
-          tid,
-          (items)=>{
-            var ref = items.url;
-            var refDomain = ref.split("/")[2];
-            var urlDomain = url.split("/")[2];
-            var samesite = refDomain.match(urlDomain);
-            var result = checkTargets(refDomain,urlDomain);
-            if(result == "stranger"){
-              if(confirm("發現未知的跨站腳本，來自"+urlDomain+"，是否預覽內容?")){
-                window.open(url);
-              }
-            }
-            //send result request2 to proxy
-            if(!samesite && type=="script") addToRecord(refDomain,urlDomain);
-            else addRecord(refDomain);
-          }
-        )
+      var ref = details.initiator;
+      if(tid == -1 || ref == null) return;
+      var refDomain = ref.split("/")[2];
+      var urlDomain = url.split("/")[2];
+      //check
+      var result = checkTargets(refDomain,urlDomain);
+      //reaction
+      if(result == "stranger"){
+        return {cancel: true};
+        if(confirm("發現未知的跨站腳本，來自"+urlDomain+"，是否預覽內容?")){
+          window.open(url);
+        }
+      }else if(result == "block"){
+        return {cancel: true};
       }
+      //record
+      var samesite = refDomain.match(urlDomain);
+      if(!samesite) addToRecord(refDomain,urlDomain);
+      else addRecord(refDomain);
       return ;
 	},{
     urls: ["<all_urls>"],
@@ -352,7 +351,6 @@ function addTarget(request,sendResponse){
   chrome.storage.sync.set({
     targets:targets
   },()=>{
-    
     sendResponse({check:"pass"});
   });
   
@@ -374,23 +372,26 @@ function deleteTarget(request,sendResponse){
   });
 }
 function setCookieStrict(cookie,url){
+  console.log(cookie);
   chrome.cookies.remove({
     url:"https://"+url
     ,name:cookie.name
+  },(detailis)=>{
+    chrome.cookies.set({
+      url:"https://"+url
+      ,name:cookie.name
+      ,value:cookie.value
+      ,path:cookie.path
+      ,secure:cookie.secure
+      ,httpOnly:cookie.httpOnly
+      ,sameSite:"strict"
+      ,expirationDate:cookie.expirationDate
+      ,storeId:cookie.storeId
+    },(c)=>{
+      console.log(c);
+    })
   })
-  chrome.cookies.set({
-    url:"https://"+url
-    ,name:cookie.name
-    ,value:cookie.value
-    ,domain:cookie.domain
-    ,path:cookie.path
-    ,secure:cookie.secure
-    ,httpOnly:cookie.httpOnly
-    ,sameSite:"strict"
-    ,expirationDate:cookie.expirationDate
-    ,storeId:cookie.storeId
-  },(cookie)=>{
-  })
+  
 }
 
 function enJSON2D(array){

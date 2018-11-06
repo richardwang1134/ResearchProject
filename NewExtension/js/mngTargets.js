@@ -115,13 +115,38 @@ function addCookieStatuRows(fixRow,name,sameSite){
   var item2 = document.createElement("div");
   item2.className = 'ThinItem Clickable Flex4';
   item2.innerHTML = sameSite;
-  var item3 = document.createElement("div");
-  item3.className = 'ThinItem Clickable';
-  item3.innerHTML = "-";
+  item2.onclick = ()=>{switchCookie(name,item2,fixRow)};
   thinRow.appendChild(item1);
   thinRow.appendChild(item2);
-  thinRow.appendChild(item3);
   fixRow.parentNode.insertBefore(thinRow,fixRow.nextSibling);
+}
+function switchCookie(name,item2,fixRow){
+  var url = fixRow.firstChild.innerHTML;
+  var newStatus;
+  if(item2.innerHTML == "strict") {
+    newStatus = "lax";
+  }else if(item2.innerHTML == "lax"){
+    newStatus = "no_restriction";
+  }else{
+    newStatus = "strict";
+  }
+  item2.innerHTML = newStatus;
+  chrome.cookies.get({
+    url:"https://"+url,
+    name:name
+  },(cookie)=>{
+    chrome.cookies.set({
+      url:"https://"+url
+      ,name:cookie.name
+      ,value:cookie.value
+      ,path:cookie.path
+      ,secure:cookie.secure
+      ,httpOnly:cookie.httpOnly
+      ,sameSite:newStatus
+      ,expirationDate:cookie.expirationDate
+      ,storeId:cookie.storeId
+    })
+  });
 }
 function addScriptDomainRows(trustItem,scroll){
   var url = trustItem.split('/')[0];
