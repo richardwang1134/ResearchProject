@@ -165,7 +165,7 @@ function addScriptDomainRows(trustItem,scroll){
   thinRow.appendChild(item2);
   scroll.appendChild(thinRow);
 }
-function addConfirmChangeRow(fixRow,scroll){
+function addConfirmChangeRow(fixRow,scroll,){
   var thinRow = document.createElement("div");
   thinRow.className = 'Hide';
   var item1 = document.createElement("div");
