@@ -35,6 +35,7 @@ var accountData=[];
 var recordData=[];
 var targets=[];
 var cookieData=[];
+var CurrentUrl;
 
 loadDatas();
 
@@ -74,6 +75,13 @@ chrome.webRequest.onBeforeRequest.addListener(
   },
     ["blocking"]
 );
+chrome.tabs.onSelectionChanged.addListener(
+	function (tabId,selectinfo) {
+	chrome.tabs.getSelected(null,
+		async function(tab){
+      CurrentUrl = tab.url.split("/")[2];
+  });
+});
 function checkTargets(refDomain,urlDomain){
   var result = "pass";
   var samesite = refDomain.match(urlDomain);
@@ -178,6 +186,9 @@ chrome.runtime.onMessage.addListener(
         return true;
       case 'updateTarget':
         updateTarget(request,sendResponse);
+        return true;
+      case 'getUrl':
+        sendResponse({check:"pass",url:JSON.stringify(CurrentUrl)});
         return true;
     }
   }
@@ -411,5 +422,3 @@ function deJSON2D(json){
   }
   return array;
 }
-
-

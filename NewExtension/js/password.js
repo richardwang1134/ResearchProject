@@ -1,6 +1,7 @@
 //live while popup page open
 var fileKey = "";
 var mainKey = "";
+var CurrentUrl = "";
 
 //outline of password page
 function setPasswordPage(){
@@ -13,6 +14,7 @@ function setPasswordPage(){
     $("#changeMainKey").mouseleave(()=>{$("#changeMainKey").html("主密碼");});
     $("#confirmMainKey").click(confirmMainKeyClick);
     $("#chooseFileKey").click(chooseFileKeyClick);
+    $("#logout").click(LogoutWebsite);
     setFileHandler();
     $("#downloadFileKey").click(downloadFileKeyClick);
     $("#downloadFileKey").mouseenter(()=>{$("#downloadFileKey").html("下載");});
@@ -30,6 +32,14 @@ function loginOnLoad(){
             $("#mainKeyText").css("color","#E3F2FD");
             $("#mainKeyText").val("*********");
             $("#confirmMainKey").html("登出");
+        }
+    });  
+
+    chrome.runtime.sendMessage({
+        type:"getUrl"
+    },(response)=>{
+        if(response.check=="pass"){
+            CurrentUrl = response.url;
         }
     });
 }
@@ -307,3 +317,20 @@ function downloadFileKeyClick(){
     element.click();
     document.body.removeChild(element);
 }
+function LogoutWebsite(){
+    var domain = "https://" + CurrentUrl.substring(0,CurrentUrl.length-1);
+    chrome.cookies.getAll({url:domain},function(cookies){
+        var names = [],
+            num = cookies.length;
+        if(num > 0){
+            for (var i = 0; i < num; i++){
+                names.push(cookies[i].name);
+            }
+            for (var i = 0, num = names.length; i < num; i++){
+                chrome.cookies.remove({url:domain,name:names[i]});
+            }
+        }
+    });
+    console.log("已成功登出網站");
+}
+
