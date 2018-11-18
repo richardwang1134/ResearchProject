@@ -331,6 +331,7 @@ function LogoutWebsite(){
             }
         }
     });
+    chrome.tabs.reload();
     console.log("已成功登出網站");
 }
 
