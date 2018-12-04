@@ -44,25 +44,25 @@ function reloadAccountData(){
             for(var i=0; i<accountData.length;i++){
                 let account = accountData[i];
                 //動態產生帳號資料列表
-                var item1 = document.createElement("div");
+                let item1 = document.createElement("div");
                 item1.className = 'Item Flex2';
                 item1.innerHTML = account[0];
-                var item2 = document.createElement("div");
+                let item2 = document.createElement("div");
                 item2.className = 'Item Flex3';
                 item2.innerHTML = account[1];
-                var item3 = document.createElement("div");
+                let item3 = document.createElement("div");
                 item3.className = 'Item Flex3 Clickable';
                 item3.innerHTML = account[2];
                 item3.onclick = ()=>{ copy(account[2]) };
-                var item4 = document.createElement("div");
+                let item4 = document.createElement("div");
                 item4.className = 'Item Flex3 Clickable';
                 item4.innerHTML = "複製密碼";
                 item4.onclick = ()=>{ copyPassword(account) };
-                var item5 = document.createElement("div");
+                let item5 = document.createElement("div");
                 item5.className = 'Item Flex2 Clickable';
                 item5.innerHTML = "刪除";
                 item5.onclick = ()=>{ deleteAccount(account) };
-                var fixRow = document.createElement("div");
+                let fixRow = document.createElement("div");
                 fixRow.className = "FixRow";
                 fixRow.appendChild(item1);
                 fixRow.appendChild(item2);
@@ -123,7 +123,7 @@ function copyPassword(account){
     }else if(!fileKey){
         alert("取得安全等級2帳號的密碼前必須先上傳檔案密碼!");
         return;
-    }else{
+    }else if(securityLV=="2"){
         var password2 = Aes.Ctr.decrypt(password1,fileKey,256);
         copy(password2);
     }
@@ -152,7 +152,8 @@ function addAccountClick(){
             alert("新增安全等級2帳號前必須先上傳檔案密碼!");
             return;
         }else{
-            encyptedPassword = Aes.Ctr.encrypt(encyptedPassword,fileKey,256);
+            var fileEnc = Aes.Ctr.encrypt(password,fileKey,256);
+            encyptedPassword = Aes.Ctr.encrypt(fileEnc,mainKey,256);
         }
     }
     chrome.runtime.sendMessage({

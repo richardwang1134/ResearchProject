@@ -56,10 +56,13 @@ chrome.webRequest.onBeforeRequest.addListener(
       var result = checkTargets(refDomain,urlDomain);
       //reaction
       if(result == "stranger"){
-        return {cancel: true};
         if(confirm("發現未知的跨站腳本，來自"+urlDomain+"，是否預覽內容?")){
           window.open(url);
         }
+        var samesite = refDomain.match(urlDomain);
+        if(!samesite) addToRecord(refDomain,urlDomain);
+        else addRecord(refDomain);
+        return {cancel: true};
       }else if(result == "block"){
         return {cancel: true};
       }
@@ -78,13 +81,20 @@ function checkTargets(refDomain,urlDomain){
   var result = "pass";
   var samesite = refDomain.match(urlDomain);
   if(!samesite){
+    console.log("!samesite");
+    console.log(targets);
     for(var i=0; i<targets.length; i++){
       var key = Object.keys(targets[i])[0];
+      console.log(key,refDomain,urlDomain);
       if(key == refDomain){//和目標網域相同
         var match = false;
+        console.log(targets[i]);
+        console.log(targets[i][key]);
+        console.log(targets[i][key].length);
         for(var j=0; j<targets[i][key].length; j++){
           var arr = targets[i][key][j].split('/');
           if(arr[0]==urlDomain){
+            console.log("arr[0]:",arr[0]);
             match = true;
             result = arr[1];
           }
@@ -93,6 +103,7 @@ function checkTargets(refDomain,urlDomain){
       }
     }
   }
+  console.log(result);
   return result;
 }
 function addRecord(refDomain){
