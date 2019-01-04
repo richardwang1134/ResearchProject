@@ -1,7 +1,5 @@
-function setXSSPage(){
+function setAddTargetPage(){
   reloadRecordData();
-  $("#addXSSTab").click(addXSSTabClick);
-  $("#mngXSSTab").click(mngXSSTabClick);
 }
 function reloadRecordData(){
   var scroll = document.getElementById("recordScroll");
@@ -101,7 +99,7 @@ function addScriptDomains(scriptDomains){
   title.innerHTML = "請檢查以下網域，再點擊 + 將此網站納入防禦範圍";
   let title2 = document.createElement("div");
   title2.className = 'ThinItem Flex2';
-  title2.innerHTML = "信任/阻擋";
+  title2.innerHTML = "處理方式";
   titleRow.appendChild(title);
   titleRow.appendChild(title2);
   scroll.appendChild(titleRow);
@@ -113,7 +111,7 @@ function addScriptDomains(scriptDomains){
     item1.innerHTML = scriptDomains[i];
     let item2 = document.createElement("div");
     item2.className = 'ThinItem Flex2 Clickable';
-    item2.innerHTML = '信任';
+    item2.innerHTML = '預設';
     item2.onclick= ()=>{trustOrNot(item2)};
     thinRow.appendChild(item1);
     thinRow.appendChild(item2);
@@ -121,18 +119,7 @@ function addScriptDomains(scriptDomains){
   }
 }
 function trustOrNot(item){
-  if(item.innerHTML=='信任') item.innerHTML = '阻擋';
-  else item.innerHTML = '信任';
-}
-function addXSSTabClick(){
-  $("#addXSSTab").removeClass("Clickable");
-  $("#mngXSSTab").addClass("Clickable");
-  $("#addXSS").css("display","flex");
-  $("#mngXSS").css("display","none");
-}
-function mngXSSTabClick(){
-  $("#addXSSTab").addClass("Clickable");
-  $("#mngXSSTab").removeClass("Clickable");
-  $("#addXSS").css("display","none");
-  $("#mngXSS").css("display","flex");
+  if(item.innerHTML=='預設') item.innerHTML = '信任';
+  else if(item.innerHTML=='信任') item.innerHTML = '阻擋';
+  else item.innerHTML = '預設';
 }

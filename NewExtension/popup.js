@@ -1,71 +1,44 @@
-/*
-todo
-  addAccountData
-  loadFileKey
-  changeMainKey
-*/
 
 document.addEventListener(
   "DOMContentLoaded",
   ()=>{
     setTopTabs();
     setPasswordPage();
-    setXSSPage();
-    setCookiePage();
+    setAddTargetPage();
+    setMngTargetPage();
   }
 );
-// ↓ setTopTabs ↓ 
 function setTopTabs(){
   $("#passwordTab").click(passwordTabClick);
-  $("#XSSTab").click(XSSTabClick);
-  $("#cookieTab").click(cookieTabClick);
+  $("#addTab").click(addTabClick);
+  $("#mngTab").click(mngTabClick);
 }
 function passwordTabClick(){
   /* tabs */
   $("#passwordTab.Clickable").removeClass("Clickable");
-  $("#XSSTab,#cookieTab").addClass("Clickable");
+  $("#mngTab,#addTab").addClass("Clickable");
   /* content */
   $("#password").css("display","flex");
-  $("#XSSTabs").css("display","none");
-  $("#addXSS").css("display","none");
-  $("#mngXSS").css("display","none");
-  $("#cookieTabs").css("display","none");
-  $("#setCookie").css("display","none");
-  $("#mngCookie").css("display","none");
+  $("#addTarget").css("display","none");
+  $("#mngTarget").css("display","none");
 }
-function XSSTabClick(){
+function addTabClick(){
   /* tabs */
-  $("#XSSTab.Clickable").removeClass("Clickable");
-  $("#cookieTab,#passwordTab").addClass("Clickable");
-  /* subtabs */
-  $("#addXSSTab").removeClass("Clickable");
-  $("#mngXSSTab").addClass("Clickable");
+  $("#addTab.Clickable").removeClass("Clickable");
+  $("#mngTab,#passwordTab").addClass("Clickable");
   /* content */
   $("#password").css("display","none");
-  $("#XSSTabs").css("display","flex");
-  $("#addXSS").css("display","flex");
-  $("#mngXSS").css("display","none");
-  $("#cookieTabs").css("display","none");
-  $("#setCookie").css("display","none");
-  $("#mngCookie").css("display","none");
+  $("#addTarget").css("display","flex");
+  $("#mngTarget").css("display","none");
 }
-function cookieTabClick(){
+function mngTabClick(){
     /* tabs */
-    $("#cookieTab.Clickable").removeClass("Clickable");
-    $("#XSSTab,#passwordTab").addClass("Clickable");
-    /* subtabs */
-    $("#setCookieTab").removeClass("Clickable");
-    $("#mngCookieTab").addClass("Clickable");
+    $("#mngTab.Clickable").removeClass("Clickable");
+    $("#addTab,#passwordTab").addClass("Clickable");
     /* content */
     $("#password").css("display","none");
-    $("#XSSTabs").css("display","none");
-    $("#addXSS").css("display","none");
-    $("#mngXSS").css("display","none");
-    $("#cookieTabs").css("display","flex");
-    $("#setCookie").css("display","flex");
-    $("#mngCookie").css("display","none");
-    reloadTargets();
+    $("#addTarget").css("display","none");
+    $("#mngTarget").css("display","flex");
 }
-// ↑ setTopTabs ↑ 
 
 

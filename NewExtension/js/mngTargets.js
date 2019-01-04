@@ -1,7 +1,5 @@
-function setCookiePage(){
+function setMngTargetPage(){
   reloadTargets();
-  $("#setCookieTab").click(setCookieTabClick);
-  $("#mngCookieTab").click(mngCookieTabClick);
 }
 
 function reloadTargets(){
@@ -182,11 +180,11 @@ function updateTarget(fixRow){
   while(thisRow.nextSibling){
     thisRow = thisRow.nextSibling;
     if(thisRow.className=="ThinRow"){
-      var trust;
+      var trust = "";
       if(thisRow.lastChild.innerHTML=="信任") trust = '/pass';
-      else trust = '/block';
+      else if(thisRow.lastChild.innerHTML=="阻擋") trust = '/block';
       var source = thisRow.firstChild.innerHTML;
-      if(source!="確定")
+      if(source!="確定" && trust!="")
       trustList.push(source + trust);
     }else{
       break;
@@ -220,13 +218,4 @@ function deleteTarget(fixRow){
       alert("刪除失敗");
     }
   });
-}
-
-function setCookieTabClick(){
-    $("#setCookieTab").removeClass("Clickable");
-    $("#mngCookieTab").addClass("Clickable");
-  }
-function mngCookieTabClick(){
-$("#setCookieTab").addClass("Clickable");
-$("#mngCookieTab").removeClass("Clickable");
 }

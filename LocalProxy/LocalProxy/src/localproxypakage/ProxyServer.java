@@ -29,7 +29,7 @@ import com.sun.net.httpserver.HttpsServer;
 
 public class ProxyServer {
 	private int port = 8000;
-	private String ipv4 = "120.113.173.51";
+	private String ipv4 = "127.0.0.1";
      
     public static void main(String[] args){
     	ProxyServer server = new ProxyServer();

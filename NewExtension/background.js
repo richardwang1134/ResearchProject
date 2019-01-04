@@ -1,23 +1,5 @@
 chrome.storage.sync.clear();
 
-
-//------------以上測試用-------------------------
-/*
-  todo
-    更新cookie的資料
-    新增確定欄位 <<
-
-    一開始讀取資料到記憶體
-    之後從記憶體讀取
-    確保所有更新資料動作都有set
-    確保一開始讀取資料是get讀出來的
-    重新命名    
-*/
-/*
-  block inline 筆記
-    偵測關鍵字document.cookie
-    偵測eval
-*/
 /*
   sync area keys
     mainKeyTestData   主密碼測試資料
@@ -37,11 +19,7 @@ var targets=[];
 var cookieData=[];
 var CurrentUrl;
 
-loadDatas();
 
-function loadDatas(){
-
-}
 //
 chrome.webRequest.onBeforeRequest.addListener(
 	(details)=>{
@@ -57,13 +35,10 @@ chrome.webRequest.onBeforeRequest.addListener(
       var result = checkTargets(refDomain,urlDomain);
       //reaction
       if(result == "stranger"){
-        if(confirm("發現未知的跨站腳本，來自"+urlDomain+"，是否預覽內容?")){
-          window.open(url);
-        }
         var samesite = refDomain.match(urlDomain);
         if(!samesite) addToRecord(refDomain,urlDomain);
         else addRecord(refDomain);
-        return {cancel: true};
+        return {redirectUrl: "http://127.0.0.1:8000" + url};
       }else if(result == "block"){
         return {cancel: true};
       }
@@ -73,8 +48,9 @@ chrome.webRequest.onBeforeRequest.addListener(
       else addRecord(refDomain);
       return ;
 	},{
-    urls: ["<all_urls>"],
-		types: ["script"]
+    urls: ["<all_urls>"]
+    /*,
+		types: ["script"]*/
   },
     ["blocking"]
 );

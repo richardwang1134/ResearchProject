@@ -17,8 +17,8 @@
     <!-- 主選單 -->
     <div class="Tabs">
       <div class="Tab" id="passwordTab">管理密碼</div>
-      <div class="Tab XSS Clickable" id="XSSTab">新增防禦目標</div>
-      <div class="Tab Cookie Clickable" id="cookieTab">管理防禦目標</div>
+      <div class="Tab XSS Clickable" id="addTab">新增防禦目標</div>
+      <div class="Tab Cookie Clickable" id="mngTab">管理防禦目標</div>
     </div>
     <!-- 主選單>>管理密碼 -->
     <div id="password" class="Rows" display="none">
@@ -68,7 +68,7 @@
       </div>
     </div>
     <!-- 主選單>>新增防禦目標 -->
-    <div class="Rows"  id="addXSS">
+    <div class="Rows"  id="addTarget" style="display:none">
       <div class="FixRow">
         <div class="Tab Flex5">近期瀏覽的網域</div>
         <div class="Tab">詳情</div>
@@ -79,7 +79,7 @@
       </div>
     </div>
     <!-- 主選單>>管理防禦目標 -->
-    <div class="Rows"  id="setCookie">
+    <div class="Rows"  id="mngTarget" style="display:none">
       <div class="FixRow">
         <div class="Item Flex5 Title">防禦目標網域</div>
         <div class="Item Flex2 Title">XSS防禦</div>
