@@ -1,0 +1,14 @@
+body {
+  min-width:300px;
+}
+.form-control:focus{
+  box-shadow: none;
+  border-color: darkgray;  
+}
+.domain:hover{
+  text-decoration:line-through;
+  cursor:pointer;
+}
+.nav-link{
+  cursor:pointer;
+}
