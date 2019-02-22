@@ -5,7 +5,7 @@ var domainList = {
   "csrf" : []
 };
 
-//todo 三個須相斥
+//
 
 document.addEventListener(
   "DOMContentLoaded",
@@ -77,8 +77,14 @@ document.addEventListener(
         //讀取input內容
         var domain = document.querySelector("#domain-input").value;
         //輸入檢查
-        if(domainList[activeTab].includes(domain)) return;
         if(domain == "") return;
+        if(activeTab=="block"||activeTab=="trust"){
+          if(domainList["trust"].includes(domain)) return;
+          if(domainList["block"].includes(domain)) return;
+        }
+        if(activeTab=="csrf"){
+          if(domainList["csrf"].includes(domain)) return;
+        }
         //UI上新增一列
         addRow(domain);
         //記憶體新增一列
