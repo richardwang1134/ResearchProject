@@ -1,6 +1,1 @@
-LocalProxy
-	將id和url資訊附加到request url
-
-Extension
-	將id和url資訊附加到request url
-	
+最新版本擴充功能 : Extension_2

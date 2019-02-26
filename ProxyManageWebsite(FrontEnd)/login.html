@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>login</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+  </head>
+  <body class="d-flex flex-column">
+    <nav class="navbar navbar-primary bg-dark d-flex justify-content-center">
+      <a class="navbar-brand text-white">歡迎使用名單管理系統</a>
+    </nav>
+    <div class="flex-grow-1 d-flex align-items-center justify-content-center">
+      <div class="card">
+        <div class="card-body">
+          <form class="d-flex flex-column">
+            <div class="form-group">
+              <label for="account">帳號</label>
+              <input type="text" class="form-control" id="account" placeholder="Enter account">
+              <!--add class "invalid" to both <input> when login fails -->
+            </div>
+            <div class="form-group">
+              <label for="password">密碼</label>
+              <input type="password" class="form-control" id="password" placeholder="Password">
+              <div class="valid-feedback">
+                  登入失敗，請再試一次
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">登入</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>

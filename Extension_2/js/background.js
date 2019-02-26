@@ -17,10 +17,10 @@ chrome.runtime.onMessage.addListener(
 );
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
-  async (details)=>{
+  (details)=>{
     //取得請求的目標網域與來源網域
     var target = new URL(details.url).hostname;
-    var referer = await getReferer();
+    var referer = getReferer();
     //判斷是否將該請求設為Strict-Cookie
     if(strictCookie()){
       details.requestHeaders.push({name:"Strict-Cookie",value:"on"});
@@ -33,22 +33,19 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
     else if(domainList["trust"].includes(target))
       return newHeaders("Pass");
     else
-      return newHeaders("Default");
+      return newHeaders("default");
+      //return newHeaders("Default");
     
     function getReferer(){
-      return new Promise(
-        (resolve,reject)=>{
-          details.requestHeaders.forEach(
-            (item)=>{
-              if(item.name == "Referer"){
-                resolve(new URL(item.value).hostname);
-              }
-            }
-          );
-          resolve("No Referer");
+      var referer = "No Referer";
+      details.requestHeaders.forEach(
+        (item)=>{
+          if(item.name == "Referer"){
+            referer = new URL(item.value).hostname;
+          }
         }
-      )
-      
+      );
+      return referer;
     }
 
     function strictCookie(){
@@ -72,6 +69,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
     function newHeaders(mode){
       var newHeader = {name:"Proxy-Mode",value:mode};
       details.requestHeaders.push(newHeader);
+      console.log(target,"::",referer,"::",mode);
       return {requestHeaders: details.requestHeaders};
     }
   },
