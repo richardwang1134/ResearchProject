@@ -1,3 +1,15 @@
+
+var searchData = {
+  type:'search',
+  Domain:"all",
+  Type:'all',
+  Tag:'all',
+  EditST:'2000/01/01 00:00',
+  EditED:'3000/12/31 23:59',
+  TrigST:'2000/01/01 00:00',
+  TrigED:'3000/12/31 23:59',
+}
+
 window.onload = async()=>{
   if(await signedIn()){
     gotoManage();
@@ -5,6 +17,7 @@ window.onload = async()=>{
     gotoLogin();
   }
 }
+
 async function signedIn(){
   var data = {type:'check'};
   var result = await POST('main.php',data);
@@ -122,16 +135,14 @@ async function gotoManage(){//顯示管理畫面
   var body = document.querySelector('body');
   body.className = "";
   body.innerHTML = response;
+  refreshTable();
+
 
   //設定確認篩選條件按鍵
   var confirm = document.querySelector('#confirm');
   confirm.onclick = async()=>{
-    var data = getFilters();
-    console.log(data);
-    var response = await POST('main.php',data);
-    //console.log(response);
-    console.log(JSON.parse(response));
-    printTable(JSON.parse(response));
+    searchData = getFilters();
+    refreshTable();
   }
 
   //設定篩選按鍵
@@ -141,6 +152,47 @@ async function gotoManage(){//顯示管理畫面
     var myModalInstance = new Modal(myModal);
       myModalInstance.show();
   }
+  //設定匯入按鈕
+  var readFileBtn = document.getElementById('read-file');
+  readFileBtn.addEventListener("change", readFile, false);
+  async function readFile() {
+    var file = this.files[0];
+    var fileReader = new FileReader();
+    fileReader.onload = async(event)=>{
+      var data = loadCSV(event.target.result);
+      var response = await POST('main.php',data);
+      console.log(response);
+      if(response == "complete"){
+        refreshTable();
+      }
+    };
+    fileReader.readAsText(file);
+  }
+
+  function loadCSV(text){
+    var rows = text.split("\r\n");
+    var table =rows.map(row=>row.split(","));
+    var data = {
+      type:'insert',
+      DOMAINNAME:[],
+      TAG:[],
+      TYPE:[]
+    };
+    if( table[0][0]=='DOMAINNAME'&&
+        table[0][1]=='TAG'&&
+        table[0][2]=='TYPE'){
+      for(var i=1; i<table.length; i++){
+          if( table[i][0]&&
+              (table[i][1]=='static'||table[i][1]=='dynamic'||table[i][1]=='delete')&&
+              (table[i][2]=='pass'||table[i][2]=='block')){
+            data.DOMAINNAME.push(table[i][0]);
+            data.TAG.push(table[i][1]);
+            data.TYPE.push(table[i][2]);
+          }
+      }
+    }
+    return data;
+  };
 
   //設定登出按鍵
   var logout = document.querySelector('#logout');
@@ -154,27 +206,14 @@ async function gotoManage(){//顯示管理畫面
       alert(result);
     }
   }
-  //取得資料
-  var data = {
-    type:'search',
-    Domain:"all",
-    Type:'all',
-    Tag:'all',
-    EditST:'2000/01/01 00:00',
-    EditED:'3000/12/31 23:59',
-    TrigST:'2000/01/01 00:00',
-    TrigED:'3000/12/31 23:59',
-  }
-  console.log(data);
-  var response = await POST('main.php',data);
-  //console.log(response);
-  console.log(JSON.parse(response));
-  printTable(JSON.parse(response));
-  
 }
 
 
-function printTable(data){
+async function refreshTable(){
+  console.log(searchData);
+  var response = await POST('main.php',searchData);
+  data = JSON.parse(response);
+  console.log(data);
   var template = document.querySelector('#row-template');
   var td = template.content.querySelectorAll('td');
   var tb = document.querySelector('tbody');

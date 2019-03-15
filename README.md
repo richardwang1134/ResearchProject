@@ -50,5 +50,11 @@
 
         Just install it on Chrome.
 
+# Usage
 
+    A. List Manage System
 
+        CSV format: 
+                col 1      | col 2 | col 3
+        row 1   DOMAINNAME |  TAG  | TYPE
+        row 1   AAA        | static| pass

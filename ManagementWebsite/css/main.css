@@ -7,3 +7,6 @@ body {
 .card{
   width: 20rem;
 }
+#read-file-btn{
+  margin-bottom: 0px;
+}
