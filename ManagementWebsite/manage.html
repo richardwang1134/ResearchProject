@@ -1,7 +1,7 @@
 
 
 <nav class="navbar navbar-primary bg-dark d-flex justify-content-center">
-  <a class="navbar-brand text-white flex-grow-1 text-center">名單管理系統</a>
+  <a class="navbar-brand text-white flex-grow-1 text-left">名單管理系統</a>
   <button class="btn btn-outline-light mr-3 " id='filter'>篩選</button>
   <label class="btn btn-outline-light mr-3" accept='.csv' id='read-file-btn'>
     <input style="display:none;" id='read-file' type="file">
@@ -25,7 +25,7 @@
       <th>Domain</th>
       <th>Edit Time</th>
       <th>Trigger Time</th>
-      <th>Modify</th>
+      <th>Modify&nbsp;&nbsp;/&nbsp;&nbsp;Delete</th>
     </tr>
   </thead>
   <tbody>
@@ -41,8 +41,8 @@
     <td>2016/01/02</td>
     <td>2016/01/02</td>
     <td>
-      <button class="btn btn-outline-dark mr-3">修改</button>
-      <button class="btn btn-outline-dark">刪除</button>
+      <button class="btn btn-outline-dark mr-3" id="modify">修改</button>
+      <button class="btn btn-outline-dark" id="delete">刪除</button>
     </td>
   </tr>
 </template>
@@ -60,13 +60,13 @@
             <form>
               <div class="form-group">
                 <label for="domain-input">Domain</label>
-                <input type="text" class="form-control" id="domain-input" placeholder="no limit">
+                <input type="text" class="form-control" id="domain-input" placeholder="All">
               </div>
               <div class="form-group">
                 <label>Edit Time</label>
                 <div class="form-row">
                   <div class="col-sm-5">
-                    <input type="text" class="form-control" id='edit-time-st' placeholder="2000/01/01">
+                    <input type="text" class="form-control" id='edit-time-st' placeholder="1970/01/01">
                   </div>
                   ~
                   <div class="col-sm-5">
@@ -78,11 +78,11 @@
                 <label>Trigger Time</label>
                 <div class="form-row">
                     <div class="col-sm-5">
-                        <input type="text" class="form-control" id='trigger-time-st' placeholder="2000/01/01">
+                        <input type="text" class="form-control" id='trig-time-st' placeholder="1970/01/01">
                       </div>
                       ~
                       <div class="col-sm-5">
-                        <input type="text" class="form-control" id='trigger-time-ed' placeholder="3000/12/31">
+                        <input type="text" class="form-control" id='trig-time-ed' placeholder="3000/12/31">
                       </div>
                 </div>
               </div>
@@ -143,6 +143,67 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             <button type="button" class="btn btn-primary" data-dismiss="modal" id='confirm'>Confirm</button>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modify-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modify-modal-title">Modify</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <div class='row'>
+                  <legend class="col-form-label col-sm-3 pt-0">Tag</legend>
+                  <div class='col-sm-3'>
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="tagRadios" checked id="modify-checkbox-1" value="option1">
+                          <label class="form-check-label" for="inlineCheckbox1">Static</label>
+                        </div>
+                  </div>
+                  <div class='col-sm-3'>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="tagRadios" id="modify-checkbox-2" value="option2">
+                          <label class="form-check-label" for="inlineCheckbox2">Dynamic</label>
+                        </div>
+                  </div>
+                  <div class='col-sm-3'>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="tagRadios" id="modify-checkbox-3" value="option2">
+                      <label class="form-check-label" for="inlineCheckbox2">Delete</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class='row'>
+                    <legend class="col-form-label col-sm-3 pt-0">Security</legend>
+                    <div class='col-sm-3'>
+                        <div class="form-check form-check-inline">
+                            <input checked class="form-check-input" type="radio" name="exampleRadios" id="modify-checkbox-4" value="option1">
+                            <label class="form-check-label" for="inlineCheckbox1">Pass</label>
+                          </div>
+                    </div>
+                    <div class='col-sm-3'>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="exampleRadios" id="modify-checkbox-5" value="option2">
+                            <label class="form-check-label" for="inlineCheckbox2">Block</label>
+                          </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" id='confirm-modify'>Confirm</button>
           </div>
       </div>
     </div>
