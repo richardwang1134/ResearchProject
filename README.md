@@ -1,5 +1,3 @@
-#Research Project
-
 # Outline
 
     This project can protect users from a part of malicious web attacks.
@@ -15,11 +13,11 @@
         
     The List Manage System will maintain a list that recorded good domains and bad domains.
 
-    The Proxy will block requests that send to bad domains.
+    The Proxy will block requests that is sent to bad domains.
 
-    If the request target not in the list, the proxy will do some analyses to decide if the domain is good or bad, and add it to the list.
+    If the request target is not in the list, the proxy will do some analyses to decide wheather the domain is secure or not, and add it to the list.
 
-    The extension provide user to customize which domain is bad or good, and notify user when request blocked by proxy.
+    The extension provide user to customize which web domain is secure or malicious, and notify user when request blocked by proxy.
 
 # Environment setting
 
@@ -36,15 +34,20 @@
 
     B. Proxy
 
-        1. Make sure your have installed python3
+        1. Make sure your have installed python3 (check 'precompiled stadard libeary')
 
-        2. Install beautiful soup (cmd: pip install BeautifulSoup4)
+        2. Install mitmproxy (pip3 install mitmproxy)
+        Install beautiful soup 4 (under pip folder cmd: pip install BeautifulSoup4)
 
-        3. Install mitmproxy
+        pip install pysqlite3
+
+        3. 
 
         4. Edit the path if you changed the path of the database.
 
-        5. Run mitmproxy under folder 'ProxyScript' (cmd: mitweb -s script.py)
+        5. Run mitmproxy under folder 'ProxyScript' (cmd: mitmweb -s proxy.py)
+
+        6. Set certificate of mitmproxy (optional)
 
     C. Extension
 

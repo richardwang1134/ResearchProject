@@ -33,7 +33,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
     else if(domainList["trust"].includes(target))
       return newHeaders("Pass");
     else
-      return newHeaders("default");
+      return newHeaders("Default");
       //return newHeaders("Default");
     
     function getReferer(){
@@ -69,7 +69,8 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
     function newHeaders(mode){
       var newHeader = {name:"Proxy-Mode",value:mode};
       details.requestHeaders.push(newHeader);
-      console.log(target,"::",referer,"::",mode);
+      //console.log("request :");
+      //console.log(details.requestHeaders);
       return {requestHeaders: details.requestHeaders};
     }
   },
@@ -77,3 +78,25 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
   ["blocking", "requestHeaders","extraHeaders"]
 );
 
+chrome.webRequest.onResponseStarted.addListener(
+  (details)=>{
+    headers = details.responseHeaders;
+    for(var i in headers){
+      var target = new URL(details.url).hostname;
+      if(headers[i].name=="proxy-message"&&headers[i].value=="block-dynamic"){
+        var trust = confirm(
+          " Request sent to "+target+
+          "\nhas been blocked by proxy,\ndo you want to trust it?"
+        );
+        if(trust && !domainList["trust"].includes(target) && !domainList["block"].includes(target))
+          domainList["trust"].push(target);
+        else if(!trust && !domainList["block"].includes(target)&& !domainList["trust"].includes(target))
+          domainList["block"].push(target);
+      }
+
+
+    }
+  },
+  {urls:["<all_urls>"]},
+  ["responseHeaders","extraHeaders"]
+);
