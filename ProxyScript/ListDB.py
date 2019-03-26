@@ -100,7 +100,7 @@ def PrintAll():
 
 def UpdateAll():
     datalist = []
-    conn = sqlite3.connect('C:\\Users\\user\\Desktop\\ProxyDB.db', check_same_thread=False)
+    conn = sqlite3.connect('C:\\SQLiteDB\\ProxyDB.db', check_same_thread=False)
     c = conn.cursor()
 
     for data in c.execute('SELECT * FROM List WHERE TAG = "dynamic" '):
