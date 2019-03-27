@@ -187,6 +187,8 @@ class ProxyRun:
             DBData.append(List)
             self.num = self.num + 1
 
+        print(DBData)
+
         for data in DBData:
             if(data.tag == "delete"):
                 sql = "DELETE from List where DOMAINNAME = ?;"
