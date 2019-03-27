@@ -1,5 +1,4 @@
 import mitmproxy.http
-from mitmproxy import http
 from mitmproxy import ctx
 import sqlite3
 import datetime
@@ -126,7 +125,6 @@ class ProxyRun:
         original = checkurl
         checkurl = ShortURL(checkurl)
 
-
         for data in self.ListDB:
             if(checkurl == data.domainname):
                 Security = data.security
@@ -136,14 +134,10 @@ class ProxyRun:
 
         if(Found == "True" and Security == "False"):
             Result = "Block"
-            print("check result",result)
             return Result
-
         elif(Found == "True" and Security == "True"):
             Result = "Pass"
-            print("check result",result)
             return Result
-            
         else:
             print("Checking ", checkurl, " Security...")
             List = ListData()
@@ -162,19 +156,24 @@ class ProxyRun:
                 if (data != " Nothing Found"):
                     Secure = "False"
                     Result = "Block"
+
             List.domainname = checkurl
             List.security = Secure
             List.edittime = now
             List.triggertime = now
             List.tag = "dynamic"
             self.ListDB.append(List)
+            print("There are ",len(self.ListDB)," data in ListDB")
+            if(len(self.ListDB) > 1000):
+                self.cleanolddata()
+
             self.num = self.num + 1
             return Result
 
     def synchronize(self):
         DBData = []
         NewData = []
-        self.conn = sqlite3.connect('C:\\SQLiteDB\\proxy.sqlite')
+        self.conn = sqlite3.connect('C:\\SQLiteDB\\ProxyDB.db')
         self.c = self.conn.cursor()
 
         for data in self.c.execute('SELECT * FROM List'):
@@ -227,16 +226,17 @@ class ProxyRun:
         
         self.ListDB = NewData
         self.conn.close()
-        print(self.ListDB)
         print("Synchronization has completed!")
+        self.PrintMemData()
         timer = Timer(60, self.synchronize)
         timer.start()
     
-    #def cleanolddata(self):
-    #    now = int(time.time())
-    #    for data in self.ListDB:
-    #        if((now-data.triggertime)/86400 > 5):
-    #            data.tag = "delete"
+    def cleanolddata(self):
+        now = int(time.time())
+        for data in self.ListDB:
+            if(data.tag != "static"):
+                if((now-data.triggertime)/86400 > 7):
+                    data.tag = "delete"
 
     def PrintMemData(self):
         for data in self.ListDB:
@@ -246,41 +246,34 @@ class ProxyRun:
                   "TriggerTime:", "{0:15}".format(data.triggertime),
                   "Tag:", "{0:10}".format(data.tag))
     
-    def request(self, flow: http.HTTPFlow):
+    def request(self, flow: mitmproxy.http.HTTPFlow):
         self.num = self.num + 1
         try:
-            if(flow.request.headers["Proxy-Mode"] == "Block"):
-                print("block-customized :",ShortURL(flow.request.url))
-                flow.response = http.HTTPResponse.make(
-                    200,
-                    b"Hello World",
-                    {
-                        "Content-Type": "text/html",
-                        "Proxy-Message": "block-customized"
-                    }
-                )
+            if(flow.request.headers["proxy-mode"] == "Block"):
+                flow.intercept()
                 #proxymessage = flow.request.url + "has been blocked , if you want to browse the website, you can add the url into WhiteList"
                 #flow.request.headers["proxy-message"] = proxymessage
-                
-            elif(flow.request.headers["Proxy-Mode"] == "Pass"):
-                print("pass-customized  :",ShortURL(flow.request.url))
+                print(ShortURL(flow.request.url)," has been blocked!")
+            elif(flow.request.headers["proxy-mode"] == "Pass"):
+                print(ShortURL(flow.request.url)," is Passed")
 
-            if(flow.request.headers["Proxy-Mode"] == "Default"):
-                flow.response = http.HTTPResponse.make(
-                    200,
-                    b"Hello World",
-                    {
-                        "Content-Type": "text/html",
-                        "Proxy-Message": "block-dynamic"
-                    }
-                )
+            if(flow.request.headers["proxy-mode"] == "default"):
+                if(self.CheckData(flow.request.url) == "Block"):
+                    #proxymessage = flow.request.url + "has been blocked , if you want to browse the website, you can add the url into WhiteList"
+                    #flow.response = http.HTTPResponse.make(
+                    #200,  # (optional) status code
+                    #b"Hello World",  # (optional) content
+                    #{"Content-Type": "text/html"}  # (optional) headers
+                    #)
+                    flow.intercept()
+                    print(ShortURL(flow.request.url),"has benn blocked")
         except:
                 self.num = self.num
 
         try:
             if(flow.request.headers["Strict-Cookie"] == "on"):
                 flow.request.cookies = ""
-                print("delete-cookie    :",ShortURL(flow.request.url))
+                print("The Cookie has been deleted!")
         except:
             self.num = self.num
 
