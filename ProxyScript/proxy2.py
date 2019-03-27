@@ -131,24 +131,6 @@ class ProxyRun:
         if mode:
             print(host+' -> '+mode)
 
-            
-
-            
-
-            
-                
-
-
-        
-
-
-
-
-            
-
-
-
-
 addons = [
     ProxyRun()
 ]
