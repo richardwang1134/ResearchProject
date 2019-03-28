@@ -48,18 +48,19 @@ class ProxyRun:
                 conn.commit()
             newData = {}
             for key in pxData:
-                if dbData[key]['TAG']=='delete':
-                    dbDelete(key)
-                    del dbData[key]
-                elif dbData[key]['TAG']=='static':
-                    newData[key] = dbData[key]
-                    del dbData[key]
-                elif dbData[key]['TAG']=='dynamic':
-                    if pxData[key]['TAG']=='delete':
+                if dbData.get(key):
+                    if dbData[key]['TAG']=='delete':
                         dbDelete(key)
-                    else:
-                        newData[key] = pxData[key]
-                    del dbData[key]
+                        del dbData[key]
+                    elif dbData[key]['TAG']=='static':
+                        newData[key] = dbData[key]
+                        del dbData[key]
+                    elif dbData[key]['TAG']=='dynamic':
+                        if pxData[key]['TAG']=='delete':
+                            dbDelete(key)
+                        else:
+                            newData[key] = pxData[key]
+                        del dbData[key]
                 elif pxData[key]['TAG']!='delete':
                     newData[key] = pxData[key]
             for key in dbData:
@@ -78,6 +79,8 @@ class ProxyRun:
         printData(self.data)
 
         print(' - - - - - sync complete - - - - -')
+        timer = Timer(30, self.synchronize)
+        timer.start()
         
 
     def request(self, flow: http.HTTPFlow):
