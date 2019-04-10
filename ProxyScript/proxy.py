@@ -99,7 +99,8 @@ class ProxyRun:
             print('\n- - - - - - - - - - - - - - - - - -\n\n',file=f)
             f.close()
         printData(self.data)
-        timer = Timer(20, self.synchronize)
+        print('sync complete')
+        timer = Timer(60, self.synchronize)
         timer.start()
         
         
@@ -131,10 +132,12 @@ class ProxyRun:
             response = http.HTTPResponse.make(200)
 
         if mode == 'Default':
-            if self.data.get(host):
-                domain = host
+            
             if self.data.get(domain):
                 mode = 'CheckData:'+self.data[domain].get('SECURITY')
+            elif self.data.get(host):
+                mode = 'CheckData:'+self.data[host].get('SECURITY')
+                domain = host
             else:
                 mode = 'CheckData:notFound'
 
@@ -147,6 +150,17 @@ class ProxyRun:
 
         if mode == 'CheckData:notFound':
             def checkURLVoid():
+                quote_page = "http://www.urlvoid.com/scan/" + domain + "/"
+                page = urllib.request.urlopen(quote_page)
+                soup = BeautifulSoup(page, "html.parser")
+                span_tag = soup.find_all('span')
+                dataList = []
+                for i in range(23, 99):
+                    if (i % 2 == 0):
+                        dataList.append(span_tag[i].text)
+                for data in dataList:
+                    if (data != " Nothing Found"):
+                        return 'block'
                 return 'pass'
             result = checkURLVoid()
             mode = mode + ' -> CheckURLVoid:' + result
@@ -160,7 +174,7 @@ class ProxyRun:
             addToData()
             
         if mode == 'CheckData:notFound -> CheckURLVoid:block':
-            response = http.HTTPResponse.make(200,{"Proxy-Message": "Block"})
+            response = http.HTTPResponse.make(200,'',{"Proxy-Message": "Block"})
         
         if mode and mode!='Pass' and mode!='CheckData:pass':
             f = open('request.txt','a')
@@ -175,7 +189,7 @@ class ProxyRun:
                     flow.request.cookies = ""
                     f = open('request.txt','a')
                     t = time.asctime(time.localtime(time.time()))
-                    print(t+'    '+domain+' -> ',file=f)
+                    print(t+'    '+domain+' -> '+'StrictCookie On',file=f)
                     f.close()
 
 addons = [
