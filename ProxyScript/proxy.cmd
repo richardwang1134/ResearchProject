@@ -1,1 +1,1 @@
-mitmweb -s proxy.py
+mitmdump -s proxy.py

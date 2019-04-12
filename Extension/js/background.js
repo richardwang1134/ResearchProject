@@ -83,7 +83,7 @@ chrome.webRequest.onResponseStarted.addListener(
     headers = details.responseHeaders;
     for(var i in headers){
       var target = new URL(details.url).hostname;
-      if(headers[i].name=="proxy-message"&&headers[i].value=="block-dynamic"){
+      if(headers[i].name=="proxy-message"&&headers[i].value=="block"){
         var trust = confirm(
           " Request sent to "+target+
           "\nhas been blocked by proxy,\ndo you want to trust it?"
@@ -93,8 +93,6 @@ chrome.webRequest.onResponseStarted.addListener(
         else if(!trust && !domainList["block"].includes(target)&& !domainList["trust"].includes(target))
           domainList["block"].push(target);
       }
-
-
     }
   },
   {urls:["<all_urls>"]},

@@ -1,708 +1,264 @@
-Thu Mar 28 18:03:34 2019
+Thu Apr 11 16:51:55 2019
 - - - - - - - - - - - - - - - - - -
 
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
-         TAG          dynamic
-         SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:03:53 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
-         TAG          dynamic
-         SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:04:13 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
-         TAG          dynamic
-         SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
 google.com
-         EDITTIME     1553767437
-         TRIGGERTIME  1553767440
+         EDITTIME     1554899211
+         TRIGGERTIME  0
+         TAG          static
+         SECURITY     pass
+criteo.net
+         EDITTIME     1554901606
+         TRIGGERTIME  1554901643
          TAG          dynamic
          SECURITY     pass
-gstatic.com
-         EDITTIME     1553767437
-         TRIGGERTIME  1553767437
+imgs.cc
+         EDITTIME     1554901608
+         TRIGGERTIME  1554901621
          TAG          dynamic
          SECURITY     pass
-youtube.com
-         EDITTIME     1553767440
-         TRIGGERTIME  1553767450
+ck101.com
+         EDITTIME     1554901612
+         TRIGGERTIME  1554901665
          TAG          dynamic
          SECURITY     pass
-ggpht.com
-         EDITTIME     1553767442
-         TRIGGERTIME  1553767446
+c.appier.net
+         EDITTIME     1554901616
+         TRIGGERTIME  1554901662
          TAG          dynamic
          SECURITY     pass
-googleapis.com
-         EDITTIME     1553767442
-         TRIGGERTIME  1553767442
+criteo.com
+         EDITTIME     1554901621
+         TRIGGERTIME  1554901621
          TAG          dynamic
          SECURITY     pass
-ytimg.com
-         EDITTIME     1553767443
-         TRIGGERTIME  1553767449
+ckcdn.com
+         EDITTIME     1554901624
+         TRIGGERTIME  1554901644
          TAG          dynamic
          SECURITY     pass
-g.doubleclick.net
-         EDITTIME     1553767443
-         TRIGGERTIME  1553767444
+facebook.net
+         EDITTIME     1554901628
+         TRIGGERTIME  1554901643
+         TAG          dynamic
+         SECURITY     pass
+popin.cc
+         EDITTIME     1554901631
+         TRIGGERTIME  1554901662
+         TAG          dynamic
+         SECURITY     pass
+cloudfront.net
+         EDITTIME     1554901634
+         TRIGGERTIME  1554901634
+         TAG          dynamic
+         SECURITY     pass
+guoshipartners.com
+         EDITTIME     1554901637
+         TRIGGERTIME  1554901637
+         TAG          dynamic
+         SECURITY     pass
+crazyegg.com
+         EDITTIME     1554901640
+         TRIGGERTIME  1554901652
+         TAG          dynamic
+         SECURITY     pass
+adnw.xyz
+         EDITTIME     1554901645
+         TRIGGERTIME  1554901664
+         TAG          dynamic
+         SECURITY     pass
+onevision.com.tw
+         EDITTIME     1554901647
+         TRIGGERTIME  1554901653
+         TAG          dynamic
+         SECURITY     pass
+alexametrics.com
+         EDITTIME     1554901650
+         TRIGGERTIME  1554901650
+         TAG          dynamic
+         SECURITY     pass
+apx.appier.net
+         EDITTIME     1554901654
+         TRIGGERTIME  1554901654
+         TAG          dynamic
+         SECURITY     block
+aralego.com
+         EDITTIME     1554901656
+         TRIGGERTIME  1554901656
+         TAG          dynamic
+         SECURITY     pass
+track.appier.net
+         EDITTIME     1554901659
+         TRIGGERTIME  1554901659
+         TAG          dynamic
+         SECURITY     block
+treasuredata.com
+         EDITTIME     1554901662
+         TRIGGERTIME  1554901664
          TAG          dynamic
          SECURITY     pass
 google.com.tw
-         EDITTIME     1553767444
-         TRIGGERTIME  1553767444
-         TAG          dynamic
-         SECURITY     pass
-doubleclick.net
-         EDITTIME     1553767445
-         TRIGGERTIME  1553767445
-         TAG          dynamic
-         SECURITY     pass
-googlevideo.com
-         EDITTIME     1553767445
-         TRIGGERTIME  1553767452
-         TAG          dynamic
-         SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:04:33 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
-         TAG          dynamic
-         SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-google.com
-         EDITTIME     1553767437
-         TRIGGERTIME  1553767472
-         TAG          dynamic
-         SECURITY     pass
-gstatic.com
-         EDITTIME     1553767437
-         TRIGGERTIME  1553767469
-         TAG          dynamic
-         SECURITY     pass
-youtube.com
-         EDITTIME     1553767440
-         TRIGGERTIME  1553767459
-         TAG          dynamic
-         SECURITY     pass
-ggpht.com
-         EDITTIME     1553767442
-         TRIGGERTIME  1553767453
-         TAG          dynamic
-         SECURITY     pass
-googleapis.com
-         EDITTIME     1553767442
-         TRIGGERTIME  1553767442
-         TAG          dynamic
-         SECURITY     pass
-ytimg.com
-         EDITTIME     1553767443
-         TRIGGERTIME  1553767456
+         EDITTIME     1554899261
+         TRIGGERTIME  1554899665
          TAG          dynamic
          SECURITY     pass
 g.doubleclick.net
-         EDITTIME     1553767443
-         TRIGGERTIME  1553767444
+         EDITTIME     1554899264
+         TRIGGERTIME  1554899665
          TAG          dynamic
-         SECURITY     pass
-google.com.tw
-         EDITTIME     1553767444
-         TRIGGERTIME  1553767444
-         TAG          dynamic
-         SECURITY     pass
-doubleclick.net
-         EDITTIME     1553767445
-         TRIGGERTIME  1553767445
-         TAG          dynamic
-         SECURITY     pass
-googlevideo.com
-         EDITTIME     1553767445
-         TRIGGERTIME  1553767452
-         TAG          dynamic
-         SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:34:28 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
-         TAG          dynamic
-         SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:34:48 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
-         TAG          dynamic
-         SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
          SECURITY     pass
 gstatic.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
+         EDITTIME     1554899269
+         TRIGGERTIME  1554901398
+         TAG          dynamic
+         SECURITY     pass
+clients6.google.com
+         EDITTIME     1554899272
+         TRIGGERTIME  1554899469
+         TAG          dynamic
+         SECURITY     pass
+client-channel.google.com
+         EDITTIME     1554899278
+         TRIGGERTIME  1554899484
+         TAG          dynamic
+         SECURITY     pass
+googleapis.com
+         EDITTIME     1554899458
+         TRIGGERTIME  1554899665
          TAG          dynamic
          SECURITY     pass
 googleusercontent.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
+         EDITTIME     1554899461
+         TRIGGERTIME  1554901398
          TAG          dynamic
          SECURITY     pass
-google.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769282
+gamer.com.tw
+         EDITTIME     1554899488
+         TRIGGERTIME  1554899697
          TAG          dynamic
          SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:35:08 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
-         TAG          dynamic
-         SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-gstatic.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
+bahamut.com.tw
+         EDITTIME     1554899492
+         TRIGGERTIME  1554899663
          TAG          dynamic
          SECURITY     pass
-googleusercontent.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
+googletagservices.com
+         EDITTIME     1554899494
+         TRIGGERTIME  1554899664
          TAG          dynamic
          SECURITY     pass
-google.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769282
+google-analytics.com
+         EDITTIME     1554899499
+         TRIGGERTIME  1554899663
          TAG          dynamic
          SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:35:28 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
-         TAG          dynamic
-         SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-gstatic.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769327
+ytimg.com
+         EDITTIME     1554899502
+         TRIGGERTIME  1554899663
          TAG          dynamic
          SECURITY     pass
-googleusercontent.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
+bootstrapcdn.com
+         EDITTIME     1554899505
+         TRIGGERTIME  1554899663
          TAG          dynamic
          SECURITY     pass
-google.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769282
+googletagmanager.com
+         EDITTIME     1554899507
+         TRIGGERTIME  1554899662
          TAG          dynamic
          SECURITY     pass
-ncyu.edu.tw
-         EDITTIME     1553769323
-         TRIGGERTIME  1553769328
+jtvnw.net
+         EDITTIME     1554899509
+         TRIGGERTIME  1554899663
          TAG          dynamic
          SECURITY     pass
-113.173.174
-         EDITTIME     1553769327
-         TRIGGERTIME  1553769327
+googlesyndication.com
+         EDITTIME     1554899514
+         TRIGGERTIME  1554899701
          TAG          dynamic
          SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:35:49 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
+2mdn.net
+         EDITTIME     1554899520
+         TRIGGERTIME  1554899666
          TAG          dynamic
          SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-gstatic.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769327
+twitch.tv
+         EDITTIME     1554899694
+         TRIGGERTIME  1554899838
          TAG          dynamic
          SECURITY     pass
-googleusercontent.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
+onelink.me
+         EDITTIME     1554899698
+         TRIGGERTIME  1554899698
          TAG          dynamic
          SECURITY     pass
-google.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769282
+twitchcdn.net
+         EDITTIME     1554899701
+         TRIGGERTIME  1554899753
          TAG          dynamic
          SECURITY     pass
-ncyu.edu.tw
-         EDITTIME     1553769323
-         TRIGGERTIME  1553769330
+com.tw
+         EDITTIME     1554899703
+         TRIGGERTIME  1554899711
          TAG          dynamic
          SECURITY     pass
-113.173.174
-         EDITTIME     1553769327
-         TRIGGERTIME  1553769327
+twitchsvc.net
+         EDITTIME     1554899705
+         TRIGGERTIME  1554899760
          TAG          dynamic
          SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:36:09 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
+sjc02.hls.ttvnw.net
+         EDITTIME     1554899893
+         TRIGGERTIME  1554899934
          TAG          dynamic
          SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-gstatic.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769327
+amazon-adsystem.com
+         EDITTIME     1554899897
+         TRIGGERTIME  1554899936
          TAG          dynamic
          SECURITY     pass
-googleusercontent.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
-         TAG          dynamic
-         SECURITY     pass
-google.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769282
-         TAG          dynamic
-         SECURITY     pass
-ncyu.edu.tw
-         EDITTIME     1553769323
-         TRIGGERTIME  1553769366
-         TAG          dynamic
-         SECURITY     pass
-113.173.174
-         EDITTIME     1553769327
-         TRIGGERTIME  1553769327
-         TAG          dynamic
-         SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:36:29 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
+imrworldwide.com
+         EDITTIME     1554899903
+         TRIGGERTIME  1554899935
          TAG          dynamic
          SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-gstatic.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769327
-         TAG          dynamic
-         SECURITY     pass
-googleusercontent.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
-         TAG          dynamic
-         SECURITY     pass
-google.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769282
-         TAG          dynamic
-         SECURITY     pass
-ncyu.edu.tw
-         EDITTIME     1553769323
-         TRIGGERTIME  1553769366
-         TAG          dynamic
-         SECURITY     pass
-113.173.174
-         EDITTIME     1553769327
-         TRIGGERTIME  1553769327
-         TAG          dynamic
-         SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:36:49 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
+scorecardresearch.com
+         EDITTIME     1554899906
+         TRIGGERTIME  1554899934
          TAG          dynamic
          SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-gstatic.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769327
+ttvnw.net
+         EDITTIME     1554899911
+         TRIGGERTIME  1554899936
          TAG          dynamic
          SECURITY     pass
-googleusercontent.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
+facebook.com
+         EDITTIME     1554899915
+         TRIGGERTIME  1554899935
          TAG          dynamic
          SECURITY     pass
-google.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769282
-         TAG          dynamic
-         SECURITY     pass
-ncyu.edu.tw
-         EDITTIME     1553769323
-         TRIGGERTIME  1553769366
-         TAG          dynamic
-         SECURITY     pass
-113.173.174
-         EDITTIME     1553769327
-         TRIGGERTIME  1553769327
-         TAG          dynamic
-         SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:37:09 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
+hkg01.hls.ttvnw.net
+         EDITTIME     1554899919
+         TRIGGERTIME  1554899933
          TAG          dynamic
          SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-gstatic.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769327
-         TAG          dynamic
-         SECURITY     pass
-googleusercontent.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
-         TAG          dynamic
-         SECURITY     pass
-google.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769282
-         TAG          dynamic
-         SECURITY     pass
-ncyu.edu.tw
-         EDITTIME     1553769323
-         TRIGGERTIME  1553769366
-         TAG          dynamic
-         SECURITY     pass
-113.173.174
-         EDITTIME     1553769327
-         TRIGGERTIME  1553769327
-         TAG          dynamic
-         SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:37:29 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
+hkg01.abs.hls.ttvnw.net
+         EDITTIME     1554899922
+         TRIGGERTIME  1554899932
          TAG          dynamic
          SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-gstatic.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769327
-         TAG          dynamic
-         SECURITY     pass
-googleusercontent.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
-         TAG          dynamic
-         SECURITY     pass
-google.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769282
-         TAG          dynamic
-         SECURITY     pass
-ncyu.edu.tw
-         EDITTIME     1553769323
-         TRIGGERTIME  1553769366
-         TAG          dynamic
-         SECURITY     pass
-113.173.174
-         EDITTIME     1553769327
-         TRIGGERTIME  1553769327
-         TAG          dynamic
-         SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:37:49 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
+com
+         EDITTIME     1554901596
+         TRIGGERTIME  1554901600
          TAG          dynamic
          SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-gstatic.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769327
+ckck.fun
+         EDITTIME     1554901601
+         TRIGGERTIME  1554901601
          TAG          dynamic
          SECURITY     pass
-googleusercontent.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
-         TAG          dynamic
-         SECURITY     pass
-google.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769282
-         TAG          dynamic
-         SECURITY     pass
-ncyu.edu.tw
-         EDITTIME     1553769323
-         TRIGGERTIME  1553769366
-         TAG          dynamic
-         SECURITY     pass
-113.173.174
-         EDITTIME     1553769327
-         TRIGGERTIME  1553769327
-         TAG          dynamic
-         SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:38:09 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
-         TAG          dynamic
-         SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-gstatic.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769327
-         TAG          dynamic
-         SECURITY     pass
-googleusercontent.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
-         TAG          dynamic
-         SECURITY     pass
-google.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769282
-         TAG          dynamic
-         SECURITY     pass
-ncyu.edu.tw
-         EDITTIME     1553769323
-         TRIGGERTIME  1553769366
-         TAG          dynamic
-         SECURITY     pass
-113.173.174
-         EDITTIME     1553769327
-         TRIGGERTIME  1553769327
-         TAG          dynamic
-         SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 18:38:29 2019
-- - - - - - - - - - - - - - - - - -
-
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
-         TAG          dynamic
-         SECURITY     block
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-gstatic.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769327
-         TAG          dynamic
-         SECURITY     pass
-googleusercontent.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
-         TAG          dynamic
-         SECURITY     pass
-google.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769282
-         TAG          dynamic
-         SECURITY     pass
-ncyu.edu.tw
-         EDITTIME     1553769323
-         TRIGGERTIME  1553769366
-         TAG          dynamic
-         SECURITY     pass
-113.173.174
-         EDITTIME     1553769327
-         TRIGGERTIME  1553769327
-         TAG          dynamic
-         SECURITY     pass
-
-- - - - - - - - - - - - - - - - - -
-
-
-Thu Mar 28 19:00:36 2019
-- - - - - - - - - - - - - - - - - -
-
-www.google.com
-         EDITTIME     1553581503
-         TRIGGERTIME  0
-         TAG          static
-         SECURITY     pass
-www.ncyu.edu.com
-         EDITTIME     1553059599
-         TRIGGERTIME  0
-         TAG          dynamic
-         SECURITY     block
-gstatic.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769327
-         TAG          dynamic
-         SECURITY     pass
-googleusercontent.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769281
-         TAG          dynamic
-         SECURITY     pass
-google.com
-         EDITTIME     1553769281
-         TRIGGERTIME  1553769282
-         TAG          dynamic
-         SECURITY     pass
-ncyu.edu.tw
-         EDITTIME     1553769323
-         TRIGGERTIME  1553769366
-         TAG          dynamic
-         SECURITY     pass
-113.173.174
-         EDITTIME     1553769327
-         TRIGGERTIME  1553769327
+googleadservices.com
+         EDITTIME     1554901603
+         TRIGGERTIME  1554901603
          TAG          dynamic
          SECURITY     pass
 
