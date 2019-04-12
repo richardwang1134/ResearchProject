@@ -138,12 +138,22 @@ class ProxyRun:
             response = http.HTTPResponse.make(200)
 
         if mode == 'Default':
+<<<<<<< HEAD
             if self.data.get(host):
                 mode = 'CheckData:'+self.data[host].get('SECURITY')
             if self.data.get(domain) and not self.data.get(host):
                 mode = 'CheckData:'+self.data[domain].get('SECURITY')
                 host = domain
             if not self.data.get(domain) and not self.data.get(host):
+=======
+            
+            if self.data.get(domain):
+                mode = 'CheckData:'+self.data[domain].get('SECURITY')
+            elif self.data.get(host):
+                mode = 'CheckData:'+self.data[host].get('SECURITY')
+                domain = host
+            else:
+>>>>>>> e807c1d72d2ea97cc82ddf96c46e61796c9a4225
                 mode = 'CheckData:notFound'
 
         if mode == 'CheckData:block':
@@ -154,6 +164,7 @@ class ProxyRun:
             self.data[host]['TRIGGERTIME'] = now
 
         if mode == 'CheckData:notFound':
+<<<<<<< HEAD
             def checkURLVoid(h):
                 MIN_DETECTED = 2
                 NO_REPORT_RETURN = 'pass'
@@ -170,6 +181,22 @@ class ProxyRun:
                     return NO_REPORT_RETURN
 
             result = checkURLVoid(host)
+=======
+            def checkURLVoid():
+                quote_page = "http://www.urlvoid.com/scan/" + domain + "/"
+                page = urllib.request.urlopen(quote_page)
+                soup = BeautifulSoup(page, "html.parser")
+                span_tag = soup.find_all('span')
+                dataList = []
+                for i in range(23, 99):
+                    if (i % 2 == 0):
+                        dataList.append(span_tag[i].text)
+                for data in dataList:
+                    if (data != " Nothing Found"):
+                        return 'block'
+                return 'pass'
+            result = checkURLVoid()
+>>>>>>> e807c1d72d2ea97cc82ddf96c46e61796c9a4225
             mode = mode + ' -> CheckURLVoid:' + result
             newData = {}
             newData['EDITTIME'] = now
@@ -179,7 +206,11 @@ class ProxyRun:
             self.data[domain] = newData
             
         if mode == 'CheckData:notFound -> CheckURLVoid:block':
+<<<<<<< HEAD
             response = http.HTTPResponse.make(200,'',{"proxy-message": "block"})
+=======
+            response = http.HTTPResponse.make(200,'',{"Proxy-Message": "Block"})
+>>>>>>> e807c1d72d2ea97cc82ddf96c46e61796c9a4225
         
         if mode and mode!='Pass' and mode!='CheckData:pass':
             f = open('request.txt','a')
