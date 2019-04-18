@@ -1,41 +1,15 @@
-Thu Apr 11 17:10:56 2019    google.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:10:59 2019    gstatic.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:11:01 2019    googleusercontent.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:11:39 2019    gamer.com.tw -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:11:42 2019    bahamut.com.tw -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:11:44 2019    googletagmanager.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:11:46 2019    google-analytics.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:11:48 2019    ytimg.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:11:51 2019    g.doubleclick.net -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:11:53 2019    jtvnw.net -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:11:55 2019    googleapis.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:11:57 2019    google.com.tw -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:12:44 2019    twitch.tv -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:12:47 2019    twitchcdn.net -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:12:49 2019    sjc02.hls.ttvnw.net -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:12:51 2019    amazon-adsystem.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:12:57 2019    imrworldwide.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:12:59 2019    scorecardresearch.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:13:02 2019    ttvnw.net -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:13:04 2019    2mdn.net -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:13:07 2019    facebook.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:13:08 2019    hkg01.hls.ttvnw.net -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:13:11 2019    hkg01.abs.hls.ttvnw.net -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:13:22 2019    hkg01.abs.hls.ttvnw.net -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:13:24 2019    hkg01.hls.ttvnw.net -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:13:26 2019    scorecardresearch.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:13:28 2019    sjc02.hls.ttvnw.net -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:13:33 2019    twitch.tv -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:13:36 2019    media-amazon.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:13:51 2019    amazon-adsystem.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:13:54 2019    googlesyndication.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:14:02 2019    twitchsvc.net -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:14:06 2019    imrworldwide.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:14:40 2019    youtube.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:14:44 2019    ggpht.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:15:13 2019    googlevideo.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:15:16 2019    doubleclick.net -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:16:08 2019    adsafeprotected.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:16:11 2019    quora.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:16:17 2019    clients6.google.com -> CheckData:notFound -> CheckURLVoid:pass
-Thu Apr 11 17:16:19 2019    client-channel.google.com -> CheckData:notFound -> CheckURLVoid:pass
+Thu Apr 18 13:09:48 2019    168.1.106 -> CheckData:block
+Thu Apr 18 13:10:28 2019    168.1.106 -> CheckData:block
+Thu Apr 18 13:10:47 2019    168.1.106 -> CheckData:block
+Thu Apr 18 13:10:47 2019    168.1.106 -> CheckData:block
+Thu Apr 18 13:11:16 2019    googlesyndication.com -> CheckData:notFound -> CheckURLVoid:pass
+Thu Apr 18 13:11:57 2019    168.1.106 -> CheckData:block
+Thu Apr 18 13:11:57 2019    168.1.106 -> CheckData:block
+Thu Apr 18 13:13:41 2019    168.1.106 -> CheckData:block
+Thu Apr 18 13:13:48 2019    168.1.106 -> Block
+Thu Apr 18 13:13:50 2019    168.1.106 -> Block
+Thu Apr 18 13:13:50 2019    168.1.106 -> Block
+Thu Apr 18 13:18:13 2019    168.1.106 -> Block
+Thu Apr 18 13:19:22 2019    168.1.106 -> Block
+Thu Apr 18 13:19:30 2019    168.1.106 -> Block
+Thu Apr 18 13:20:05 2019    168.1.106 -> CheckData:block

@@ -135,7 +135,7 @@ class ProxyRun:
         now = int(time.time())
 
         if mode == 'Block':
-            response = http.HTTPResponse.make(200)
+            flow.response = http.HTTPResponse.make(200)
 
         if mode == 'Default':
             if self.data.get(host):
@@ -147,7 +147,7 @@ class ProxyRun:
                 mode = 'CheckData:notFound'
 
         if mode == 'CheckData:block':
-            response = http.HTTPResponse.make(200,"",{"proxy-message": "block"})
+            flow.response = http.HTTPResponse.make(200,"",{"proxy-message": "block"})
             self.data[host]['TRIGGERTIME'] = now
 
         if mode == 'CheckData:pass':
@@ -179,7 +179,7 @@ class ProxyRun:
             self.data[domain] = newData
             
         if mode == 'CheckData:notFound -> CheckURLVoid:block':
-            response = http.HTTPResponse.make(200,'',{"proxy-message": "block"})
+            flow.response = http.HTTPResponse.make(200,'',{"proxy-message": "block"})
         
         if mode and mode!='Pass' and mode!='CheckData:pass':
             f = open('request.txt','a')
@@ -188,13 +188,11 @@ class ProxyRun:
             f.close()
 
         if flow.request.headers.get('strict-cookie')=='on':
-            (host_r,domain_r) = getHostDomain(flow.request.headers.get('referer'))
-            if domain != domain_r:
-                flow.request.cookies = ""
-                f = open('request.txt','a')
-                t = time.asctime(time.localtime(time.time()))
-                print(t+'    '+domain+' -> '+'StrictCookie On',file=f)
-                f.close()
+            flow.request.cookies = ""
+            f = open('request.txt','a')
+            t = time.asctime(time.localtime(time.time()))
+            print(t+'    '+domain+' -> '+'StrictCookie On',file=f)
+            f.close()
 
 addons = [
     ProxyRun()
