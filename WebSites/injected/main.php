@@ -1,4 +1,6 @@
 <?php
+    $SQliteDB = 'sqlite:/root/ResearchProject/SQLiteDB/injected.sqlite';
+
     //receive request
     if(isset($_GET["type"]))        $type = $_GET["type"];
     elseif(isset($_POST["type"]))   $type = $_POST["type"];
@@ -10,7 +12,7 @@
     if(isset($_COOKIE["password"])) $c_password = $_COOKIE["password"];
 
     //connect to server
-    $SQliteDB = 'sqlite:C:\SQLiteDB\injected.sqlite';
+    
     $db_conn = new PDO($SQliteDB);     
 
     //login

@@ -1,6 +1,6 @@
 <?php
 
-    $SQliteDB = 'sqlite:C:\SQLiteDB\injected.sqlite';
+    $SQliteDB = 'sqlite:/root/ResearchProject/SQLiteDB/injected.sqlite';
     
     $pdo = new PDO($SQliteDB);
 
@@ -38,7 +38,7 @@
         <div class = "row flex3 skyblue">
             <div class = "backdark item"></div>
             <div class = "column skyblue">
-                <div class = "blue item"> 「防禦XSS與CSRF的擴充功能」測試網站 </div>
+                <div class = "blue item"> 「網頁跨站防禦系統」測試網站 </div>
                 <div class = "row flex15">
                     <div class = "blue item">帳號</div>
                     <div class = "flex3 item">
