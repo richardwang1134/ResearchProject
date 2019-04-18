@@ -11850,3 +11850,60 @@ client-channel.google.com
 - - - - - - - - - - - - - - - - - -
 
 
+Thu Apr 18 12:35:15 2019
+- - - - - - - - - - - - - - - - - -
+
+www.google.com
+         EDITTIME     1553705645
+         TRIGGERTIME  0
+         TAG          static
+         SECURITY     pass
+google.com.tw
+         EDITTIME     1554779569
+         TRIGGERTIME  1554779574
+         TAG          static
+         SECURITY     pass
+google.com
+         EDITTIME     1554779488
+         TRIGGERTIME  1554779488
+         TAG          static
+         SECURITY     pass
+www.ncyu.edu.tw
+         EDITTIME     1553705645
+         TRIGGERTIME  0
+         TAG          dynamic
+         SECURITY     pass
+www.facebook.com
+         EDITTIME     1553705645
+         TRIGGERTIME  0
+         TAG          dynamic
+         SECURITY     pass
+g.doubleclick.net
+         EDITTIME     1554779571
+         TRIGGERTIME  1554779931
+         TAG          dynamic
+         SECURITY     pass
+googleusercontent.com
+         EDITTIME     1554779924
+         TRIGGERTIME  1555561233
+         TAG          dynamic
+         SECURITY     pass
+gstatic.com
+         EDITTIME     1554779927
+         TRIGGERTIME  1555561657
+         TAG          dynamic
+         SECURITY     pass
+clients6.google.com
+         EDITTIME     1554780099
+         TRIGGERTIME  1555561260
+         TAG          dynamic
+         SECURITY     pass
+client-channel.google.com
+         EDITTIME     1554780105
+         TRIGGERTIME  1555561682
+         TAG          dynamic
+         SECURITY     pass
+
+- - - - - - - - - - - - - - - - - -
+
+
