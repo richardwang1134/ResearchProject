@@ -39,16 +39,16 @@
         <div class = "row">
             <div class = "item backdark"></div>
             <div class = "column">
-                <div class = "item blue">留言輸入區</div>
+                <div class = "item blue">Message Board</div>
                 <div class = "item skyblue">
                     <input type="textarea" class="inputArea" id="message">
                 </div>
                 <div class = "row">
-                    <div class = "item dark" onclick="addMsg()">更新留言</div>
-                    <div class = "item dark" onclick="goChangePass()">更改密碼</div>
-                    <div class = "item dark" onclick="logout()">登出</div>
+                    <div class = "item dark" onclick="addMsg()">update message</div>
+                    <div class = "item dark" onclick="goChangePass()">update password</div>
+                    <div class = "item dark" onclick="logout()">logout</div>
                 </div>
-                <div class = "item blue">留言顯示區</div>
+                <div class = "item blue">messages</div>
                 <div class = "column skyblue flex7">
                     <div class = "scroll">
 

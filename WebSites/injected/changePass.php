@@ -35,17 +35,17 @@
         <div class = "row flex3">
             <div class = "item backdark"></div>
             <div class = "column skyblue">
-                <div class = "item blue">更改密碼</div>
+                <div class = "item blue">update password</div>
                 <div class = "row flex3">
-                    <div class = "item blue">新密碼</div>
+                    <div class = "item blue">new password</div>
                     <div class = "item flex3">
                         <input type="textarea" class="inputArea" id="newPass">
                     </div>
                 </div>
                 <div class = "item blue" id="message">&nbsp;</div>
                 <div class = "row">
-                    <div class = "item dark" onclick ="changePass()">確認更改</div>
-                    <div class = "item dark" onclick ="goBack()">重新登入</div>
+                    <div class = "item dark" onclick ="changePass()">confirm</div>
+                    <div class = "item dark" onclick ="goBack()">logout</div>
                 </div>
             </div>
             <div class = "item backdark"></div>

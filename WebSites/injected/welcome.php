@@ -38,23 +38,23 @@
         <div class = "row flex3 skyblue">
             <div class = "backdark item"></div>
             <div class = "column skyblue">
-                <div class = "blue item"> 「防禦XSS與CSRF的擴充功能」測試網站 </div>
+                <div class = "blue item">Cooperative Two-layer Web Security Filtering System - Test Website </div>
                 <div class = "row flex15">
-                    <div class = "blue item">帳號</div>
+                    <div class = "blue item">username</div>
                     <div class = "flex3 item">
                         <input type="textarea" class="inputArea" id="username">
                     </div>
                 </div>
                 <div class = "row flex15">
-                    <div class = "blue item">密碼</div>
+                    <div class = "blue item">password</div>
                     <div class = "flex3 item">
                         <input type="textarea" class="inputArea" id="password">
                     </div>
                 </div>
                 <div class = "blue item"  id="message"></div>
                 <div class = "row">
-                    <div class = "dark item" onclick="login()">登入</div>
-                    <div class = "dark item" onclick="register()">註冊</div>
+                    <div class = "dark item" onclick="login()">login</div>
+                    <div class = "dark item" onclick="register()">register</div>
                 </div>
                 
             </div>
