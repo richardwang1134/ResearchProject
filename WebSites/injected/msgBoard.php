@@ -1,6 +1,6 @@
 <?php
 
-    $SQliteDB = 'sqlite:/root/ResearchProject/SQLiteDB/injected.sqlite';
+    $SQliteDB = 'sqlite:C:\SQLiteDB\injected.sqlite';
     $pdo = new PDO($SQliteDB);
 
     //get cookie
