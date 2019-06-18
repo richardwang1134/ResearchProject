@@ -1,6 +1,6 @@
 <?php
 
-    $SQliteDB = 'sqlite:C:\SQLiteDB\injected.sqlite';
+    $SQliteDB = 'sqlite:/root/ResearchProject/SQLiteDB/injected.sqlite';
     
     $pdo = new PDO($SQliteDB);
 
@@ -38,7 +38,11 @@
         <div class = "row flex3 skyblue">
             <div class = "backdark item"></div>
             <div class = "column skyblue">
+<<<<<<< HEAD
                 <div class = "blue item">Cooperative Two-layer Web Security Filtering System - Test Website </div>
+=======
+                <div class = "blue item"> 「網頁跨站防禦系統」測試網站 </div>
+>>>>>>> 1eb0d50fc31e19e26b7fd5ee6ba15d1924f03fc0
                 <div class = "row flex15">
                     <div class = "blue item">username</div>
                     <div class = "flex3 item">
